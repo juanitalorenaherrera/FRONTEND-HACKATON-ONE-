@@ -1,3 +1,17 @@
+# About
+
++ El proyecto está en vite
++ Estamos usando React + Typescript
++ Usaremos estructura de carpetas por tipo (es lo maás típico en un proyecto pequeño
++ Para el **css** usaremos Tailwind css para mejorar la velocidad y la productividad
++ Como gestor de paquetes esta usando pnpm que es mas rápido.
+> [!Note]
+> para instalar dependencias usen solo usen pnpm i [dependencia]
+
+
+
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
