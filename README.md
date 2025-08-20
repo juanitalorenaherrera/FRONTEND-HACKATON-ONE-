@@ -2,9 +2,11 @@
 
 + El proyecto está en vite
 + Estamos usando React + Typescript
-+ Usaremos estructura de carpetas por tipo (es lo maás típico en un proyecto pequeño
++ Usaremos estructura de carpetas por tipo (es lo maás típico en un proyecto pequeño)
 + Para el **css** usaremos Tailwind css para mejorar la velocidad y la productividad
 + Como gestor de paquetes esta usando pnpm que es mas rápido.
++ Para el manejo de estados sugiero zustand
+
 > [!Note]
 > para instalar dependencias usen solo usen pnpm i [dependencia]
 
