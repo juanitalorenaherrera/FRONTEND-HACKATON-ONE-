@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import { getSitterProfile } from "../services/sitterService";
 import type { Sitter, Service } from "../services/sitterService";
