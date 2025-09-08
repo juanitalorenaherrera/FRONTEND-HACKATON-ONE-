@@ -1,28 +1,33 @@
-import { BrowserRouter, Routes, Route } from 'react-router';
-import { AuthProvider } from './componentes/providers/AuthProvider';
+import { BrowserRouter, Route, Routes } from 'react-router';
 
-// Componentes estructurales
-import RoleProtectedRoute from './componentes/auth/RoleProtectedRoute';
-
-// Páginas
-import Home from './pages/home';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/Register';
-import BookingPage from './pages/BookingPage';
-import OwnerDashboard from './pages/OwnerDashboard';
-import SitterDashboard from './pages/SitterDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import { AuthProvider } from './components/providers/AuthProvider';
+import BookingPage from './pages/BookingPage';
+import { ClientDashboard } from './pages/ClientDashboard';
+import Home from './pages/home';
+import { LoginPage } from './pages/LoginPage';
+import OwnerBooking from './pages/OwnerBooking';
+import OwnerDashboard from './pages/OwnerDashboard';
+import RegisterPage from './pages/Register';
+import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
+import SitterDashboard from './pages/SitterDashboard';
 
 export default function App() {
 	return (
-		<AuthProvider>
-			<BrowserRouter>
+		<BrowserRouter>
+			<AuthProvider>
 				<main className="py-8 px-4">
 					<Routes>
 						{/* --- Rutas Públicas (accesibles para todos) --- */}
 						<Route path="/" element={<Home />} />
 						<Route path="/login" element={<LoginPage />} />
 						<Route path="/register" element={<RegisterPage />} />
+						<Route path="/OwnerDashboard" element={<OwnerDashboard />} />
+						<Route path="/SitterDashboard" element={<SitterDashboard />} />
+						<Route path="/AdminDashboard" element={<AdminDashboard />} />
+						<Route path="/OwnerBooking" element={<OwnerBooking />} />
+						<Route path="/ClientDashboard" element={<ClientDashboard />} />
+
 
 						{/* --- Rutas Protegidas (requieren iniciar sesión) --- */}
 
@@ -77,7 +82,7 @@ export default function App() {
 						</Route>
 					</Routes>
 				</main>
-			</BrowserRouter>
-		</AuthProvider>
+			</AuthProvider>
+		</BrowserRouter>
 	);
 }

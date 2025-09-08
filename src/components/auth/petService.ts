@@ -1,5 +1,6 @@
 import axios from 'axios';
-const API_URL = 'http://localhost:8080/pets';
+
+const API_URL = 'http://localhost:8088/api/pets';
 
 interface PetData {
 	name: string;
