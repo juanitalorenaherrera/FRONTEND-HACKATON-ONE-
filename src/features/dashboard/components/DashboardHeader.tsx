@@ -1,6 +1,6 @@
 import { Bell, ChevronDown, LogOut, Menu, PawPrint, Search, Settings, User } from 'lucide-react';
 
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 import { useState } from 'react';
 
 interface DashboardHeaderProps {
@@ -69,7 +69,7 @@ export function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) {
                                     getRoleDisplayName(user?.role)
                                 )}
                             </h1>
-                            <p className="text-sm text-gray-600">
+                            <div className="text-sm text-gray-600">
                                 {isLoading ? (
                                     <div className="h-4 w-48 bg-gray-200 rounded animate-pulse mt-1"></div>
                                 ) : user ? (
@@ -77,7 +77,7 @@ export function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) {
                                 ) : (
                                     'Bienvenido al sistema'
                                 )}
-                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import type { Service, Sitter } from "../services/sitterService";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+
 import type { FormEvent } from "react";
-import { useParams, useNavigate } from "react-router";
-import { useAuth } from "../hooks/useAuth";
-import { getSitterProfile } from "../services/sitterService";
-import type { Sitter, Service } from "../services/sitterService";
 import { createBooking } from "../services/bookingService";
+import { getSitterProfile } from "../services/sitterService";
+import { useAuth } from "../hooks/useAuth";
 
 export default function BookingPage() {
     const { sitterId } = useParams<{ sitterId: string }>();

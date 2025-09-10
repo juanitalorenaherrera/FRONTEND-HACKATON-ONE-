@@ -1,11 +1,17 @@
-import { useState, useEffect } from "react";
-import type { FormEvent } from "react";
-import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-// Corregido: Importar los nombres de función correctos
+
 import { addMyService, getMyServices } from "../services/sitterService";
+import { useEffect, useState } from "react";
+
+import Calendar from "react-calendar";
+import type { FormEvent } from "react";
 import type { Service } from "../services/sitterService";
 import { useAuth } from "../hooks/useAuth";
+
+// Corregido: Importar los nombres de función correctos
+
+
+
 
 export default function SitterDashboard() {
   const { user } = useAuth();

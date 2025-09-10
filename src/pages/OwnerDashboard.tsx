@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+/* import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { addPet, getPets } from "../services/petService";
+import { createPet, getPets } from "../services/petService";
 
 interface Pet {
   id: string | number;
@@ -49,7 +49,7 @@ export default function OwnerDashboard() {
       return;
     }
     try {
-      const newPet = await addPet(user.token, { name: petName, type: petType });
+      const newPet = await createPet(user.token, { name: petName, type: petType });
       setPets(currentPets => [...currentPets, newPet]);
       setPetName("");
       setPetType("");
@@ -69,7 +69,7 @@ export default function OwnerDashboard() {
     <div className="p-8 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold mb-6">Panel de Dueño 🐾</h1>
       
-      {/* Sección para añadir mascotas */}
+      {/* Sección para añadir mascotas }/*
       <div className="p-6 bg-white rounded-xl shadow mb-8">
         <h2 className="text-xl font-semibold mb-4">Registrar una nueva mascota</h2>
         <form onSubmit={handleAddPet} className="flex flex-col sm:flex-row gap-4">
@@ -93,7 +93,7 @@ export default function OwnerDashboard() {
         </form>
       </div>
 
-      {/* Sección para listar mascotas */}
+      {/* Sección para listar mascotas }/*
       <div className="p-6 bg-white rounded-xl shadow">
         <h2 className="text-xl font-semibold mb-4">Tus Mascotas</h2>
         {pets.length > 0 ? (
@@ -110,4 +110,4 @@ export default function OwnerDashboard() {
       </div>
     </div>
   );
-}
+} */

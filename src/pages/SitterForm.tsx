@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+
 import type { FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router';
-import { useAuth } from '../hooks/useAuth';
 import { register as registerService } from '../services/authService';
+import { useAuth } from '../hooks/useAuth';
+import { useState } from 'react';
 
 export default function RegisterPage() {
 	// --- Hooks ---

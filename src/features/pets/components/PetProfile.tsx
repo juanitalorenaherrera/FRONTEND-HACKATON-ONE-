@@ -1,6 +1,6 @@
 import { Activity, AlertTriangle, ArrowLeft, Calendar, Camera, Clock, Edit, Heart, MapPin, Phone, Trash2 } from 'lucide-react'
 
-import { ImageWithFallback } from '../components/ui/ImageWithFallback'
+import ImageWithFallback from '../../../components/ui/ImageWithFallback'
 import { useState } from 'react'
 
 interface PetProfileProps {

@@ -3,8 +3,8 @@
 import { Activity, AlertCircle, Calendar, CheckCircle, Heart, Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import type { DashboardStatsData } from '../../types/DashboardStatsData';
-import { getDashboardStats } from '../../services/dashboardService';
+import type { DashboardStatsData } from '../../../types/DashboardStatsData';
+import { getDashboardStats } from '../../../services/dashboardService';
 
 /*************  ✨ Windsurf Command ⭐  *************/
 /**
@@ -248,18 +248,20 @@ import { getDashboardStats } from '../../services/dashboardService';
                 );
             })}
 
-            <style jsx>{`
-                @keyframes slideInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(30px);
+            <style type="text/css">
+                {`
+                    @keyframes slideInUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(30px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
                     }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-            `}</style>
+                `}
+            </style>
         </div>
     );
 }

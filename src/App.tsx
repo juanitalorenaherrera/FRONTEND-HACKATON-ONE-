@@ -7,10 +7,14 @@ import { ClientDashboard } from './pages/ClientDashboard';
 import Home from './pages/home';
 import { LoginPage } from './pages/LoginPage';
 import OwnerBooking from './pages/OwnerBooking';
-import OwnerDashboard from './pages/OwnerDashboard';
 import RegisterPage from './pages/Register';
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
 import SitterDashboard from './pages/SitterDashboard';
+
+// import OwnerDashboard from './pages/OwnerDashboard';
+
+
+
 
 export default function App() {
 	return (
@@ -22,7 +26,7 @@ export default function App() {
 						<Route path="/" element={<Home />} />
 						<Route path="/login" element={<LoginPage />} />
 						<Route path="/register" element={<RegisterPage />} />
-						<Route path="/OwnerDashboard" element={<OwnerDashboard />} />
+						{/* <Route path="/OwnerDashboard" element={<OwnerDashboard />} /> */}
 						<Route path="/SitterDashboard" element={<SitterDashboard />} />
 						<Route path="/AdminDashboard" element={<AdminDashboard />} />
 						<Route path="/OwnerBooking" element={<OwnerBooking />} />
@@ -46,7 +50,7 @@ export default function App() {
 						</Route>
 
 						{/* Rutas solo para el rol 'owner' */}
-						<Route
+						{/* <Route
 							element={
 								<RoleProtectedRoute allowedRoles={['owner']} />
 							}
@@ -55,7 +59,7 @@ export default function App() {
 								path="/owner/dashboard"
 								element={<OwnerDashboard />}
 							/>
-						</Route>
+						</Route> */}
 
 						{/* Rutas solo para el rol 'sitter' */}
 						<Route
