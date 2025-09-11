@@ -1,10 +1,11 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { login as apiLogin, logout as apiLogout, getProfile } from '../../services/authService';
 
 import { AuthContext } from '../../context/AuthContext';
 import type { AuthContextType } from '../../context/AuthContext';
 import type { User } from '../../types/user';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 // Exporta únicamente el componente, cumpliendo la regla de Fast Refresh.
 export function AuthProvider({ children }: { children: ReactNode }) {
