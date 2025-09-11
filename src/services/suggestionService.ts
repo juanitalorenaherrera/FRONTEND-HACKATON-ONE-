@@ -1,4 +1,4 @@
-import { Search, MapPin, User, Tag } from 'lucide-react';
+import { MapPin, User, Tag } from 'lucide-react';
 import type { SearchSuggestion } from '../features/sitters/components/SitterSearchBar'; // El tipo vivirá junto al componente
 
 // En una aplicación real, esta función haría una llamada a un endpoint como `/api/search/suggestions?q=...`
