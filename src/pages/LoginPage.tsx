@@ -4,7 +4,7 @@ import { ArrowRight, Eye, EyeOff, Lock, Mail, PawPrint } from 'lucide-react';
 
 import type { FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useState } from "react";
 
 export function LoginPage() {
