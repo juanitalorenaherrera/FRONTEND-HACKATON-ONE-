@@ -95,6 +95,8 @@ export function useBookingActions() {
         }
     }, [dispatch]);
 
+
+    
     const setPage = useCallback((page: number) => {
         dispatch({ type: 'SET_PAGE', payload: page });
     }, [dispatch]);
