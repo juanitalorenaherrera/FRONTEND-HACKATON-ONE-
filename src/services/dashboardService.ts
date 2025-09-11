@@ -1,24 +1,10 @@
-// src/services/dashboardService.tsx
-
+// src/services/dashboardService.ts
 import type { DashboardData, Pet } from '../types/dashboardData';
-
 import type { DashboardStatsData } from '../types/DashboardStatsData';
-import type { PetSummaryResponse } from './petService';
-import axios from 'axios';
+import type { PetSummaryResponse } from '../types/pets';
+import axios from './auth';
 
-const API_URL = 'http://localhost:8088/api/dashboard';
-
-// Función helper para obtener el token
-const getAuthToken = (): string => {
-    const token = localStorage.getItem('authToken');
-    if (!token) throw new Error('No auth token found');
-    return token;
-};
-
-// Función helper para configurar headers
-const getAuthHeaders = () => ({
-    headers: { Authorization: `Bearer ${getAuthToken()}` }
-});
+const API_URL = '/api/dashboard';
 
 /**
  * Obtiene las estadísticas del dashboard
@@ -26,7 +12,7 @@ const getAuthHeaders = () => ({
  */
 export const getDashboardStats = async (): Promise<DashboardStatsData> => {
     try {
-        const response = await axios.get(`${API_URL}/stats`, getAuthHeaders());
+        const response = await axios.get(`${API_URL}/stats`);
         return response.data;
     } catch (error) {
         console.error('Error fetching dashboard stats:', error);
@@ -42,7 +28,7 @@ export const getDashboardData = async (): Promise<DashboardData> => {
     try {
         // Llamar a múltiples endpoints en paralelo
         const [dashboardResponse, userPets] = await Promise.all([
-            axios.get(`${API_URL}/main`, getAuthHeaders()),
+            axios.get(`${API_URL}/main`),
             getUserPetsForDashboard()
         ]);
 
@@ -64,7 +50,7 @@ export const getDashboardData = async (): Promise<DashboardData> => {
  */
 export const getNextAppointment = async () => {
     try {
-        const response = await axios.get(`${API_URL}/next-appointment`, getAuthHeaders());
+        const response = await axios.get(`${API_URL}/next-appointment`);
         return response.data;
     } catch (error) {
         console.error('Error fetching next appointment:', error);
@@ -106,7 +92,7 @@ export const getUserPetsForDashboard = async (): Promise<Pet[]> => {
  */
 export const getRecentSitters = async () => {
     try {
-        const response = await axios.get(`${API_URL}/recent-sitters`, getAuthHeaders());
+        const response = await axios.get(`${API_URL}/recent-sitters`);
         return response.data;
     } catch (error) {
         console.error('Error fetching recent sitters:', error);
@@ -120,7 +106,7 @@ export const getRecentSitters = async () => {
  */
 async function getPetsSummary(): Promise<PetSummaryResponse[]> {
     try {
-        const response = await axios.get('http://localhost:8088/api/pets/summary', getAuthHeaders());
+        const response = await axios.get('/api/pets/summary');
         return response.data;
     } catch (error) {
         console.error('Error fetching pets summary:', error);
