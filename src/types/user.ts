@@ -9,4 +9,5 @@ export interface User {
   email: string;
   role: 'owner' | 'sitter' | 'admin';
   token: string;
+  accountId: number;
 }

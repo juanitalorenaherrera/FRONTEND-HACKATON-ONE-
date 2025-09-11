@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router";
 import type { FormEvent } from "react";
 import { createBooking } from "../services/bookingService";
 import { getSitterProfile } from "../services/sitterService";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 
 export default function BookingPage() {
     const { sitterId } = useParams<{ sitterId: string }>();

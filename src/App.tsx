@@ -1,12 +1,19 @@
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, Route, Routes, useParams } from 'react-router';
 
 import AdminDashboard from './pages/AdminDashboard';
-import { AuthProvider } from './components/providers/AuthProvider';
+import { AuthProvider } from './context/AuthContext';
 import BookingPage from './pages/BookingPage';
+import { BookingsView } from './features/booking/views/BookingView';
 import { ClientDashboard } from './pages/ClientDashboard';
+import { DashboardLayout } from './layouts/DashboardLayout';
+import { FindSittersView } from './features/sitters/components/FindSittersView';
 import Home from './pages/home';
 import { LoginPage } from './pages/LoginPage';
+import MainDashboardView from './features/dashboard/MainDashboardView';
 import OwnerBooking from './pages/OwnerBooking';
+import { PetProfile } from './features/pets/components/PetProfile';
+import { PetsOverview } from './features/pets/components/PetsOverview';
+import { PetsView } from './features/pets/view/PetsView';
 import RegisterPage from './pages/Register';
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
 import SitterDashboard from './pages/SitterDashboard';
@@ -31,6 +38,20 @@ export default function App() {
 						<Route path="/AdminDashboard" element={<AdminDashboard />} />
 						<Route path="/OwnerBooking" element={<OwnerBooking />} />
 						<Route path="/ClientDashboard" element={<ClientDashboard />} />
+						<Route path="/dashboard" element={<DashboardLayout />}>
+
+						{/* Rutas hijas que se renderizarán dentro del <Outlet> */}
+						<Route index element={<MainDashboardView />} />
+						<Route path="pets" element={<PetsView />}>
+                            <Route index element={<PetsOverview />} />
+                            <Route path=":petId" element={<PetProfile />} />
+                        </Route>
+						<Route path="pets/:petId" element={<PetProfile id={useParams().petId} onBack={() => console.log('Go back')} />
+} />
+						<Route path="find-sitters" element={<FindSittersView />} />
+						<Route path="bookings" element={<BookingsView />} />
+						{/* <Route path="favorites" element={<FavoritesView />} /> ... y así sucesivamente */}
+						</Route>
 
 
 						{/* --- Rutas Protegidas (requieren iniciar sesión) --- */}

@@ -1,101 +1,101 @@
-// src/components/clientDashboard/ClientSidebar.tsx
+// src/features/dashboard/components/DashboardSidebar.tsx
 
-import { Bell, Calendar, CreditCard, Heart, Home, PawPrint, Settings, User, Users } from 'lucide-react'
+import { Bell, Calendar, CreditCard, Heart, Home, PawPrint, Settings, User, Users } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
+import React from 'react';
+import { useAuth } from '../../../context/AuthContext';
+import { usePetsContext } from '../../pets/hooks/usePetsContext'; // Importamos el contexto de mascotas
+
+// 1. La configuración de navegación ahora incluye las rutas correctas del router.
+const NAV_ITEMS = [
+    { id: 'dashboard', icon: Home, label: 'Dashboard', path: '/dashboard' },
+    { id: 'pets', icon: PawPrint, label: 'Mis Mascotas', path: '/dashboard/pets' },
+    { id: 'findSitters', icon: Users, label: 'Buscar Cuidadores', path: '/dashboard/find-sitters' },
+    { id: 'appointments', icon: Calendar, label: 'Mis Citas', path: '/dashboard/bookings' }, // Ruta corregida
+    { id: 'favorites', icon: Heart, label: 'Favoritos', path: '/dashboard/favorites' },
+    { id: 'notifications', icon: Bell, label: 'Notificaciones', path: '/dashboard/notifications' },
+    { id: 'billing', icon: CreditCard, label: 'Facturación', path: '/dashboard/billing' },
+    { id: 'profile', icon: User, label: 'Perfil', path: '/dashboard/profile' },
+    { id: 'settings', icon: Settings, label: 'Configuración', path: '/dashboard/settings' },
+];
+
+// 2. Las props ya no incluyen `onItemSelect`.
 interface ClientSidebarProps {
-    activeItem: string
-    onItemSelect: (item: string) => void
+    activeItem: string;
 }
 
-export function ClientSidebar({ activeItem, onItemSelect }: ClientSidebarProps) {
-    const menuItems = [
-        { id: 'dashboard', icon: Home, label: 'Dashboard', badge: null },
-        { id: 'pets', icon: PawPrint, label: 'Mis Mascotas', badge: null },
-        { id: 'findSitters', icon: Users, label: 'Buscar Cuidadores', badge: null },
-        { id: 'appointments', icon: Calendar, label: 'Reservas', badge: '2' },
-        { id: 'favorites', icon: Heart, label: 'Favoritos', badge: null },
-        { id: 'notifications', icon: Bell, label: 'Notificaciones', badge: '3' },
-        { id: 'billing', icon: CreditCard, label: 'Facturación', badge: null },
-        { id: 'profile', icon: User, label: 'Perfil', badge: null },
-        { id: 'settings', icon: Settings, label: 'Configuración', badge: null },
-    ]
+export function ClientSidebar({ activeItem }: ClientSidebarProps) {
+    // 3. Consumimos los contextos para obtener datos dinámicos.
+    const { user } = useAuth();
+    const { state: petsState } = usePetsContext();
 
     return (
-        <div className="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
-            {/* Logo y título */}
+        <aside className="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
+            {/* Logo y título (sin cambios) */}
             <div className="p-6 border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <PawPrint className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900">PetCare</h2>
-                        <p className="text-sm text-gray-500">Tu compañero de confianza</p>
-                    </div>
-                </div>
+                {/* ... */}
             </div>
 
-            {/* Navigation Menu */}
+            {/* Menú de Navegación (ahora usa <Link>) */}
             <nav className="flex-1 p-4">
                 <div className="space-y-1">
-                    {menuItems.map((item) => {
-                        const Icon = item.icon
-                        const isActive = activeItem === item.id
+                    {NAV_ITEMS.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = activeItem === item.id;
                         
                         return (
-                            <button
+                            // 4. Reemplazamos <button> por <Link> para la navegación.
+                            <Link
                                 key={item.id}
-                                onClick={() => onItemSelect(item.id)}
-                                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 group ${
+                                to={item.path}
+                                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors group ${
                                     isActive 
-                                        ? 'bg-gradient-to-r from-orange-50 to-orange-100 text-orange-700 border border-orange-200 shadow-sm' 
+                                        ? 'bg-orange-50 text-orange-700 font-bold' 
                                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                 }`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <Icon className={`w-5 h-5 transition-colors ${
-                                        isActive ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600'
-                                    }`} />
-                                    <span className="font-medium">{item.label}</span>
+                                    <Icon className={`w-5 h-5 ${isActive ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                                    <span>{item.label}</span>
                                 </div>
                                 
-                                {/* Badge de notificaciones */}
-                                {item.badge && (
-                                    <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full min-w-[20px]">
-                                        {item.badge}
-                                    </span>
-                                )}
-                            </button>
-                        )
+                                {/* Aquí podrías poner lógica de notificaciones real */}
+                            </Link>
+                        );
                     })}
                 </div>
             </nav>
 
-            {/* User Profile Footer */}
-            <div className="p-4 border-t border-gray-100">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-all cursor-pointer">
-                    <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center shadow-md">
-                        <User className="w-5 h-5 text-white" />
+            {/* Pie de Página con Perfil de Usuario (ahora dinámico) */}
+            <div className="p-4 border-t border-gray-100 mt-auto">
+                {user && (
+                    <div className="p-3 rounded-lg bg-gray-50">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center shadow-md">
+                                <span className="text-white font-bold">{user.firstName?.charAt(0)}</span>
+                            </div>
+                            <div className="flex-1">
+                                <p className="font-semibold text-gray-900 text-sm">{`${user.firstName} ${user.lastName}`}</p>
+                                <p className="text-xs text-gray-500 capitalize">{user.role?.toLowerCase()}</p>
+                            </div>
+                            <div className="w-2 h-2 bg-green-500 rounded-full" title="Online"></div>
+                        </div>
+                        
+                        <div className="mt-3 grid grid-cols-2 gap-2 text-center">
+                            <div className="bg-orange-100 rounded-lg p-2">
+                                <p className="text-lg font-bold text-orange-600">{petsState.pets.length}</p>
+                                <p className="text-xs text-orange-700">Mascotas</p>
+                            </div>
+                            <div className="bg-green-100 rounded-lg p-2">
+                                {/* Aquí podrías obtener el número de citas de un futuro BookingContext */}
+                                <p className="text-lg font-bold text-green-600">0</p>
+                                <p className="text-xs text-green-700">Citas</p>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex-1">
-                        <p className="font-semibold text-gray-900">María García</p>
-                        <p className="text-sm text-gray-500">Cliente Premium</p>
-                    </div>
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                </div>
-                
-                {/* Quick Stats */}
-                <div className="mt-3 grid grid-cols-2 gap-2 text-center">
-                    <div className="bg-orange-50 rounded-lg p-2">
-                        <p className="text-lg font-bold text-orange-600">3</p>
-                        <p className="text-xs text-orange-700">Mascotas</p>
-                    </div>
-                    <div className="bg-green-50 rounded-lg p-2">
-                        <p className="text-lg font-bold text-green-600">12</p>
-                        <p className="text-xs text-green-700">Servicios</p>
-                    </div>
-                </div>
+                )}
             </div>
-        </div>
-    )
+        </aside>
+    );
 }

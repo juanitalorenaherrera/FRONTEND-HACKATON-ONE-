@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import type { FormEvent } from "react";
 import type { Service } from "../services/sitterService";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 
 // Corregido: Importar los nombres de función correctos
 

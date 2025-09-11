@@ -6,27 +6,7 @@ import { useEffect, useState } from 'react';
 import type { DashboardStatsData } from '../../../types/DashboardStatsData';
 import { getDashboardStats } from '../../../services/dashboardService';
 
-/*************  ✨ Windsurf Command ⭐  *************/
-/**
- * DashboardStats: Componente que muestra estadísticas relevantes en el dashboard de la aplicación.
- * 
- * Muestra cuatro estadísticas:
- * - Mascotas Activas: Número de mascotas que tienen al menos una cita programada.
- * - Citas Programadas: Número de citas programadas.
- * - Vacunas al Día: Número de mascotas con vacunas al día.
- * - Recordatorios: Número de recordatorios pendientes.
- * 
- * Se utiliza el hook `useEffect` para cargar las estadísticas al montar el componente.
- * Si ocurre un error al cargar las estadísticas, se muestra un mensaje de error.
- * Si las estadísticas se cargan correctamente, se renderiza una lista de componentes 
- * que muestan las estadísticas con un diseño personalizado.
- * 
- * Propiedades:
- * - Ninguna
- * 
- * @returns {JSX.Element} El componente DashboardStats.
- */
-/*******  a3c895e5-3eab-488c-926b-959b863b7e9b  *******/export function DashboardStats() {
+export function DashboardStats() {
     const [stats, setStats] = useState<DashboardStatsData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
