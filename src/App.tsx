@@ -1,15 +1,15 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 
 import AdminDashboard from './pages/AdminDashboard';
-import { AuthProvider } from './components/providers/AuthProvider';
-import BookingPage from './pages/BookingPage';
+//import BookingPage from './pages/BookingPage';
 import { ClientDashboard } from './pages/ClientDashboard';
 import Home from './pages/home';
 import { LoginPage } from './pages/LoginPage';
 import OwnerBooking from './pages/OwnerBooking';
 import RegisterPage from './pages/Register';
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
-import SitterDashboard from './pages/SitterDashboard';
+import { Role } from './types/authStore';
+//import SitterDashboard from './pages/SitterDashboard';
 
 // import OwnerDashboard from './pages/OwnerDashboard';
 
@@ -19,7 +19,7 @@ import SitterDashboard from './pages/SitterDashboard';
 export default function App() {
 	return (
 		<BrowserRouter>
-			<AuthProvider>
+			
 				<main className="py-8 px-4">
 					<Routes>
 						{/* --- Rutas Públicas (accesibles para todos) --- */}
@@ -27,7 +27,7 @@ export default function App() {
 						<Route path="/login" element={<LoginPage />} />
 						<Route path="/register" element={<RegisterPage />} />
 						{/* <Route path="/OwnerDashboard" element={<OwnerDashboard />} /> */}
-						<Route path="/SitterDashboard" element={<SitterDashboard />} />
+						{/* <Route path="/SitterDashboard" element={<SitterDashboard />} /> */}
 						<Route path="/AdminDashboard" element={<AdminDashboard />} />
 						<Route path="/OwnerBooking" element={<OwnerBooking />} />
 						<Route path="/ClientDashboard" element={<ClientDashboard />} />
@@ -36,17 +36,17 @@ export default function App() {
 						{/* --- Rutas Protegidas (requieren iniciar sesión) --- */}
 
 						{/* Ruta de reserva accesible para cualquier rol autenticado */}
-						<Route
-							element={
-								<RoleProtectedRoute
-									allowedRoles={['owner', 'sitter', 'admin']}
+					<Route
+						element={
+							<RoleProtectedRoute
+								allowedRoles={[Role.CLIENT, Role.SITTER, Role.ADMIN]}
 								/>
 							}
 						>
-							<Route
+							{/* <Route
 								path="/book/:sitterId"
 								element={<BookingPage />}
-							/>
+							/> */}
 						</Route>
 
 						{/* Rutas solo para el rol 'owner' */}
@@ -64,19 +64,19 @@ export default function App() {
 						{/* Rutas solo para el rol 'sitter' */}
 						<Route
 							element={
-								<RoleProtectedRoute allowedRoles={['sitter']} />
+								<RoleProtectedRoute allowedRoles={[Role.SITTER]} />
 							}
 						>
-							<Route
+							{/* <Route
 								path="/sitter/dashboard"
 								element={<SitterDashboard />}
-							/>
+							/> */}
 						</Route>
 
 						{/* Rutas solo para el rol 'admin' */}
 						<Route
 							element={
-								<RoleProtectedRoute allowedRoles={['admin']} />
+								<RoleProtectedRoute allowedRoles={[Role.ADMIN]} />
 							}
 						>
 							<Route
@@ -86,7 +86,6 @@ export default function App() {
 						</Route>
 					</Routes>
 				</main>
-			</AuthProvider>
 		</BrowserRouter>
 	);
 }
