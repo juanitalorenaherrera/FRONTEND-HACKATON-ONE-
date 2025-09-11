@@ -7,10 +7,13 @@ import type {
 	AuthResponse,
 	CreateSitterProfileRequest,
 	ExtendedSitter,
+	NewService,
 	SitterProfileDTO,
 	SitterProfileSummary,
 	SitterRegisterRequest,
 } from '../types/sitter';
+import type { Service } from '../pages/OwnerBooking';
+import type { ServiceForm } from '../pages/SitterDashboard';
 
 const API_URL = '/api/sitter-profiles';
 const USERS_API_URL = '/api/users';
@@ -299,17 +302,24 @@ export const getSitterStats = async () => {
 	}
 };
 
-export async function getMyServices() {
+export async function getMyServices(id: number): Promise<Service[]> {
 	// Lógica para obtener los servicios del cuidador desde la API
-	console.log('Obteniendo mis servicios...');
-	// Ejemplo: const response = await axios.get('/api/my-services', getAuthHeaders());
-	// return response.data;
+	const response = await axios.get<Service[]>(`/api/services/all/${id}`);
+	return response.data;
 }
 
-export async function addMyService(serviceData: any) {
-	// 'any' debería ser un tipo más específico
+export async function addMyService(
+	serviceType: string,
+	price: number,
+	sitterId: number
+): Promise<Service> {
 	// Lógica para añadir un nuevo servicio a través de la API
-	console.log('Añadiendo nuevo servicio:', serviceData);
-	// Ejemplo: const response = await axios.post('/api/my-services', serviceData, getAuthHeaders());
-	// return response.data;
+	const response = await axios.post<Service>(
+		`/api/services/create/${sitterId}`,
+		{
+			serviceType,
+			price
+		}
+	);
+	return response.data;
 }
