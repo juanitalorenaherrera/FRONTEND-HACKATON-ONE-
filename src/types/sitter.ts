@@ -84,3 +84,13 @@ export interface ExtendedSitter extends SitterProfileSummary {
 	nextAvailable?: string;
 	specialties?: string[];
 }
+
+
+export interface NewService {
+	sitterId: number;
+	serviceType: string;
+	name: 'caminata';
+	description: string;
+	price: number;
+	durationInMinutes: 120;
+}
