@@ -261,7 +261,8 @@ export const hasActiveSitterProfile = async (): Promise<boolean> => {
 
 		const profile = await getSitterProfile(userId);
 		return profile.availableForBookings || false;
-	} catch (_error) {
+	} catch (error) {
+		console.error('Error checking sitter profile:', error);
 		return false; // No tiene perfil o error
 	}
 };
@@ -310,7 +311,10 @@ export async function getMyServices(id: number): Promise<Service[]> {
 
 export async function addMyService(
 	serviceType: string,
+	name: string,
+	description: string,
 	price: number,
+	durationInMinutes: number,
 	sitterId: number
 ): Promise<Service> {
 	// Lógica para añadir un nuevo servicio a través de la API
@@ -318,7 +322,10 @@ export async function addMyService(
 		`/api/services/create/${sitterId}`,
 		{
 			serviceType,
-			price
+			name,
+			description,
+			price,
+			durationInMinutes
 		}
 	);
 	return response.data;
