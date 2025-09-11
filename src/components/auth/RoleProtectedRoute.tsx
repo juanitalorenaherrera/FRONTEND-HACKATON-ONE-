@@ -1,14 +1,13 @@
 import { Navigate, Outlet } from 'react-router';
-
-import type { User } from '../../types/user';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuthStore } from '../../store/AuthStore';
+import type { Profile } from '../../types/authStore';
 
 interface RoleProtectedRouteProps {
-    allowedRoles: User['role'][];
+    allowedRoles: Profile['role'][];
 }
 
 export default function RoleProtectedRoute({ allowedRoles }: RoleProtectedRouteProps) {
-    const { user } = useAuth();
+    const user = useAuthStore((state) => state.profile);
 
     if (!user) {
     // Si no hay usuario, redirige a la página de login
