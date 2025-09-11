@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
 import { useAuthStore } from '../store/AuthStore';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 
 export interface Service {
 	id: number;
@@ -21,7 +22,6 @@ export interface Service {
 //'2025-09-09T03:42:27.793+00:00'
 
 const useGetServices = (sitterId: number) => {
-	
 	const [services, setServices] = useState<Service[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -41,39 +41,39 @@ const useGetServices = (sitterId: number) => {
 	}, [sitterId]);
 
 	return { services, isLoading };
-}
+};
 
 export interface ServiceForm {
 	serviceType: string;
+	name: string;
+	description: string;
 	price: number;
+	durationInMinutes: number;
 }
 
 export default function SitterDashboard() {
 	const user = useAuthStore((state) => state.profile);
-	const [serviceType, setServiceType] = useState('');
-	const [price, setPrice] = useState('');
 	const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 	const { services, isLoading } = useGetServices(user?.id || 0);
 	const { register, handleSubmit } = useForm<ServiceForm>();
-
+	const navigate = useNavigate();
 
 	const handleAddService = async (data: ServiceForm) => {
 		if (!user) {
 			alert('Tu sesión ha expirado.');
-			return;
-		}
-		if (!serviceType || !price) {
-			alert('Por favor, completa todos los campos del servicio.');
+			navigate('/login');
 			return;
 		}
 		try {
-			// Corregido: Llamar a la función con el nombre nuevo
-			const newService = await addMyService(data, user.id, {
-				
-			});
-			setServices((currentServices) => [...currentServices, newService]);
-			setServiceType('');
-			setPrice('');
+			const newService = await addMyService(
+				data.serviceType,
+				data.name,
+				data.description,
+				data.price,
+				data.durationInMinutes,
+				user.id
+			);
+			return newService;
 		} catch (err) {
 			console.error(err);
 			alert('Error al registrar el servicio.');
@@ -96,7 +96,7 @@ export default function SitterDashboard() {
 					</h2>
 
 					<form
-						onSubmit={handleAddService}
+						onSubmit={handleSubmit(handleAddService)}
 						className="flex flex-col gap-4 mb-6"
 					>
 						<input
@@ -106,10 +106,30 @@ export default function SitterDashboard() {
 							{...register('serviceType', { required: true })}
 						/>
 						<input
+							type="text"
+							placeholder="Nombre del servicio (Ej: Paseo de 30 minutos)"
+							className="p-2 border rounded-md w-full"
+							{...register('name', { required: true })}
+						/>
+						<input
+							type="text"
+							placeholder="Descripción (Ej: Paseo en parque, cuidado de perros pequeños)"
+							className="p-2 border rounded-md w-full"
+							{...register('description', { required: true })}
+						/>
+						<input
 							type="number"
 							placeholder="Precio"
 							className="p-2 border rounded-md w-full"
 							{...register('price', { required: true, min: 0 })}
+						/>
+						<input
+							type="text"
+							placeholder="Duración en minutos (Ej: 30)"
+							className="p-2 border rounded-md w-full"
+							{...register('durationInMinutes', {
+								required: true,
+							})}
 						/>
 						<button
 							type="submit"
