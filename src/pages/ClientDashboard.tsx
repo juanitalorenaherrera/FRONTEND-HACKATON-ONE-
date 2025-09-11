@@ -1,12 +1,10 @@
 // ===========================================
 // ClientDashboard.tsx - Versión Final Refactorizada
 // ===========================================
-
-import { useCallback, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router';
 
 import { ClientSidebar } from '../features/dashboard/components/DashboardSidebar';
-import { DashboardHeader } from '../features/dashboard/components/DashboardHeader';
+import { DashboardHeader } from '../features/dashboard/components/dashboard-header/DashboardHeader';
 import { PetsProvider } from '../features/pets/context/PetsContext'; // <-- 1. IMPORTANTE: Importamos el Provider
 
 /**
@@ -16,6 +14,12 @@ import { PetsProvider } from '../features/pets/context/PetsContext'; // <-- 1. I
  */
 export function ClientDashboard() {
     const location = useLocation();
+
+    // Handle mobile menu toggle
+    const handleMenuToggle = () => {
+        // Add mobile menu logic here if needed
+        console.log('Menu toggled');
+    };
 
     // 2. Lógica mejorada para determinar el ítem activo en el sidebar.
     // Es más precisa que usar `includes()`.
@@ -47,7 +51,7 @@ export function ClientDashboard() {
                 />
 
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    <DashboardHeader />
+                    <DashboardHeader onMenuToggle={handleMenuToggle} />
                     <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
                         {/* El router renderizará el componente de la ruta activa aquí (PetsView, BookingsView, etc.) */}
                         <Outlet />
