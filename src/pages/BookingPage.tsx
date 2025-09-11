@@ -1,4 +1,4 @@
-import type { Service, Sitter } from "../services/sitterService";
+/*import type { Service, Sitter } from "../services/sitterService";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
@@ -288,3 +288,5 @@ export default function BookingPage() {
     </div>
     );
 }
+
+*/
