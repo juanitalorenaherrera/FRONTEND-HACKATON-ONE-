@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-
-import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router';
+import { useAuthStore } from '../store/AuthStore';
 
 // Tipos para los datos del dashboard
 interface DashboardStats {
@@ -21,7 +20,7 @@ interface RecentActivity {
 }
 
 export default function AdminDashboard() {
-	const { user } = useAuth();
+	const user = useAuthStore((state) => state.profile);
 	const navigate = useNavigate();
 
 	const [stats, setStats] = useState<DashboardStats>({
@@ -193,7 +192,7 @@ export default function AdminDashboard() {
 					Panel de Administrador 👩‍💻
 				</h1>
 				<p className="text-gray-600">
-					Bienvenido, {user?.name || 'Admin'}. Gestiona tu plataforma
+					Bienvenido, {user?.firstName || 'Admin'}. Gestiona tu plataforma
 					desde aquí.
 				</p>
 			</div>
