@@ -2,26 +2,37 @@
 
 import { ArrowRight, Eye, EyeOff, Lock, Mail, PawPrint } from 'lucide-react';
 
-import type { FormEvent } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { useState } from "react";
+import { useAuthStore } from '../store/AuthStore';
+import { loginRequest } from '../services/authService';
+
+interface Login {
+	email: string;
+	password: string;
+}
 
 export function LoginPage() {
-    const { login } = useAuth(); 
-    const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+	const navigate = useNavigate();
+	const { register, handleSubmit } = useForm<Login>();
+    const setToken = useAuthStore((state) => state.setToken);
+	const setProfile = useAuthStore((state) => state.setProfile);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleLogin = async (e: FormEvent) => {
-        e.preventDefault();
+	const handleLogin = async (data: Login) => {
         setError(null);
         setIsLoading(true);
         try {
-            await login({ email, password });
+            const res = await loginRequest(data.email, data.password);
+			const { token, userProfile } = res;
+			setToken(token);
+			setProfile(userProfile);
+			if (userProfile.role === 'ADMIN') navigate('/AdminDashboard');
+			else if (userProfile.role === 'SITTER') navigate('/SitterDashboard');
+			else if (userProfile.role === 'CLIENT') navigate('/ClientDashboard');
         } catch (err) {
             setError("Error al iniciar sesión. Verifica tus credenciales.");
             console.error(err);
@@ -63,7 +74,7 @@ export function LoginPage() {
                     </div>
 
                     {/* Form Section */}
-                    <form onSubmit={handleLogin} className="space-y-6">
+                    <form onSubmit={handleSubmit(handleLogin)} className="space-y-6">
                         {/* Email Field */}
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-700 block">
@@ -74,10 +85,9 @@ export function LoginPage() {
                                 <input 
                                     type="email" 
                                     placeholder="tu@correo.com" 
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)} 
                                     className="w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-gray-900 placeholder-gray-400"
-                                    required 
+									required 
+									{...register("email", { required: true })}
                                 />
                             </div>
                         </div>
@@ -92,10 +102,9 @@ export function LoginPage() {
                                 <input 
                                     type={showPassword ? "text" : "password"}
                                     placeholder="••••••••" 
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)} 
                                     className="w-full pl-12 pr-12 py-4 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-gray-900 placeholder-gray-400"
-                                    required
+									required
+									{...register("password", { required: true })}
                                 />
                                 <button
                                     type="button"
