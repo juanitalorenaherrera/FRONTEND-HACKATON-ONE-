@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuthStore } from '../store/AuthStore';
+import { Role } from '../types/authStore';
 
 // Tipos para los datos del dashboard
 interface DashboardStats {
@@ -38,7 +39,7 @@ export default function AdminDashboard() {
 
 	useEffect(() => {
 		// Verificar que el usuario sea admin
-		if (!user || user.role !== 'admin') {
+		if (!user || user.role !== Role.ADMIN) {
 			navigate('/login');
 			return;
 		}
