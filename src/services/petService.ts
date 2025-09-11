@@ -1,10 +1,6 @@
 import axios from '../services/auth';
 import type { PetResponse, PetSummaryResponse, CreatePetRequest, PetStatsResponse } from '../types/pets';
-
 const API_URL = '/api/pets';
-
-// ========== SERVICIOS ==========
-
 /**
  * Obtiene todas las mascotas del usuario autenticado
  */

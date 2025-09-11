@@ -1,34 +1,61 @@
-import React, { createContext, useContext, ReactNode, useReducer, useMemo } from 'react';
-import { BookingSummary, BookingStats, BookingFilters } from '../types';
-import { PageResponse } from '../types';
+import type { Booking, BookingDetail, BookingFilters, BookingStats, PaginationState } from '../types';
+import React, { createContext, useMemo, useReducer } from 'react';
+
+import type { ReactNode } from 'react';
+
+// ====================================================================
+// 1. INTERFACES Y TIPOS COMPLETOS
+// ====================================================================
 
 interface BookingsState {
-    bookings: BookingSummary[];
+    bookings: Booking[];
+    selectedBooking: BookingDetail | null;
     stats: BookingStats | null;
-    pagination: {
-        page: number;
-        totalPages: number;
-        totalElements: number;
-        size: number;
-    };
     isLoading: boolean;
     error: string | null;
     filters: BookingFilters;
+    pagination: PaginationState;
 }
 
+// Todas las acciones que pueden modificar el estado de las reservas
 type BookingsAction =
     | { type: 'SET_LOADING'; payload: boolean }
     | { type: 'SET_ERROR'; payload: string | null }
-    | { type: 'SET_DATA'; payload: { page: PageResponse<BookingSummary>, stats: BookingStats } }
-    | { type: 'UPDATE_FILTERS'; payload: Partial<BookingFilters> };
+    | { type: 'SET_DATA_SUCCESS'; payload: { page: any; stats: BookingStats } } // `any` para la página de Spring
+    | { type: 'SET_SELECTED_BOOKING'; payload: BookingDetail | null }
+    | { type: 'DELETE_BOOKING_SUCCESS'; payload: number } // id de la reserva
+    | { type: 'UPDATE_BOOKING_SUCCESS'; payload: Booking } // Resumen de la reserva
+    | { type: 'ADD_BOOKING_SUCCESS'; payload: Booking }
+    | { type: 'SET_PAGE'; payload: number };
+
+export interface BookingContextValue {
+    state: BookingsState;
+    dispatch: React.Dispatch<BookingsAction>;
+    filteredBookings: Booking[];
+}
+
+// ====================================================================
+// 2. ESTADO INICIAL Y REDUCER COMPLETOS
+// ====================================================================
 
 const initialState: BookingsState = {
     bookings: [],
+    selectedBooking: null,
     stats: null,
-    pagination: { page: 0, totalPages: 0, totalElements: 0, size: 15 },
     isLoading: true,
     error: null,
-    filters: { sortBy: 'startTime', sortDirection: 'desc' },
+    filters: {
+        status: ['PENDING', 'CONFIRMED'], // Ejemplo de filtro inicial
+        sortBy: 'startTime',
+        sortOrder: 'asc',
+    },
+    pagination: {
+        currentPage: 1,
+        pageSize: 10,
+        totalPages: 1,
+        totalItems: 0,
+        hasNext: false,
+    },
 };
 
 function bookingsReducer(state: BookingsState, action: BookingsAction): BookingsState {
@@ -37,46 +64,66 @@ function bookingsReducer(state: BookingsState, action: BookingsAction): Bookings
             return { ...state, isLoading: action.payload, error: null };
         case 'SET_ERROR':
             return { ...state, error: action.payload, isLoading: false };
-        case 'SET_DATA':
+        case 'SET_DATA_SUCCESS':
             return {
                 ...state,
                 isLoading: false,
                 bookings: action.payload.page.content,
                 stats: action.payload.stats,
                 pagination: {
-                    page: action.payload.page.number,
+                    ...state.pagination,
+                    currentPage: action.payload.page.number + 1, // Spring pages son 0-indexed
                     totalPages: action.payload.page.totalPages,
-                    totalElements: action.payload.page.totalElements,
-                    size: action.payload.page.size,
+                    totalItems: action.payload.page.totalElements,
+                    hasNext: !action.payload.page.last,
                 },
             };
-        case 'UPDATE_FILTERS':
-            return { ...state, filters: { ...state.filters, ...action.payload }, pagination: { ...initialState.pagination, page: 0 } };
+        case 'SET_SELECTED_BOOKING':
+            return { ...state, selectedBooking: action.payload };
+        case 'DELETE_BOOKING_SUCCESS':
+            return { 
+                ...state,
+                bookings: state.bookings.filter(b => b.id !== action.payload),
+                stats: state.stats ? { ...state.stats, totalCount: state.stats.totalCount - 1 } : null,
+            };
+        case 'UPDATE_BOOKING_SUCCESS':
+            return {
+                ...state,
+                bookings: state.bookings.map(b => b.id === action.payload.id ? action.payload : b),
+            };
+        case 'ADD_BOOKING_SUCCESS':
+            return { ...state, bookings: [action.payload, ...state.bookings] };
+        case 'SET_PAGE':
+            return { ...state, pagination: { ...state.pagination, currentPage: action.payload } };
         default:
             return state;
     }
 }
 
-interface BookingsContextValue {
-    state: BookingsState;
-    dispatch: React.Dispatch<BookingsAction>;
-}
+// ====================================================================
+// 3. CONTEXTO Y PROVEEDOR OPTIMIZADOS
+// ====================================================================
 
-const BookingsContext = createContext<BookingsContextValue | undefined>(undefined);
+export const BookingContext = createContext<BookingContextValue | undefined>(undefined);
 
-export function BookingsProvider({ children }: { children: ReactNode }) {
+export function BookingsProvider({ children }: { readonly children: ReactNode }) {
     const [state, dispatch] = useReducer(bookingsReducer, initialState);
+
+    const filteredBookings = useMemo(() => {
+        // Aquí iría la lógica de filtrado del frontend si la necesitaras.
+        // Por ahora, devolvemos las reservas tal cual vienen de la paginación.
+        return state.bookings;
+    }, [state.bookings]); // Dependencia simplificada
+
+    const value = useMemo(() => ({
+        state,
+        dispatch,
+        filteredBookings,
+    }), [state, filteredBookings]);
+
     return (
-        <BookingsContext.Provider value={{ state, dispatch }}>
+        <BookingContext.Provider value={value}>
             {children}
-        </BookingsContext.Provider>
+        </BookingContext.Provider>
     );
 }
-
-export const useBookingsContext = () => {
-    const context = useContext(BookingsContext);
-    if (!context) {
-        throw new Error('useBookingsContext must be used within a BookingsProvider');
-    }
-    return context;
-};
