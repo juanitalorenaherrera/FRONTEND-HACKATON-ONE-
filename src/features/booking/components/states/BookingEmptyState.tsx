@@ -1,8 +1,7 @@
 // features/booking/components/states/BookingsEmptyState.tsx
 
 import { CalendarSearch } from 'lucide-react';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export function BookingsEmptyState() {
     const navigate = useNavigate();
