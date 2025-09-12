@@ -4,22 +4,21 @@ import { BookingsEmptyState } from '../components/states/BookingEmptyState';
 import { BookingsErrorState } from '../components/states/BookingErrorState';
 import { BookingsList } from './BookingList';
 import { BookingsLoadingState } from '../components/states/BookingsLoadingState';
-import React from 'react';
-import { useAuth } from '../../../context/AuthContext'; // <-- Necesario para el reintento
 import { useBookingActions } from '../hooks/useBookingActions'; // <-- Obtiene las acciones
 import { useBookingContext } from '../hooks/useBookingContext'; // <-- Obtiene el estado
+import { useAuthStore } from '../../../store/AuthStore';
 
 export function BookingsOverview() {
     // SEPARACIÓN CORRECTA: El estado y las acciones vienen de hooks diferentes.
     const { state } = useBookingContext();
     const { refreshBookings } = useBookingActions(); // Usamos refresh para el botón de reintento
-    const { user } = useAuth();
+   	const user = useAuthStore((state) => state.profile); // Obtener el usuario autenticado
 
     // EL useEffect PARA CARGAR DATOS SE HA ELIMINADO DE AQUÍ.
     
     const handleRetry = () => {
-        if (user?.accountId) {
-            refreshBookings(user.accountId);
+        if (user?.id) {
+            refreshBookings(user.id);
         }
     };
 
@@ -28,7 +27,7 @@ export function BookingsOverview() {
             return <BookingsLoadingState />;
         }
         if (state.error) {
-            return <BookingsErrorState message={state.error} onRetry={handleRetry} />;
+            return <BookingsErrorState error={state.error} onRetry={handleRetry} />;
         }
         if (state.bookings.length === 0) {
             return <BookingsEmptyState />;
