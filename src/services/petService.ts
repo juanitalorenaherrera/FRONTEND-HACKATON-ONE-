@@ -69,9 +69,38 @@ export const getActivePetsByAccountId = async (accountId: number): Promise<PetRe
 /**
  * Crea una nueva mascota
  */
-export const createPet = async (petData: CreatePetRequest): Promise<PetResponse> => {
+
+export const createPet = async (
+	accountId: number,
+	name: string,
+	species?: string,
+	breed?: string,
+	age?: number,
+	weight?: number,
+	gender?: string,
+	color?: string,
+	physicalDescription?: string,
+	medications?: string,
+	allergies?: string,
+	specialNotes?: string
+) => {
     try {
-        const response = await axios.post(`${API_URL}`, petData);
+		const response = await axios.post<CreatePetRequest>(`${API_URL}`,
+			{
+				accountId,
+				name,
+				species,
+				breed,
+				age,
+				weight,
+				gender,
+				color,
+				physicalDescription,
+				medications,
+				allergies,
+				specialNotes
+			}
+		);
         return response.data;
     } catch (error) {
         console.error('Error creating pet:', error);
