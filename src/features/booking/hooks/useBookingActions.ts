@@ -2,16 +2,16 @@ import * as bookingService from '../../../services/bookingService';
 
 import type { BookingStatus, CreateBookingRequest } from '../types';
 
-import { useAuth } from '../../../context/AuthContext';
 import { useBookingContext } from '../hooks/useBookingContext';
 import { useCallback } from 'react';
+import { useAuthStore } from '../../../store/AuthStore';
 
 /**
  * Hook que encapsula las funciones para interactuar con la feature de reservas.
  */
 export function useBookingActions() {
-    const { state, dispatch } = useBookingContext();
-    const { user } = useAuth();
+	const { state, dispatch } = useBookingContext();
+	const user = useAuthStore((state) => state.profile);
 
     const loadBookings = useCallback(async () => {
         if (!user) return dispatch({ type: 'SET_ERROR', payload: 'Usuario no autenticado.' });
@@ -23,10 +23,16 @@ export function useBookingActions() {
                 size: state.pagination.pageSize,
                 // ...otros filtros de state.filters
             };
-            const bookingsPage = await bookingService.getBookingsByUser(user.id, user.role, filters);
+            const bookingsPage = await bookingService.getBookingsByUser(user.id, user.role as 'CLIENT' | 'SITTER', filters);
 
             // La lógica para calcular stats es un buen candidato para un utilitario
-            const stats = { /* ...cálculo de stats... */ };
+            const stats = {
+                totalCount: 0,
+                pendingCount: 0,
+                confirmedCount: 0,
+                inProgressCount: 0,
+                upcomingCount: 0
+            };
 
             dispatch({ type: 'SET_DATA_SUCCESS', payload: { page: bookingsPage, stats } });
         } catch (error) {
@@ -44,8 +50,14 @@ export function useBookingActions() {
                 page: state.pagination.currentPage - 1,
                 size: state.pagination.pageSize,
             };
-            const bookingsPage = await bookingService.getBookingsByUser(accountId, user.role, filters);
-            const stats = { /* ...cálculo de stats... */ };
+            const bookingsPage = await bookingService.getBookingsByUser(accountId, user.role as 'CLIENT' | 'SITTER', filters);
+            const stats = {
+                totalCount: 0,
+                pendingCount: 0,
+                confirmedCount: 0,
+                inProgressCount: 0,
+                upcomingCount: 0
+            };
             dispatch({ type: 'SET_DATA_SUCCESS', payload: { page: bookingsPage, stats } });
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Error desconocido';
@@ -57,10 +69,10 @@ export function useBookingActions() {
         try {
             await bookingService.createBooking(bookingData);
             await loadBookings(); // Recargamos para ver el nuevo dato
-        } catch (error) {
-            const message = error instanceof Error ? error.message : 'Error al crear la reserva';
+        } catch {
+            const message = 'Error al crear la reserva';
             dispatch({ type: 'SET_ERROR', payload: message });
-            throw error;
+            throw new Error(message);
         }
     }, [dispatch, loadBookings]);
     
@@ -68,20 +80,19 @@ export function useBookingActions() {
         try {
             await bookingService.deleteBooking(bookingId);
             dispatch({ type: 'DELETE_BOOKING_SUCCESS', payload: bookingId });
-        } catch (error) {
+        } catch {
             dispatch({ type: 'SET_ERROR', payload: 'No se pudo eliminar la reserva' });
         }
     }, [dispatch]);
     
     const updateStatus = useCallback(async (bookingId: number, newStatus: BookingStatus, reason?: string) => {
         try {
-            const updatedBookingDetail = await bookingService.updateBookingStatus(bookingId, newStatus, reason);
-            const summary = { /* ...extraer resumen del detalle... */ };
-            dispatch({ type: 'UPDATE_BOOKING_SUCCESS', payload: summary });
-        } catch (error) {
+            await bookingService.updateBookingStatus(bookingId, newStatus, reason);
+            await loadBookings(); // Reload to get updated data
+        } catch {
             dispatch({ type: 'SET_ERROR', payload: 'No se pudo actualizar el estado' });
         }
-    }, [dispatch]);
+    }, [dispatch, loadBookings]);
     
     const selectBooking = useCallback(async (bookingId: number | null) => {
         if (bookingId === null) {
@@ -90,7 +101,7 @@ export function useBookingActions() {
         try {
             const bookingDetail = await bookingService.getBookingById(bookingId);
             dispatch({ type: 'SET_SELECTED_BOOKING', payload: bookingDetail });
-        } catch (error) {
+        } catch {
             dispatch({ type: 'SET_ERROR', payload: 'Error al cargar detalles' });
         }
     }, [dispatch]);
