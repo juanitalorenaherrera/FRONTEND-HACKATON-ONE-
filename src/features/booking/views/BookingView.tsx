@@ -1,29 +1,27 @@
 // features/booking/pages/BookingsView.tsx - NUEVO ARCHIVO
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { BookingsOverview } from '../components/BookingOverview';
 import { BookingsProvider } from '../context/BookingContext';
-import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
-import { useAuth } from '../../../context/AuthContext';
+//import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
 import { useBookingActions } from '../hooks/useBookingActions';
 import { useBookingContext } from '../hooks/useBookingContext';
+import { useAuthStore } from '../../../store/AuthStore';
 
 function BookingsViewContent() {
     const { state: bookingsState } = useBookingContext();
-    const { loadBookings } = useBookingActions();
-    const { user, isLoading: isAuthLoading } = useAuth();
+	const { loadBookings } = useBookingActions();
+	const user = useAuthStore((state) => state.profile);
 
     // LÓGICA DE CARGA CENTRALIZADA: Este es el lugar correcto para el useEffect.
     useEffect(() => {
-        if (user?.accountId && bookingsState.isLoading) {
-            loadBookings(user.accountId);
+        if (user?.id && bookingsState.isLoading) {
+            loadBookings();
         }
     }, [user, bookingsState.isLoading, loadBookings]);
 
-    if (isAuthLoading) {
-        return <div className="..."><LoadingSpinner title="Verificando sesión..." /></div>;
-    }
+
     if (!user) {
         return <div className="...">Por favor, inicia sesión para ver tus citas.</div>;
     }
