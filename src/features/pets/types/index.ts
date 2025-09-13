@@ -73,10 +73,22 @@ export interface PetCardProps {
     className?: string;
 }
 
+export enum SortBy {
+	NAME = 'name',
+	AGE = 'age',
+	SPECIES = 'species',
+	CREATED = 'created',
+}
+
+export enum SortOrderBy {
+	ASC = 'asc',
+	DESC = 'desc',
+}
+
 export interface PetFilters {
     search: string;
     species: string[];
     activeOnly: boolean;
-    sortBy: 'name' | 'age' | 'species' | 'created';
-    sortOrder: 'asc' | 'desc';
+    sortBy: SortBy;
+    sortOrder: SortOrderBy;
 }
