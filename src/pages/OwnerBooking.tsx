@@ -52,7 +52,7 @@ export default function OwnerBooking() {
 	};
 
 	return (
-		<div style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
+		<div className='p-5 max-w-[600px] m-auto' >
 			<h2>🐶 Reservar un Servicio</h2>
 
 			{/* Selección de cuidador */}
@@ -113,18 +113,13 @@ export default function OwnerBooking() {
 			)}
 
 			{/* Botón */}
-			<div style={{ marginTop: '20px' }}>
+			<div className='mt-5'>
 				<button onClick={handleReservation}>Reservar</button>
 			</div>
 
 			{/* Confirmación */}
 			{message && (
-				<div
-					style={{
-						marginTop: '20px',
-						color: 'green',
-						fontWeight: 'bold',
-					}}
+				<div className='mt-5 text-green-500 font-bold'
 				>
 					{message}
 				</div>
