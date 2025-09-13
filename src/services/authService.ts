@@ -2,7 +2,7 @@
 
 import type { User } from '../types/user';
 import axios from '../services/auth';
-import type { Profile } from '../types/authStore';
+import type { Profile, Role } from '../types/authStore';
 ;
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -40,20 +40,30 @@ export const getProfile = async (): Promise<User> => {
 	return response.data;
 };
 
+interface RegisterResponse {
+	token: string;
+	role: Role;
+	userProfile: Profile;
+}
+
 /**
  * Registra un nuevo usuario. (Función que ya tenías)
  */
-export const register = async (
-	name: string,
+export const registerRequest = async (
+	firstName: string,
+	lastName: string,
 	email: string,
 	password: string,
-	role: 'client' | 'sitter'
-): Promise<User> => {
-	const response = await axios.post<User>(`${API_URL}/api/users/register`, {
-		name,
+	address: string,
+	phoneNumber: string,
+): Promise<RegisterResponse> => {
+	const response = await axios.post<RegisterResponse>(`${API_URL}/api/users/register`, {
+		firstName,
+		lastName,
 		email,
 		password,
-		role,
+		address,
+		phoneNumber
 	});
 	return response.data;
 };
