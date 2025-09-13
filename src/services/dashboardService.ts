@@ -2,7 +2,7 @@
 import type { DashboardData, Pet } from '../types/dashboardData';
 import type { DashboardStatsData } from '../types/DashboardStatsData';
 import type { PetSummaryResponse } from '../types/pets';
-import axios from './auth';
+import axios from '../services/auth';
 
 const API_URL = '/api/dashboard';
 
