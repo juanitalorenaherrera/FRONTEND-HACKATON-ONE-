@@ -1,113 +1,158 @@
-/* import { useState, useEffect } from "react";
-import type { FormEvent } from "react";
-import { useAuth } from "../hooks/useAuth";
-import { createPet, getPets } from "../services/petService";
+import { useAuthStore } from '../store/AuthStore';
+import { createPet } from '../services/petService';
+import { useForm } from 'react-hook-form';
+import type { CreatePetRequest } from '../types/pets';
+import { useGetPets } from '../features/pets/hooks/useGetPets';
 
-interface Pet {
-  id: string | number;
-  name: string;
-  type: string;
-}
+
 
 export default function OwnerDashboard() {
-  const { user } = useAuth();
-  const [pets, setPets] = useState<Pet[]>([]);
-  const [petName, setPetName] = useState("");
-  const [petType, setPetType] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+	const user = useAuthStore((state) => state.profile);
+	const { register, handleSubmit } = useForm<CreatePetRequest>();
+	const { pets, isLoading } = useGetPets();
 
-  // El Hook se llama siempre en el nivel superior.
-  useEffect(() => {
-    // La lógica condicional se mueve DENTRO del Hook.
-    if (user) {
-      getPets(user.token)
-        .then(data => {
-          setPets(data);
-        })
-        .catch(console.error)
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      // Si no hay usuario, simplemente no hacemos la llamada a la API
-      // y consideramos que la carga ha terminado.
-      setIsLoading(false);
-    }
-    // La dependencia ahora es el objeto 'user' completo.
-  }, [user]);
+	const handleAddPet = async (data: CreatePetRequest) => {
+		// Añadimos una comprobación aquí también por si el usuario cierra sesión
+		// mientras está en la página.
+		if (!user) {
+			alert('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
+			return;
+		}
+		try {
+			const newPet = await createPet(
+				user.id,
+				data.name,
+				data.species,
+				data.breed,
+				data.age,
+				data.weight,
+				data.gender,
+				data.color,
+				data.physicalDescription,
+				data.medications,
+				data.allergies,
+				data.specialNotes
+			);
+			return newPet;
+		} catch (err) {
+			console.error(err);
+			alert('Error al registrar la mascota.');
+		}
+	};
 
-  const handleAddPet = async (e: FormEvent) => {
-    e.preventDefault();
-    // Añadimos una comprobación aquí también por si el usuario cierra sesión
-    // mientras está en la página.
-    if (!user) {
-      alert("Tu sesión ha expirado. Por favor, inicia sesión de nuevo.");
-      return;
-    }
-    if (!petName || !petType) {
-      alert("Por favor, completa ambos campos.");
-      return;
-    }
-    try {
-      const newPet = await createPet(user.token, { name: petName, type: petType });
-      setPets(currentPets => [...currentPets, newPet]);
-      setPetName("");
-      setPetType("");
-    } catch (err) {
-      console.error(err);
-      alert("Error al registrar la mascota.");
-    }
-  };
-  
-  // Si la página se carga y el usuario se está autenticando,
-  // el 'ProtectedRoute' y este estado de carga lo manejan.
-  if (isLoading) {
-    return <p>Cargando datos del dueño...</p>
-  }
+	// Si la página se carga y el usuario se está autenticando,
+	// el 'ProtectedRoute' y este estado de carga lo manejan.
+	if (isLoading) {
+		return <p>Cargando datos del dueño...</p>;
+	}
 
-  return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">Panel de Dueño 🐾</h1>
-      
-      {/* Sección para añadir mascotas }/*
-      <div className="p-6 bg-white rounded-xl shadow mb-8">
-        <h2 className="text-xl font-semibold mb-4">Registrar una nueva mascota</h2>
-        <form onSubmit={handleAddPet} className="flex flex-col sm:flex-row gap-4">
-          <input 
-            type="text" 
-            placeholder="Nombre de la mascota"
-            value={petName} 
-            onChange={(e) => setPetName(e.target.value)}
-            className="p-2 border rounded-md flex-grow"
-          />
-          <input 
-            type="text" 
-            placeholder="Tipo (perro, gato...)"
-            value={petType} 
-            onChange={(e) => setPetType(e.target.value)}
-            className="p-2 border rounded-md flex-grow"
-          />
-          <button type="submit" className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition-colors">
-            Añadir
-          </button>
-        </form>
-      </div>
+	return (
+		<div className="p-8 bg-gray-50 min-h-screen">
+			<h1 className="text-3xl font-bold mb-6">Panel de Dueño 🐾</h1>
 
-      {/* Sección para listar mascotas }/*
-      <div className="p-6 bg-white rounded-xl shadow">
-        <h2 className="text-xl font-semibold mb-4">Tus Mascotas</h2>
-        {pets.length > 0 ? (
-          <ul className="space-y-2">
-            {pets.map((pet) => (
-              <li key={pet.id} className="p-3 bg-gray-100 rounded-md">
-                <strong>{pet.name}</strong> ({pet.type})
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Aún no has registrado ninguna mascota.</p>
-        )}
-      </div>
-    </div>
-  );
-} */
+			{/* Sección para añadir mascotas */}
+			<div className="p-6 bg-white rounded-xl shadow mb-8">
+				<h2 className="text-xl font-semibold mb-4">
+					Registrar una nueva mascota
+				</h2>
+				<form
+					onSubmit={handleSubmit(handleAddPet)}
+					className="flex flex-col sm:flex-row gap-4"
+				>
+					<input
+						type="text"
+						placeholder="Nombre de la mascota"
+						className="p-2 border rounded-md flex-grow"
+						{...register('name', { required: true })}
+					/>
+					<input
+						type="text"
+						placeholder="Especie (ej: Perro, Gato)"
+						className="p-2 border rounded-md flex-grow"
+						{...register('species', { required: true })}
+					/>
+					<input
+						type="text"
+						placeholder="Raza (dejar en blanco si no aplica)"
+						className="p-2 border rounded-md flex-grow"
+						{...register('breed', { required: false })}
+					/>
+					<input
+						type="number"
+						placeholder="Edad (en años)"
+						className="p-2 border rounded-md flex-grow"
+						{...register('age', { required: true })}
+					/>
+					<input
+						type="number"
+						step="0.1"
+						placeholder="Peso (ej: 12.5 kg)"
+						className="p-2 border rounded-md flex-grow"
+						{...register('weight', { required: true })}
+					/>
+					<input
+						type="text"
+						placeholder="Género (ej: Macho, Hembra)"
+						className="p-2 border rounded-md flex-grow"
+						{...register('gender', { required: true })}
+					/>
+					<input
+						type="text"
+						placeholder="Color (Descripción del color)"
+						className="p-2 border rounded-md flex-grow"
+						{...register('color', { required: true })}
+					/>
+					<textarea
+						placeholder="Descripción física (escalofríos, marcas, etc.)"
+						className="p-2 border rounded-md flex-grow"
+						{...register('physicalDescription', {
+							required: false,
+						})}
+					/>
+					<input
+						type="text"
+						placeholder="Medicaciones (dejar en blanco si no aplica)"
+						className="p-2 border rounded-md flex-grow"
+						{...register('medications', { required: false })}
+					/>
+					<input
+						type="text"
+						placeholder="Alergias (dejar en blanco si no aplica)"
+						className="p-2 border rounded-md flex-grow"
+						{...register('allergies', { required: false })}
+					/>
+					<textarea
+						placeholder="Notas especiales (dejar en blanco si no aplica)"
+						className="p-2 border rounded-md flex-grow"
+						{...register('specialNotes', { required: false })}
+					/>
+					<button
+						type="submit"
+						className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition-colors"
+					>
+						Añadir
+					</button>
+				</form>
+			</div>
+
+			{/* Sección para listar mascotas */}
+			<div className="p-6 bg-white rounded-xl shadow">
+				<h2 className="text-xl font-semibold mb-4">Tus Mascotas</h2>
+				{pets.length > 0 ? (
+					<ul className="space-y-2">
+						{pets.map((pet) => (
+							<li
+								key={pet.id}
+								className="p-3 bg-gray-100 rounded-md"
+							>
+								<strong>{pet.name}</strong> ({pet.species})
+							</li>
+						))}
+					</ul>
+				) : (
+					<p>Aún no has registrado ninguna mascota.</p>
+				)}
+			</div>
+		</div>
+	);
+}
