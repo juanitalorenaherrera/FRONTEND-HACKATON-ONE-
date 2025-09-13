@@ -5,11 +5,11 @@ import {
 } from '../../../../../utils/dashboardHeader';
 import { useAuthStore } from '../../../../../store/AuthStore';
 
-export interface DashboardHeaderProps {
+interface LeftSectionProps {
 	onMenuToggle: () => void;
 }
 
-export default function LeftSection({ onMenuToggle }: DashboardHeaderProps) {
+export default function LeftSection({ onMenuToggle }: LeftSectionProps) {
 	const user = useAuthStore((state) => state.profile);
 	const isLoading = useAuthStore(
 		(state) => state.isAuth === false && state.profile === null
