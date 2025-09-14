@@ -2,10 +2,10 @@
 
 import { Heart, Plus, RefreshCw } from 'lucide-react';
 
-import { useAuth } from '../../../context/AuthContext';
 import { useMemo } from 'react';
 import { usePetsActions } from '../hooks/usePetsActions';
 import { usePetsContext } from '../hooks/usePetsContext';
+import { useAuthStore } from '../../../store/AuthStore';
 
 export function PetsHeader() {
     const { state } = usePetsContext();
@@ -17,11 +17,11 @@ export function PetsHeader() {
 
     const pluralSuffix = totalActivePets > 1 ? 's' : '';
 
-    const { user } = useAuth();
+    const user = useAuthStore((state) => state.profile);
 
     const handleRefresh = () => {
-        if (user?.accountId) {
-            refreshPets(user.accountId);
+        if (user?.id) {
+            refreshPets(user.id);
         }
     };
 
