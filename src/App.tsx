@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 
 import AdminDashboard from './pages/AdminDashboard';
 //import BookingPage from './pages/BookingPage';
-import { ClientDashboard } from './pages/ClientDashboard';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { FindSittersView } from './features/sitters/components/FindSittersView';
 import Home from './pages/home';
@@ -19,10 +18,6 @@ import { BookingsView } from './features/booking/views/BookingView';
 //import SitterDashboard from './pages/SitterDashboard';
 
 // import OwnerDashboard from './pages/OwnerDashboard';
-
-
-
-
 export default function App() {
 	return (
 		<BrowserRouter>
@@ -37,7 +32,7 @@ export default function App() {
 						{/* <Route path="/SitterDashboard" element={<SitterDashboard />} /> */}
 						<Route path="/AdminDashboard" element={<AdminDashboard />} />
 						<Route path="/OwnerBooking" element={<OwnerBooking />} />
-						<Route path="/ClientDashboard" element={<ClientDashboard />} />
+						{/* <Route path="/ClientDashboard" element={<ClientDashboard />} /> */}
 						<Route path="/dashboard" element={<DashboardLayout />}>
 
 						{/* Rutas hijas que se renderizarán dentro del <Outlet> */}
