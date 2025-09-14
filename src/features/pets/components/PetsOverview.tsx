@@ -5,26 +5,25 @@ import { PetsEmptyState, PetsErrorState, PetsLoadingState } from './states';
 import { PetsFilters } from './PetsFilters';
 import { PetsGrid } from './PetsGrid';
 import { PetsHeader } from './PetsHeader';
-import React from 'react';
-import { useAuth } from '../../../context/AuthContext';
-import { useMemo } from 'react';
+import { useAuthStore } from '../../../store/AuthStore';
+//import { useMemo } from 'react';
 import { usePetsActions } from '../hooks/usePetsActions';
 import { usePetsContext } from '../hooks/usePetsContext';
 
 export function PetsOverview({ className = '' }: { className?: string }) {
     const { state, filteredPets } = usePetsContext();
-    const { refreshPets } = usePetsActions();
-    const { user } = useAuth();
+	const { refreshPets } = usePetsActions();
+	const user = useAuthStore((state) => state.profile);
 
     const handleRetry = () => {
         // Usamos el 'user' del AuthContext para obtener el accountId
-        if (user?.accountId) {
-            refreshPets(user.accountId);
+        if (user?.id) {
+            refreshPets(user.id);
         }
     };
     
     // He movido el cálculo de los totales aquí usando useMemo para que PetsHeader sea más "tonto"
-    const totalActivePets = useMemo(() => state.pets.filter(p => p.active).length, [state.pets]);
+    //const totalActivePets = useMemo(() => state.pets.filter(p => p.active).length, [state.pets]);
 
     const renderContent = () => {
 
@@ -54,7 +53,7 @@ export function PetsOverview({ className = '' }: { className?: string }) {
 
     return (
         <div className={`bg-white rounded-2xl p-6 shadow-sm border border-gray-100 ${className}`}>
-            <PetsHeader totalActivePets={totalActivePets} />
+            <PetsHeader />
             <div className="mt-6">
                 {renderContent()}
             </div>
