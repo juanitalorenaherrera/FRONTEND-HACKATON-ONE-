@@ -7,13 +7,11 @@ import type {
 	AuthResponse,
 	CreateSitterProfileRequest,
 	ExtendedSitter,
-	NewService,
 	SitterProfileDTO,
 	SitterProfileSummary,
 	SitterRegisterRequest,
 } from '../types/sitter';
-import type { Service } from '../pages/OwnerBooking';
-import type { ServiceForm } from '../pages/SitterDashboard';
+import type { Service } from '../pages/SitterDashboard';
 
 const API_URL = '/api/sitter-profiles';
 const USERS_API_URL = '/api/users';
@@ -42,7 +40,9 @@ export const getSitterProfile = async (
 	userId: number
 ): Promise<SitterProfileDTO> => {
 	try {
-		const response = await axios.get(`${API_URL}/${userId}`);
+		const response = await axios.get<SitterProfileDTO>(
+			`${API_URL}/${userId}`
+		);
 		return response.data;
 	} catch (error) {
 		console.error('Error fetching sitter profile:', error);
@@ -55,7 +55,7 @@ export const getSitterProfile = async (
  */
 export const getAllSitterProfiles = async (): Promise<SitterProfileDTO[]> => {
 	try {
-		const response = await axios.get(API_URL);
+		const response = await axios.get<SitterProfileDTO[]>(API_URL);
 		return response.data;
 	} catch (error) {
 		console.error('Error fetching all sitter profiles:', error);
@@ -199,7 +199,13 @@ export const searchSitters = async (filters: {
 /**
  * Mapea UserSummaryResponse a SitterProfileSummary
  */
-const mapUserToSitter = (user: any): SitterProfileSummary => {
+const mapUserToSitter = (user: {
+	id: number;
+	firstName: string;
+	lastName: string;
+	emailVerified?: boolean;
+	address?: string;
+}): SitterProfileSummary => {
 	return {
 		id: user.id,
 		sitterName: `${user.firstName} ${user.lastName}`,
@@ -242,20 +248,14 @@ const mapProfileToExtendedSitter = (
 	};
 };
 
-// Función helper para obtener el token
-const getAuthToken = (): string => {
-	const token = localStorage.getItem('auth');
-	if (!token) throw new Error('No auth token found');
-	return token;
-};
-
 /**
  * Verifica si el usuario actual tiene perfil de cuidador
  */
 export const hasActiveSitterProfile = async (): Promise<boolean> => {
 	try {
-		// Obtener información del usuario actual del token
-		const token = getAuthToken();
+		const token = localStorage.getItem('auth');
+		if (!token) return false;
+
 		const payload = JSON.parse(atob(token.split('.')[1]));
 		const userId = payload.id || payload.sub;
 
@@ -325,7 +325,7 @@ export async function addMyService(
 			name,
 			description,
 			price,
-			durationInMinutes
+			durationInMinutes,
 		}
 	);
 	return response.data;
