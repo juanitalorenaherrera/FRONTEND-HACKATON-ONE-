@@ -5,7 +5,7 @@ import type { BookingStatus, CreateBookingRequest } from '../types';
 import { useBookingContext } from '../hooks/useBookingContext';
 import { useCallback } from 'react';
 import { useAuthStore } from '../../../store/AuthStore';
-
+import type { Role } from '../../../types/authStore';
 /**
  * Hook que encapsula las funciones para interactuar con la feature de reservas.
  */
@@ -23,7 +23,7 @@ export function useBookingActions() {
                 size: state.pagination.pageSize,
                 // ...otros filtros de state.filters
             };
-            const bookingsPage = await bookingService.getBookingsByUser(user.id, user.role as 'CLIENT' | 'SITTER', filters);
+            const bookingsPage = await bookingService.getBookingsByUser(user.id, user.role as Role, filters);
 
             // La lógica para calcular stats es un buen candidato para un utilitario
             const stats = {
@@ -50,7 +50,7 @@ export function useBookingActions() {
                 page: state.pagination.currentPage - 1,
                 size: state.pagination.pageSize,
             };
-            const bookingsPage = await bookingService.getBookingsByUser(accountId, user.role as 'CLIENT' | 'SITTER', filters);
+            const bookingsPage = await bookingService.getBookingsByUser(accountId, user.role as Role, filters);
             const stats = {
                 totalCount: 0,
                 pendingCount: 0,
@@ -67,7 +67,13 @@ export function useBookingActions() {
 
     const createBooking = useCallback(async (bookingData: CreateBookingRequest) => {
         try {
-            await bookingService.createBooking(bookingData);
+            await bookingService.createBooking(
+                bookingData.petId,
+                bookingData.sitterId,
+                bookingData.serviceOfferingId,
+                bookingData.startTime,
+                bookingData.notes
+            );
             await loadBookings(); // Recargamos para ver el nuevo dato
         } catch {
             const message = 'Error al crear la reserva';
