@@ -1,18 +1,13 @@
 // ===========================================
 // MainDashboardView.tsx - Versión alineada
 // ===========================================
-
-import type {
-	Appointment,
-	Sitter,
-} from '../../types/dashboardData';
-
+import type { Appointment, Sitter } from '../../types/dashboardData';
 import { AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import HeroBanner from './components/sections/MainDashboard/HeroBanner/HeroBanner';
 import MyPetsSection from './components/sections/MainDashboard/MyPets/MyPetsSection';
 import NextAppointmentCard from './components/sections/MainDashboard/NextBooking/NextBookingCard';
 import QuickActionsSection from './components/sections/MainDashboard/QuickActions/QuickActionsSection';
-import React from 'react';
 import RecentSittersSection from './components/sections/MainDashboard/RecentSitters/RecentSittersSection';
 import RecommendationBanner from './components/sections/MainDashboard/RecommendationBanner/RecommendationBanner';
 import StatsSection from './components/sections/MainDashboard/Stats/StatsSection';
@@ -24,10 +19,12 @@ interface MainDashboardViewProps {
 	className?: string;
 }
 
-const MainDashboardView: React.FC<MainDashboardViewProps> = ({
+export default function MainDashboardView({
 	onPetSelect,
 	className = '',
-}) => {
+}: MainDashboardViewProps) {
+	const navigate = useNavigate();
+
 	// Usar el hook personalizado para obtener todos los datos
 	const {
 		isLoading,
@@ -40,86 +37,55 @@ const MainDashboardView: React.FC<MainDashboardViewProps> = ({
 		nextAppointment,
 	} = useDashboardData();
 
-	// Handlers para las diferentes acciones
+	// Route mappings for optimized navigation
+	const serviceRoutes: Record<string, string> = {
+		'find-sitter': '/dashboard/find-sitters',
+		'care-24-7': '/dashboard/care',
+		'grooming': '/dashboard/grooming',
+		'emergency': '/dashboard/emergency'
+	};
+
+	const statRoutes: Record<string, string> = {
+		'vaccines': '/dashboard/pets?filter=vaccines',
+		'reminders': '/dashboard/reminders',
+		'pets': '/dashboard/pets',
+		'appointments': '/dashboard/bookings'
+	};
+
+	const actionRoutes: Record<string, string> = {
+		'new-pet': '/dashboard/pets/new',
+		'schedule-appointment': '/dashboard/bookings/new',
+		'emergency': '/dashboard/emergency',
+		'reminders': '/dashboard/reminders',
+		'find-sitter': '/dashboard/find-sitters'
+	};
+
+	// Optimized handlers
 	const handleServiceClick = (serviceId: string) => {
-		console.log(`Service clicked: ${serviceId}`);
-		switch (serviceId) {
-			case 'find-sitter':
-				// Navegar a búsqueda de cuidadores
-				break;
-			case 'care-24-7':
-				// Navegar a cuidado 24/7
-				break;
-			case 'grooming':
-				// Navegar a servicios de grooming
-				break;
-			case 'emergency':
-				// Navegar a servicios de emergencia
-				break;
-			default:
-				console.log(`Unknown service: ${serviceId}`);
-		}
+		const route = serviceRoutes[serviceId];
+		if (route) navigate(route);
 	};
 
 	const handleHireSitter = (sitter: Sitter) => {
-		console.log('Hiring sitter:', sitter.id);
-		// Implementar lógica de contratación
-		// Posible navegación: /hire-sitter/${sitter.id}
+		navigate(`/dashboard/hire-sitter/${sitter.id}`);
 	};
 
 	const handleViewSitterProfile = (sitter: Sitter) => {
-		console.log('Viewing sitter profile:', sitter.id);
-		// Implementar navegación al perfil del cuidador
-		// Posible navegación: /sitter-profile/${sitter.id}
+		navigate(`/dashboard/sitter-profile/${sitter.id}`);
 	};
 
 	const handleViewAllSitters = () => {
-		console.log('Viewing all sitters');
-		// Implementar navegación a lista completa de cuidadores
-		// Posible navegación: /sitters
+		navigate('/dashboard/find-sitters');
 	};
 
 	const handleStatClick = (statId: string) => {
-		console.log(`Stat clicked: ${statId}`);
-		switch (statId) {
-			case 'vaccines':
-				// Navegar a recordatorios de vacunas
-				break;
-			case 'reminders':
-				// Navegar a recordatorios pendientes
-				break;
-			case 'pets':
-				// Navegar a lista de mascotas
-				break;
-			case 'appointments':
-				// Navegar a citas programadas
-				break;
-			default:
-				console.log(`Unknown stat: ${statId}`);
-		}
+		const route = statRoutes[statId];
+		if (route) navigate(route);
 	};
 
 	const handleQuickAction = (actionId: string) => {
-		console.log(`Quick action: ${actionId}`);
-		switch (actionId) {
-			case 'new-pet':
-				// Navegar a agregar mascota
-				break;
-			case 'schedule-appointment':
-				// Navegar a agendar cita
-				break;
-			case 'emergency':
-				// Navegar a servicios de emergencia
-				break;
-			case 'reminders':
-				// Navegar a recordatorios
-				break;
-			case 'find-sitter':
-				// Navegar a búsqueda de cuidadores
-				break;
-			default:
-				console.log(`Unknown action: ${actionId}`);
-		}
+		const route = actionRoutes[actionId];
+		if (route) navigate(route);
 	};
 
 	const handleRecommendationAction = (actionId: string) => {
@@ -133,29 +99,20 @@ const MainDashboardView: React.FC<MainDashboardViewProps> = ({
 	};
 
 	const handleAppointmentContact = (appointment: Appointment) => {
-		console.log('Contacting sitter for appointment:', appointment.id);
-		// Implementar contacto con cuidador
-		// Posible acción: abrir modal de contacto o navegar a chat
+		navigate(`/dashboard/chat/${appointment.sitterId}`);
 	};
 
 	const handleAppointmentDetails = (appointment: Appointment) => {
-		console.log('Viewing appointment details:', appointment.id);
-		// Implementar vista de detalles de cita
-		// Posible navegación: /appointment/${appointment.id}
+		navigate(`/dashboard/appointment/${appointment.id}`);
 	};
 
 	const handleAppointmentReschedule = (appointment: Appointment) => {
-		console.log('Rescheduling appointment:', appointment.id);
-		// Implementar reprogramación de cita
-		// Posible navegación: /reschedule/${appointment.id}
+		navigate(`/dashboard/reschedule/${appointment.id}`);
 	};
 
 	const handlePetSelect = (petId: string) => {
-		console.log('Pet selected:', petId);
-		if (onPetSelect) {
-			onPetSelect(petId);
-		}
-		// Posible navegación: /pet-profile/${petId}
+		if (onPetSelect) onPetSelect(petId);
+		navigate(`/dashboard/pet-profile/${petId}`);
 	};
 
 	const handleRetry = () => {
@@ -363,6 +320,4 @@ const MainDashboardView: React.FC<MainDashboardViewProps> = ({
 			</div>
 		</div>
 	);
-};
-
-export default MainDashboardView;
+}
