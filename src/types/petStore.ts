@@ -1,6 +1,6 @@
 import type { Pet, PetFilters, PetStats } from '../features/pets/types';
 
-enum Type {
+export enum Type {
 	ADD = 'add',
 	EDIT = 'edit'
 }
