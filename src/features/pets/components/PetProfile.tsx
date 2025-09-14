@@ -3,7 +3,6 @@
 import { PetProfileHeader } from './profile/PetProfileHeader';
 import { PetProfileTabs } from './profile/PetProfileTabs';
 import { PetsLoadingState } from './states';
-import React from 'react';
 import { usePetsContext } from '../hooks/usePetsContext';
 
 export function PetProfile() {
