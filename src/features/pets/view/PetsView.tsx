@@ -1,24 +1,21 @@
 // features/pets/pages/PetsView.tsx - VERSIÓN FINAL Y CORRECTA
-
 import { useEffect } from 'react';
-
 //import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
 import { Outlet } from 'react-router';
 import { usePetsActions } from '../hooks/usePetsActions';
-import { usePetsContext } from '../hooks/usePetsContext';
 import { useAuthStore } from '../../../store/AuthStore';
 import { usePetsStore } from '../../../store/PetStore';
 
 function PetsViewContent() {
-	const petsState = usePetsStore((state) => state);
+	const isLoading = usePetsStore((state) => state.isLoading);
 	const { loadPets } = usePetsActions();
 	const user = useAuthStore((state) => state.profile);
 
 	useEffect(() => {
-		if (user?.id && petsState.isLoading) {
+		if (user?.id && isLoading) {
 			loadPets(user.id);
 		}
-	}, [user, petsState.isLoading, loadPets]);
+	}, [user, isLoading, loadPets]);
 
 	if (!user) {
 		return (
