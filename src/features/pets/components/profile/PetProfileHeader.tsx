@@ -3,14 +3,14 @@
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 
 import type { Pet } from '../../types';
-import { usePetsContext } from '../../hooks/usePetsContext';
+import { usePetsStore } from '../../../../store/PetStore';
 
 export function PetProfileHeader({ pet }: { pet: Pet }) {
-    const { dispatch } = usePetsContext();
+    const setSelectedPet = usePetsStore((state) => state.setSelectedPet);
     // const { showEditPetModal, deletePet } = usePetsActions();
 
     const handleBack = () => {
-        dispatch({ type: 'SET_SELECTED_PET', payload: null });
+        setSelectedPet(null);
     };
 
     return (
@@ -28,8 +28,9 @@ export function PetProfileHeader({ pet }: { pet: Pet }) {
                     </button>
                 </div>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm ...">
-                {/* ... JSX para mostrar el avatar, nombre, raza, etc., usando el objeto `pet` ... */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <h1 className="text-2xl font-bold">{pet.name}</h1>
+                <p className="text-gray-600">{pet.breed} • {pet.species}</p>
             </div>
         </>
     );
