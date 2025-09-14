@@ -1,41 +1,45 @@
 import { Link, useNavigate } from 'react-router';
-
-import type { FormEvent } from 'react';
-import { register as registerService } from '../services/authService';
-import { useAuth } from '../hooks/useAuth';
+import { registerRequest } from '../services/authService';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import type { SitterRegisterRequest } from '../types/sitter';
+import { useAuthStore } from '../store/AuthStore';
+import { Role } from '../types/authStore';
 
 export default function RegisterPage() {
 	// --- Hooks ---
-	const { login } = useAuth();
 	const navigate = useNavigate();
 
 	// --- Estado del formulario ---
-	const [name, setName] = useState('');
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [role, setRole] = useState<'owner' | 'sitter'>('owner'); // Rol por defecto
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
+	const { register, handleSubmit } = useForm<SitterRegisterRequest>();
+	const setToken = useAuthStore((state) => state.setToken);
+	const setProfile = useAuthStore((state) => state.setProfile);
 
 	// --- Lógica de envío ---
-	const handleRegister = async (e: FormEvent) => {
-		e.preventDefault();
+	const handleRegister = async (data: SitterRegisterRequest) => {
 		setIsLoading(true);
 		setError(null);
 
-		if (!name || !email || !password) {
-			setError('Todos los campos son obligatorios.');
-			setIsLoading(false);
-			return;
-		}
-
 		try {
-			const userData = await registerService(name, email, password, role);
-			// Inicia sesión automáticamente al usuario después del registro
-			login(userData);
+			const res = await registerRequest(
+				data.firstName || '',
+				data.lastName || '',
+				data.email || '',
+				data.password || '',
+				data.address || '',
+				data.phoneNumber || ''
+			);
 			// Redirige al dashboard correspondiente según el rol
-			navigate(`/${userData.role}/dashboard`);
+			setToken(res.token);
+			setProfile(res.userProfile);
+			if (res.role === Role.SITTER) {
+				navigate('/sitter/onboarding');
+				return res;
+			}
+			navigate(`/dashboard`);
+			return res;
 		} catch (err) {
 			setError(
 				'No se pudo completar el registro. El correo ya puede estar en uso.'
@@ -51,42 +55,52 @@ export default function RegisterPage() {
 			<h1 className="text-2xl font-bold mb-4 text-center">
 				Crear Cuenta
 			</h1>
-			<form onSubmit={handleRegister} className="flex flex-col gap-4">
+			<form
+				onSubmit={handleSubmit(handleRegister)}
+				className="flex flex-col gap-4"
+			>
 				<input
 					type="text"
-					placeholder="Nombre completo"
-					value={name}
-					onChange={(e) => setName(e.target.value)}
+					placeholder="Jhon"
 					className="p-2 border rounded-md"
 					required
+					{...register('firstName', { required: true })}
+				/>
+				<input
+					type="text"
+					placeholder="Doe"
+					className="p-2 border rounded-md"
+					required
+					{...register('lastName', { required: true })}
 				/>
 				<input
 					type="email"
-					placeholder="Correo electrónico"
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
+					placeholder="ejemplo@ejemplo.com"
 					className="p-2 border rounded-md"
 					required
+					{...register('email', { required: true })}
 				/>
 				<input
 					type="password"
 					placeholder="Contraseña"
-					value={password}
-					onChange={(e) => setPassword(e.target.value)}
 					className="p-2 border rounded-md"
 					required
+					{...register('password', { required: true, minLength: 8 })}
 				/>
-				<select
-					value={role}
-					onChange={(e) =>
-						setRole(e.target.value as 'owner' | 'sitter')
-					}
-					className="p-2 border rounded-md bg-white"
-				>
-					<option value="owner">Soy Dueño de Mascota</option>
-					<option value="sitter">Quiero ser Cuidador</option>
-				</select>
-
+				<input
+					type="text"
+					placeholder="calle falsa 123"
+					className="p-2 border rounded-md"
+					required
+					{...register('address', { required: true })}
+				/>
+				<input
+					type="text"
+					placeholder="555-555-5555"
+					className="p-2 border rounded-md"
+					required
+					{...register('phoneNumber', { required: true })}
+				/>
 				{error && <p className="text-red-500 text-sm">{error}</p>}
 
 				<button
