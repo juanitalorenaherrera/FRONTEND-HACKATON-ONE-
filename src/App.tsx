@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, useParams } from 'react-router';
+import { BrowserRouter, Route, Routes } from 'react-router';
 
 import AdminDashboard from './pages/AdminDashboard';
 //import BookingPage from './pages/BookingPage';
@@ -46,7 +46,8 @@ export default function App() {
                             <Route index element={<PetsOverview />} />
                             <Route path=":petId" element={<PetProfile />} />
                         </Route>
-						<Route path="pets/:petId" element={<PetProfile id={useParams().petId} onBack={() => console.log('Go back')} />
+						<Route path="pets/:petId" element={<PetProfile />
+							// id={useParams().petId} onBack={() => console.log('Go back')}
 } />
 						<Route path="find-sitters" element={<FindSittersView />} />
 						<Route path="bookings" element={<BookingsView />} />
