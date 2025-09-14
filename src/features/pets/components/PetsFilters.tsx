@@ -5,23 +5,25 @@ import { useMemo, useState } from 'react';
 import { PET_SPECIES_OPTIONS } from '../constants';
 import type { PetFilters } from '../types';
 import { Search } from 'lucide-react';
-import { usePetsContext } from '../hooks/usePetsContext';
+import { usePetsStore } from '../../../store/PetStore';
 
 interface PetsFiltersProps {
     className?: string;
 }
 
 export function PetsFilters({ className = '' }: PetsFiltersProps) {
-    // 1. LEEMOS EL ESTADO DIRECTAMENTE DEL CONTEXTO. No hay un hook `usePets`.
-    const { state, dispatch } = usePetsContext();
-    const { filters, pets } = state;
+    // 1. LEEMOS EL ESTADO DIRECTAMENTE DEL STORE
+    const filters = usePetsStore((state) => state.filters);
+    const pets = usePetsStore((state) => state.pets);
+    const updateFilters = usePetsStore((state) => state.updateFilters);
+    const clearFilters = usePetsStore((state) => state.clearFilters);
 
     // El estado local para la visibilidad de la UI es correcto, se mantiene.
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
-    // 2. LOS HANDLERS AHORA DESPACHAN ACCIONES. Son simples y declarativos.
+    // 2. LOS HANDLERS USAN LAS ACCIONES DEL STORE DIRECTAMENTE
     const handleFilterChange = (update: Partial<PetFilters>) => {
-        dispatch({ type: 'UPDATE_FILTERS', payload: update });
+        updateFilters(update);
     };
 
     const handleSpeciesToggle = (species: string) => {
@@ -33,19 +35,9 @@ export function PetsFilters({ className = '' }: PetsFiltersProps) {
     };
     
     const clearAllFilters = () => {
-        dispatch({ type: 'CLEAR_FILTERS' });
+        clearFilters();
     };
     
-    // 3. LA LÓGICA DERIVADA SE MANTIENE. Es una buena práctica.
-    const activeFiltersCount = useMemo(() => {
-        let count = 0;
-        if (filters.search) count++;
-        if (filters.species && filters.species.length > 0) count++;
-        if (!filters.activeOnly) count++;
-        // Añadir más condiciones si es necesario
-        return count;
-    }, [filters]);
-
     const availableSpecies = useMemo(() => {
         const petSpecies = [...new Set(pets.map(p => p.species?.toLowerCase()).filter(Boolean))];
         return PET_SPECIES_OPTIONS.filter(option => 
