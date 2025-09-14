@@ -1,6 +1,6 @@
 // features/pets/components/profile/PetVaccinationsTab.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
 
 import { ErrorState } from '../../../../components/ui/ErrorState';
@@ -94,22 +94,23 @@ export function PetVaccinationsTab({ pet }: { pet: Pet }) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchRecords = async () => {
+    const fetchRecords = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
             const data = await vaccinationService.getByPetId(pet.id);
             setRecords(data);
         } catch (err) {
-            setError('No se pudo cargar el historial de vacunación.');
+			setError('No se pudo cargar el historial de vacunación.')
+			console.log(err);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [pet.id]);
 
     useEffect(() => {
         fetchRecords();
-    }, [pet.id]);
+    }, [pet.id, fetchRecords]);
 
     if (isLoading) {
         return (
