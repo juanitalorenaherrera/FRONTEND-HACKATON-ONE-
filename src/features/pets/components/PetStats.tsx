@@ -3,12 +3,12 @@
 import { Activity, BarChart3, Clock, Heart, TrendingUp } from 'lucide-react';
 
 import { useMemo } from 'react';
-import { usePetsContext } from '../hooks/usePetsContext';
+import { usePetsStore } from '../../../store/PetStore';
 
 export function PetStats() {
-    // 1. Leemos el estado directamente del contexto.
-    const { state } = usePetsContext();
-    const { pets, stats: backendStats } = state;
+    // 1. Leemos el estado directamente del store.
+    const pets = usePetsStore((state) => state.pets);
+    const backendStats = usePetsStore((state) => state.stats);
 
     // 2. Centralizamos y memoizamos todos los cálculos derivados para eficiencia.
     const derivedStats = useMemo(() => {
