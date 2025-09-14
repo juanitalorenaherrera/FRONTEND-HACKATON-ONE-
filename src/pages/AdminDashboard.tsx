@@ -12,12 +12,25 @@ interface DashboardStats {
 	monthlyRevenue: number;
 }
 
+enum TypeActivity {
+	BOOKING = 'booking',
+	REGISTRATION = 'registration',
+	APPROVAL = 'approval',
+	COMPLAINT = 'complaint',
+}
+
+enum Status {
+	PENDING = 'pending',
+	COMPLETED = 'completed',
+	WARNING = 'warning'
+}
+
 interface RecentActivity {
 	id: string;
-	type: 'booking' | 'registration' | 'approval' | 'complaint';
+	type: TypeActivity;
 	message: string;
 	timestamp: Date;
-	status: 'pending' | 'completed' | 'warning';
+	status: Status;
 }
 
 export default function AdminDashboard() {
@@ -66,31 +79,31 @@ export default function AdminDashboard() {
 			setRecentActivity([
 				{
 					id: '1',
-					type: 'booking',
+					type: TypeActivity.BOOKING,
 					message: 'Nueva reserva de María González',
 					timestamp: new Date(Date.now() - 1000 * 60 * 30),
-					status: 'completed',
+					status: Status.COMPLETED,
 				},
 				{
 					id: '2',
-					type: 'registration',
+					type: TypeActivity.REGISTRATION,
 					message: 'Nuevo cuidador registrado: Carlos Ruiz',
 					timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-					status: 'pending',
+					status: Status.PENDING,
 				},
 				{
 					id: '3',
-					type: 'approval',
+					type: TypeActivity.APPROVAL,
 					message: 'Solicitud de verificación pendiente',
 					timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4),
-					status: 'warning',
+					status: Status.WARNING,
 				},
 				{
 					id: '4',
-					type: 'complaint',
+					type: TypeActivity.COMPLAINT,
 					message: 'Reporte de problema con reserva #234',
 					timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6),
-					status: 'warning',
+					status: Status.WARNING,
 				},
 			]);
 		} catch (err) {
