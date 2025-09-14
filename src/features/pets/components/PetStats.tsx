@@ -3,7 +3,7 @@
 import { Activity, BarChart3, Clock, Heart, TrendingUp } from 'lucide-react';
 
 import { useMemo } from 'react';
-import { usePetsContext } from '../context/PetsContext';
+import { usePetsContext } from '../hooks/usePetsContext';
 
 export function PetStats() {
     // 1. Leemos el estado directamente del contexto.
