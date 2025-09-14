@@ -8,10 +8,14 @@ import { PetsHeader } from './PetsHeader';
 import { useAuthStore } from '../../../store/AuthStore';
 //import { useMemo } from 'react';
 import { usePetsActions } from '../hooks/usePetsActions';
-import { usePetsContext } from '../hooks/usePetsContext';
+import { usePetsStore } from '../../../store/PetStore';
 
 export function PetsOverview({ className = '' }: { className?: string }) {
-    const { state, filteredPets } = usePetsContext();
+    const { state, filteredPets } = usePetsStore((store) => ({
+		state: store,
+		filteredPets: store.filteredPets,
+	}));
+
 	const { refreshPets } = usePetsActions();
 	const user = useAuthStore((state) => state.profile);
 
