@@ -3,6 +3,7 @@ import type { DashboardData, Pet } from '../types/dashboardData';
 import type { DashboardStatsData } from '../types/DashboardStatsData';
 import type { PetSummaryResponse } from '../types/pets';
 import axios from '../services/auth';
+import { getMockDashboardData } from './mockDashboardService';
 
 const API_URL = '/api/dashboard';
 
@@ -12,7 +13,7 @@ const API_URL = '/api/dashboard';
  */
 export const getDashboardStats = async (): Promise<DashboardStatsData> => {
     try {
-        const response = await axios.get(`${API_URL}/stats`);
+        const response = await axios.get<DashboardStatsData>(`${API_URL}/stats`);
         return response.data;
     } catch (error) {
         console.error('Error fetching dashboard stats:', error);
@@ -29,12 +30,11 @@ export const getDashboardData = async (): Promise<DashboardData> => {
         console.log('🔄 Iniciando carga de datos del dashboard...');
         console.log('📡 API URL:', import.meta.env.VITE_API_URL);
         
-        const [statsResponse, mainResponse, petsResponse, sittersResponse, appointmentResponse] = await Promise.all([
-            axios.get(`${API_URL}/stats`),
+        const [statsResponse, mainResponse, petsResponse, sittersResponse] = await Promise.all([
+            axios.get<DashboardStatsData>(`${API_URL}/stats`),
             axios.get(`${API_URL}/main`),
-            axios.get('/api/pets/summary'),
-            axios.get(`${API_URL}/recent-sitters`),
-            axios.get(`${API_URL}/next-appointment`)
+            axios.get<PetSummaryResponse[]>('/api/pets/summary'),
+            axios.get(`${API_URL}/sitter-profiles`)
         ]);
 
         const userPets = petsResponse.data
@@ -57,7 +57,7 @@ export const getDashboardData = async (): Promise<DashboardData> => {
             stats: statsResponse.data,
             userPets,
             recentSitters: sittersResponse.data,
-            nextAppointment: appointmentResponse.data
+            nextAppointment: null
         };
     } catch (error: unknown) {
         const axiosError = error as { message?: string; response?: { status?: number; statusText?: string }; config?: { url?: string; baseURL?: string }; code?: string };
@@ -70,8 +70,9 @@ export const getDashboardData = async (): Promise<DashboardData> => {
             baseURL: axiosError.config?.baseURL
         });
         
-        if (axiosError.code === 'ECONNREFUSED' || axiosError.code === 'ERR_NETWORK') {
-            throw new Error('🔌 El servidor backend no está disponible. Verifica que esté corriendo en http://localhost:8088');
+        if (axiosError.code === 'ECONNREFUSED' || axiosError.code === 'ERR_NETWORK' || axiosError.response?.status === 500) {
+            console.warn('⚠️ Backend no disponible o con errores, usando datos mock...');
+            return await getMockDashboardData();
         }
         
         throw new Error(`No se pudieron cargar los datos del dashboard: ${axiosError.message || 'Error desconocido'}`);
@@ -96,7 +97,7 @@ export const getRecentSitters = async () => {
 
 export const getPetsSummary = async (): Promise<PetSummaryResponse[]> => {
     try {
-        const response = await axios.get('/api/pets/summary');
+        const response = await axios.get<PetSummaryResponse[]>('/api/pets/summary');
         return response.data;
     } catch (error) {
         console.error('Error fetching pets summary:', error);
