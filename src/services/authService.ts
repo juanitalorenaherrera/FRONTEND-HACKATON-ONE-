@@ -5,8 +5,6 @@ import axios from '../services/auth';
 import type { Profile, Role } from '../types/authStore';
 ;
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 // 1. (Opcional pero recomendado) Creamos una interfaz para la respuesta del login
 interface LoginResponse {
 	token: string;
@@ -45,7 +43,16 @@ interface RegisterResponse {
 	role: Role;
 	userProfile: Profile;
 }
-
+/*
+interface RegisterRequest {
+	firstName: string;
+	lastName: string;
+	email: string;
+	password: string;
+	address: string;
+	phoneNumber: string;
+}
+	*/
 /**
  * Registra un nuevo usuario. (Función que ya tenías)
  */
@@ -57,7 +64,7 @@ export const registerRequest = async (
 	address: string,
 	phoneNumber: string,
 ): Promise<RegisterResponse> => {
-	const response = await axios.post<RegisterResponse>(`${API_URL}/api/users/register`, {
+	const response = await axios.post<RegisterResponse>(`/api/users/register`, {
 		firstName,
 		lastName,
 		email,
@@ -65,5 +72,7 @@ export const registerRequest = async (
 		address,
 		phoneNumber
 	});
+	console.log(response.data);
+
 	return response.data;
 };
