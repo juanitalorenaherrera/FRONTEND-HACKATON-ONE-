@@ -25,7 +25,7 @@ export const createSitterProfile = async (
 	profileData: CreateSitterProfileRequest
 ): Promise<SitterProfileDTO> => {
 	try {
-		const response = await axios.post(API_URL, profileData);
+		const response = await axios.post<SitterProfileDTO>(API_URL, profileData);
 		return response.data;
 	} catch (error) {
 		console.error('Error creating sitter profile:', error);
@@ -71,7 +71,7 @@ export const updateSitterProfile = async (
 	profileData: CreateSitterProfileRequest
 ): Promise<SitterProfileDTO> => {
 	try {
-		const response = await axios.put(`${API_URL}/${userId}`, profileData);
+		const response = await axios.put<SitterProfileDTO>(`${API_URL}/${userId}`, profileData);
 		return response.data;
 	} catch (error) {
 		console.error('Error updating sitter profile:', error);
@@ -100,7 +100,7 @@ export const registerSitter = async (
 	sitterData: SitterRegisterRequest
 ): Promise<AuthResponse> => {
 	try {
-		const response = await axios.post(
+		const response = await axios.post<AuthResponse>(
 			`${USERS_API_URL}/register-sitter`,
 			sitterData
 		);
@@ -325,7 +325,7 @@ export async function addMyService(
 			name,
 			description,
 			price,
-			durationInMinutes,
+			durationInMinutes
 		}
 	);
 	return response.data;
