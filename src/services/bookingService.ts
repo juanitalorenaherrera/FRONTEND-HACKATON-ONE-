@@ -3,7 +3,6 @@ import type {
 	BookingDetail,
 	BookingStatus,
 	BookingSummary,
-	CreateBookingRequest,
 	PageResponse,
 	UpdateBookingRequest,
 } from '../features/booking/types';
@@ -22,7 +21,7 @@ export async function createBooking(
 	startTime: string, // Formato ISO: "YYYY-MM-DDTHH:mm:ss"
 	notes?: string
 ) {
-	const { data } = await axios.post<CreateBookingRequest>(API_URL, {
+	const { data } = await axios.post<BookingDetail>(API_URL, {
 		petId,
 		sitterId,
 		serviceOfferingId,
@@ -41,9 +40,10 @@ export async function getBookingsByUser(
 	filters: { status?: string; page?: number; size?: number }
 ): Promise<PageResponse<BookingSummary>> {
 	const { data } = await axios.get<PageResponse<BookingSummary>>(
-		`${API_URL}/user/${userId}`,
+		`${API_URL}`,
 		{
 			params: {
+				userId,
 				role,
 				status: filters.status,
 				page: filters.page,
