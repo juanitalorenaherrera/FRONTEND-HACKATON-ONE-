@@ -1,9 +1,10 @@
 import { Navigate, Outlet } from 'react-router';
-import { useAuthStore } from '../../store/AuthStore';
-import type { Profile } from '../../types/authStore';
+
+import type { Profile } from '../../../types/authStore';
+import { useAuthStore } from '../../../store/AuthStore';
 
 interface RoleProtectedRouteProps {
-    allowedRoles: Profile['role'][];
+    readonly allowedRoles: Profile['role'][];
 }
 
 export default function RoleProtectedRoute({ allowedRoles }: RoleProtectedRouteProps) {

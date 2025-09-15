@@ -4,7 +4,7 @@
 
 import { Calendar, MapPin, Phone } from 'lucide-react';
 
-import type { Appointment } from '../../../../../../types/dashboardData';
+import type { Appointment } from '../../../../../../types/dashboard';
 import React from 'react';
 
 interface AppointmentActionsProps {

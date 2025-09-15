@@ -1,89 +1,104 @@
-// ========== INTERFACES ALINEADAS CON BACKEND ==========
+// src/types/booking.ts (VERSIÓN FINAL)
+
+// =======================================================
+// DTOs - Data Transfer Objects (Alineados con la API)
+// =======================================================
 
 /**
- * Estados de reserva según el backend
+ * Representa los posibles estados de una reserva.
  */
 export enum BookingStatus {
-	PENDING = 'PENDING',
-	CONFIRMED = 'CONFIRMED',
-	IN_PROGRESS = 'IN_PROGRESS',
-	COMPLETED = 'COMPLETED',
-	CANCELLED = 'CANCELLED',
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
 }
 
+// --- REQUEST DTOs (Datos que el Frontend ENVÍA al Backend) ---
+
 /**
- * Interface para crear una nueva reserva
- * Basada en CreateBookingRequest del backend
+ * DTO para crear una nueva reserva.
  */
 export interface CreateBookingRequest {
-	petId: number;
-	sitterId: number;
-	serviceOfferingId: number;
-	startTime: string; // ISO string
-	notes?: string;
+  petId: number;
+  sitterId: number;
+  serviceOfferingId: number;
+  startTime: string; // ISO string
+  notes?: string;
 }
 
 /**
- * Interface para actualizar una reserva
- * Basada en UpdateBookingRequest del backend
+ * DTO para actualizar los detalles de una reserva.
  */
 export interface UpdateBookingRequest {
-	startTime?: string;
-	notes?: string;
-	totalPrice?: number;
-	actualStartTime?: string;
-	actualEndTime?: string;
+  startTime?: string;
+  notes?: string;
 }
 
 /**
- * Interface para resumen de reservas
- * Basada en BookingSummaryResponse del backend
+ * DTO para actualizar solo el estado de una reserva.
  */
-export interface BookingSummaryResponse {
-	id: number;
-	petName: string;
-	sitterName: string;
-	startTime: string;
-	status: BookingStatus;
-	totalPrice: number;
+export interface UpdateBookingStatusRequest {
+  newStatus: BookingStatus;
+  reason?: string;
 }
 
 /**
- * Interface para detalles completos de reserva
- * Basada en BookingDetailResponse del backend
+ * DTO para los parámetros de búsqueda de reservas.
  */
-export interface BookingDetailResponse {
-	id: number;
-	petId: number;
-	petName: string;
-	sitterId: number;
-	sitterName: string;
-	serviceOfferingId: number;
-	serviceName: string;
-	bookedByUserId: number;
-	bookedByUserName: string;
-	startTime: string;
-	endTime: string;
-	actualStartTime?: string;
-	actualEndTime?: string;
-	status: BookingStatus;
-	totalPrice: number;
-	notes?: string;
-	cancellationReason?: string;
-	createdAt: string;
-	updatedAt: string;
+export interface GetBookingsRequest {
+  userId: number;
+  role: string; // O tu enum Role
+  status?: BookingStatus;
+  page?: number;
+  size?: number;
+}
+
+// --- RESPONSE DTOs (Datos que el Backend DEVUELVE al Frontend) ---
+
+/**
+ * DTO para un resumen de reserva (usado en listas).
+ */
+export interface BookingSummary {
+  id: number;
+  petName: string;
+  sitterName: string;
+  startTime: string;
+  status: BookingStatus;
+  totalPrice: number;
 }
 
 /**
- * Interface para paginación
+ * DTO para los detalles completos de una reserva.
+ */
+export interface BookingDetail {
+  id: number;
+  petId: number;
+  petName: string;
+  sitterId: number;
+  sitterName: string;
+  serviceName: string;
+  startTime: string;
+  endTime: string;
+  status: BookingStatus;
+  totalPrice: number;
+  notes?: string;
+  cancellationReason?: string;
+  createdAt: string;
+}
+
+// =======================================================
+// Tipos Genéricos (Pueden moverse a un archivo global)
+// =======================================================
+
+/**
+ * DTO genérico para respuestas paginadas de la API.
  */
 export interface PageResponse<T> {
-	content: T[];
-	totalElements: number;
-	totalPages: number;
-	number: number;
-	size: number;
-	first: boolean;
-	last: boolean;
-	empty: boolean;
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number; // Número de la página actual
+  size: number;
 }

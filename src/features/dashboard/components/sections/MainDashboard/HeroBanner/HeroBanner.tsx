@@ -15,7 +15,7 @@ import type {
 	Pet,
 	Sitter,
 	UserProfile,
-} from '../../../../../../types/dashboardData';
+} from '../../../../../../types/dashboard';
 
 import React from 'react';
 import ServiceButton from './ServiceButton';

@@ -1,78 +1,75 @@
 // src/services/authService.ts
 
-import type { User } from '../types/user';
-import axios from '../services/auth';
-import type { Profile, Role } from '../types/authStore';
-;
+import type {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+} from '../types/auth';
 
-// 1. (Opcional pero recomendado) Creamos una interfaz para la respuesta del login
-interface LoginResponse {
-	token: string;
-	userProfile: Profile;
-}
+import authApi from './auth'; // Nuestra instancia configurada de Axios
 
-export const loginRequest = async (email: string, password: string): Promise<LoginResponse> => {
-	const res = await axios.post<LoginResponse>('/api/users/login', {
-		email,
-		password,
-	});
-
-	console.log(res.data);
-	return res.data;
+/**
+ * Envía las credenciales del usuario para iniciar sesión.
+ * @param credentials - Un objeto que contiene el email y la contraseña.
+ * @returns Una promesa que se resuelve con el token y el perfil del usuario.
+ */
+export const loginRequest = async (
+  credentials: LoginRequest
+): Promise<LoginResponse> => {
+  const { data } = await authApi.post<LoginResponse>('/api/users/login', credentials);
+  return data;
 };
 
 /**
- * Inicia sesión, guarda el token y devuelve los datos del usuario.
+ * Función de compatibilidad para el código existente que pasa email y password por separado
+ * @deprecated Usa loginRequest con un objeto credentials en su lugar
  */
-/**
- * Obtiene el perfil del usuario autenticado a través del token.
- */
-export const getProfile = async (): Promise<User> => {
-	const token = localStorage.getItem('auth');
-	if (!token) {
-		throw new Error('No se encontró el token de autenticación.');
-	}
-
-	const response = await axios.get<User>(`/api/dashboard/profile`);
-
-	return response.data;
+export const loginUser = async (
+  email: string,
+  password: string
+): Promise<LoginResponse> => {
+  return loginRequest({ email, password });
 };
 
-interface RegisterResponse {
-	token: string;
-	role: Role;
-	userProfile: Profile;
-}
-/*
-interface RegisterRequest {
-	firstName: string;
-	lastName: string;
-	email: string;
-	password: string;
-	address: string;
-	phoneNumber: string;
-}
-	*/
 /**
- * Registra un nuevo usuario. (Función que ya tenías)
+ * Función de compatibilidad para el código existente que pasa parámetros por separado
+ * @deprecated Usa registerRequest con un objeto userData en su lugar
+ */
+export const registerUser = async (
+  firstName: string,
+  lastName: string,
+  email: string,
+  password: string,
+  address?: string,
+  phoneNumber?: string
+): Promise<RegisterResponse> => {
+  return registerRequest({ 
+    firstName, 
+    lastName, 
+    email, 
+    password, 
+    address, 
+    phoneNumber 
+  });
+};
+
+/**
+ * Envía los datos de un nuevo usuario para registrarlo en el sistema.
+ * @param userData - Un objeto con toda la información del nuevo usuario.
+ * @returns Una promesa que se resuelve con la respuesta del registro.
  */
 export const registerRequest = async (
-	firstName: string,
-	lastName: string,
-	email: string,
-	password: string,
-	address: string,
-	phoneNumber: string,
+  userData: RegisterRequest
 ): Promise<RegisterResponse> => {
-	const response = await axios.post<RegisterResponse>(`/api/users/register`, {
-		firstName,
-		lastName,
-		email,
-		password,
-		address,
-		phoneNumber
-	});
-	console.log(response.data);
+  const { data } = await authApi.post<RegisterResponse>('/api/users/register', userData);
+  return data;
+};
 
-	return response.data;
+// Limpiamos las exportaciones confusas del final
+export default {
+  loginRequest,
+  loginUser,
+  registerRequest,
+  registerUser,
 };

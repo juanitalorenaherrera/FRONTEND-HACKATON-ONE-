@@ -4,7 +4,7 @@
 
 import { ArrowRight, Heart, PawPrint, Zap } from 'lucide-react';
 
-import type { Pet } from '../../../../../../types/dashboardData';
+import type { Pet } from '../../../../../../types/dashboard';
 import React from 'react';
 import { getRecommendation } from '../../../../../../utils/dashboardUtils';
 

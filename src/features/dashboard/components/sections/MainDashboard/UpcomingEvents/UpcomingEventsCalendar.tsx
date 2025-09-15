@@ -2,7 +2,7 @@
 // sections/UpcomingEvents/UpcomingEventsCalendar.tsx
 // ===========================================
 
-import type { Appointment, Stats } from '../../../../../../types/dashboardData';
+import type { Appointment, Stats } from '../../../../../../types/dashboard';
 
 import { Calendar } from 'lucide-react';
 import EventCard from './EventCard';

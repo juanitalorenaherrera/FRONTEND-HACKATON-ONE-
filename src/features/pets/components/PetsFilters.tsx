@@ -1,49 +1,48 @@
 // features/pets/components/PetsFilters.tsx - Versión Refactorizada
 
-import { useMemo, useState } from 'react';
+import { Filter, Search, X } from 'lucide-react';
 
-import { PET_SPECIES_OPTIONS } from '../constants';
-import type { PetFilters } from '../types';
-import { Search } from 'lucide-react';
-import { usePetsStore } from '../../../store/PetStore';
+import { useState } from 'react';
 
 interface PetsFiltersProps {
     className?: string;
+    filters: {
+        species: string;
+        active: 'all' | 'active' | 'inactive';
+        search: string;
+    };
+    onFiltersChange: (filters: any) => void;
+    availableSpecies: string[];
 }
 
-export function PetsFilters({ className = '' }: PetsFiltersProps) {
-    // 1. LEEMOS EL ESTADO DIRECTAMENTE DEL STORE
-    const filters = usePetsStore((state) => state.filters);
-    const pets = usePetsStore((state) => state.pets);
-    const updateFilters = usePetsStore((state) => state.updateFilters);
-    const clearFilters = usePetsStore((state) => state.clearFilters);
-
-    // El estado local para la visibilidad de la UI es correcto, se mantiene.
+export function PetsFilters({ 
+    className = '', 
+    filters, 
+    onFiltersChange,
+    availableSpecies 
+}: PetsFiltersProps) {
+    // Estado local solo para la visibilidad de la UI
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
-    // 2. LOS HANDLERS USAN LAS ACCIONES DEL STORE DIRECTAMENTE
-    const handleFilterChange = (update: Partial<PetFilters>) => {
-        updateFilters(update);
+    // Handlers que actualizan los filtros en el componente padre
+    const handleFilterChange = (update: Partial<typeof filters>) => {
+        onFiltersChange({ ...filters, ...update });
     };
 
-    const handleSpeciesToggle = (species: string) => {
-        const currentSpecies = filters.species || [];
-        const newSpecies = currentSpecies.includes(species)
-            ? currentSpecies.filter(s => s !== species)
-            : [...currentSpecies, species];
-        handleFilterChange({ species: newSpecies });
+    const handleSpeciesChange = (species: string) => {
+        handleFilterChange({ species });
     };
     
     const clearAllFilters = () => {
-        clearFilters();
+        onFiltersChange({
+            species: '',
+            active: 'all',
+            search: ''
+        });
     };
-    
-    const availableSpecies = useMemo(() => {
-        const petSpecies = [...new Set(pets.map(p => p.species?.toLowerCase()).filter(Boolean))];
-        return PET_SPECIES_OPTIONS.filter(option => 
-            petSpecies.includes(option.value)
-        );
-    }, [pets]);
+
+    // Verificar si hay filtros activos
+    const hasActiveFilters = filters.species || filters.active !== 'all' || filters.search;
     
     return (
         <div className={`space-y-4 ${className}`}>
@@ -53,51 +52,112 @@ export function PetsFilters({ className = '' }: PetsFiltersProps) {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                         type="text"
-                        placeholder="Buscar mascotas..."
-                        // 4. EL VALOR VIENE DIRECTAMENTE DEL ESTADO GLOBAL. No hay `searchValue` local.
+                        placeholder="Buscar por nombre o raza..."
                         value={filters.search || ''}
                         onChange={(e) => handleFilterChange({ search: e.target.value })}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                     />
+                    {filters.search && (
+                        <button
+                            onClick={() => handleFilterChange({ search: '' })}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    )}
                 </div>
                 
                 {/* Filter Toggle */}
                 <button
                     onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                    className={`flex items-center gap-2 px-4 py-3 border rounded-xl...`}
+                    className={`flex items-center gap-2 px-4 py-3 border rounded-xl transition-all duration-200 ${
+                        showAdvancedFilters || hasActiveFilters
+                            ? 'bg-orange-50 border-orange-200 text-orange-700'
+                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                    }`}
                 >
-                    {/* ... Contenido del botón sin cambios ... */}
+                    <Filter className="w-4 h-4" />
+                    <span className="font-medium">Filtros</span>
+                    {hasActiveFilters && (
+                        <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                    )}
                 </button>
             </div>
             
             {/* Advanced Filters */}
             {showAdvancedFilters && (
-                <div className="bg-gray-50 rounded-xl p-4 space-y-4">
+                <div className="bg-gray-50 rounded-xl p-4 space-y-4 animate-fade-in">
                     <div className="flex items-center justify-between">
                         <h4 className="font-medium text-gray-900">Filtros Avanzados</h4>
-                        <button onClick={clearAllFilters} className="text-sm text-orange-600 hover:underline">
-                            Limpiar todo
-                        </button>
+                        {hasActiveFilters && (
+                            <button 
+                                onClick={clearAllFilters} 
+                                className="text-sm text-orange-600 hover:text-orange-700 hover:underline transition-colors"
+                            >
+                                Limpiar todo
+                            </button>
+                        )}
                     </div>
                     
                     {/* Species Filter */}
+                    {availableSpecies.length > 0 && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Especie
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    onClick={() => handleSpeciesChange('')}
+                                    className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                                        !filters.species
+                                            ? 'bg-orange-100 border-orange-300 text-orange-700'
+                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    Todas
+                                </button>
+                                {availableSpecies.map((species) => (
+                                    <button
+                                        key={species}
+                                        onClick={() => handleSpeciesChange(species)}
+                                        className={`px-3 py-1.5 text-sm rounded-lg border transition-colors capitalize ${
+                                            filters.species === species
+                                                ? 'bg-orange-100 border-orange-300 text-orange-700'
+                                                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        {species}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* Status Filter */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Especies</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Estado
+                        </label>
                         <div className="flex flex-wrap gap-2">
-                            {availableSpecies.map((option) => (
+                            {[
+                                { value: 'all', label: 'Todas' },
+                                { value: 'active', label: 'Activas' },
+                                { value: 'inactive', label: 'Inactivas' }
+                            ].map((option) => (
                                 <button
                                     key={option.value}
-                                    onClick={() => handleSpeciesToggle(option.value)}
-                                    className={`... ${filters.species?.includes(option.value) ? 'bg-orange-100' : 'bg-white'}`}
+                                    onClick={() => handleFilterChange({ active: option.value as any })}
+                                    className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                                        filters.active === option.value
+                                            ? 'bg-orange-100 border-orange-300 text-orange-700'
+                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                    }`}
                                 >
-                                    {/* ... Contenido del botón de especie ... */}
+                                    {option.label}
                                 </button>
                             ))}
                         </div>
                     </div>
-                    
-                    {/* Status and Sort Filters ... */}
-                    {/* Se refactorizarían de manera similar, llamando a `handleFilterChange` */}
                 </div>
             )}
         </div>

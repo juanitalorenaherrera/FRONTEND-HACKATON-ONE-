@@ -66,3 +66,8 @@ export interface SitterFilters {
 
 // Re-exportamos las funciones ya definidas anteriormente
 export { applySitterFilters, sortSitters } from './sitterUtils';
+
+export const mapProfileToExtendedSitter = (profile: SitterProfileDTO): ExtendedSitter => {
+  // ...lógica del mapeo...
+  return { /* ...datos extendidos para la UI... */ };
+};

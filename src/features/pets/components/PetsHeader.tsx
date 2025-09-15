@@ -2,17 +2,13 @@
 
 import { Heart, Plus, RefreshCw } from 'lucide-react';
 
+import { useAuthStore } from '../../../store/AuthStore';
 import { useMemo } from 'react';
 import { usePetsActions } from '../hooks/usePetsActions';
-import { useAuthStore } from '../../../store/AuthStore';
-import { usePetsStore } from '../../../store/PetStore';
 
 export function PetsHeader() {
-	const state = usePetsStore((store) => store);
-    const { pets, isLoading } = state;
+    const { pets, isLoading, showAddPetModal, refreshPets } = usePetsActions();
     
-    const { showAddPetModal, refreshPets } = usePetsActions(); 
-
     const totalActivePets = useMemo(() => pets.filter(p => p.active).length, [pets]);
 
     const pluralSuffix = totalActivePets > 1 ? 's' : '';
@@ -55,7 +51,8 @@ export function PetsHeader() {
                 
                 <button 
                     onClick={showAddPetModal}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                    disabled={isLoading}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Plus className="w-4 h-4" />
                     <span className="font-medium">Agregar</span>

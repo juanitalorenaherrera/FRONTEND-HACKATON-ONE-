@@ -6,7 +6,7 @@ import { Bell, Calendar, Heart, Shield } from 'lucide-react';
 
 import React from 'react';
 import { StatCard } from './StatCard';
-import type { Stats } from '../../../../../../types/dashboardData';
+import type { Stats } from '../../../../../../types/dashboard';
 
 interface StatsSectionProps {
   stats: Stats;

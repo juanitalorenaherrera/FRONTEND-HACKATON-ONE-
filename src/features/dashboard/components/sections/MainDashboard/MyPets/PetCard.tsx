@@ -4,7 +4,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import ImageWithFallback from '../../../../../../components/ui/ImageWithFallback';
-import type { Pet } from '../../../../../../types/dashboardData';
+import type { Pet } from '../../../../../../types/dashboard';
 import React from 'react';
 import { getPetImage } from '../../../../../../utils/dashboardUtils';
 

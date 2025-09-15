@@ -1,5 +1,6 @@
-import { Calendar, Heart, Activity, CheckCircle } from "lucide-react";
-import type { Stats } from '../types/dashboardData';
+import { Activity, Calendar, CheckCircle, Heart } from "lucide-react";
+
+import type { Stats } from '../types/dashboard';
 
 export const getDisplayStats = (stats: Stats) => [
 	{

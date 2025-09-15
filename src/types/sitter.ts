@@ -1,96 +1,84 @@
-// ========== INTERFACES ALINEADAS CON BACKEND ==========
+// src/types/sitter.ts
+
+// =======================================================
+// DTOs - Data Transfer Objects (Alineados con la API)
+// =======================================================
+
+// --- REQUEST DTOs (Datos que el Frontend ENVÍA al Backend) ---
 
 /**
- * Interface para el perfil completo de cuidador
- * Basada en SitterProfileDTO del backend
- */
-export interface SitterProfileDTO {
-	id?: number;
-	userId?: number;
-	bio?: string;
-	hourlyRate?: number;
-	servicingRadius?: number;
-	profileImageUrl?: string;
-	verified?: boolean;
-	availableForBookings?: boolean;
-}
-
-/**
- * Interface para resumen de cuidador
- * Basada en SitterProfileSummary del backend
- */
-export interface SitterProfileSummary {
-	id: number;
-	sitterName: string;
-	profileImageUrl?: string;
-	hourlyRate?: number;
-	averageRating?: number;
-	isVerified: boolean;
-	location?: string;
-}
-
-/**
- * Interface para registro de cuidador
- * Basada en SitterRegisterDTO del backend
+ * DTO para registrar un nuevo usuario con el rol de cuidador.
  */
 export interface SitterRegisterRequest {
-	firstName: string;
-	lastName: string;
-	email: string;
-	password: string;
-	address?: string;
-	phoneNumber?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  address?: string;
+  phoneNumber?: string;
 }
 
 /**
- * Interface para crear perfil de cuidador
+ * DTO para crear o actualizar el perfil de un cuidador.
  */
 export interface CreateSitterProfileRequest {
-	bio?: string;
-	hourlyRate: number;
-	servicingRadius?: number;
-	profileImageUrl?: string;
-	availableForBookings?: boolean;
+  bio?: string;
+  hourlyRate: number;
+  servicingRadius?: number;
+  profileImageUrl?: string;
+  availableForBookings?: boolean;
 }
 
 /**
- * Interface para respuesta de autenticación
+ * DTO para los parámetros de búsqueda de cuidadores en la API.
  */
-export interface AuthResponse {
-	token: string;
-	role: string;
-	user: {
-		id: number;
-		email: string;
-		firstName: string;
-		lastName: string;
-	};
+export interface SearchSittersParams {
+    location?: string;
+    maxDistance?: number;
+    minRating?: number;
+    maxHourlyRate?: number;
+    availableOnly?: boolean;
+    page?: number;
+    size?: number;
+}
+
+
+// --- RESPONSE DTOs (Datos que el Backend DEVUELVE al Frontend) ---
+
+/**
+ * DTO para los detalles completos del perfil de un cuidador.
+ */
+export interface SitterProfile {
+  id: number;
+  userId: number;
+  bio?: string;
+  hourlyRate?: number;
+  servicingRadius?: number;
+  profileImageUrl?: string;
+  verified: boolean;
+  availableForBookings: boolean;
 }
 
 /**
- * Interface para cuidador con información extendida (para FindSittersView)
+ * DTO para un resumen del perfil de un cuidador (usado en listas y tarjetas).
  */
-export interface ExtendedSitter extends SitterProfileSummary {
-	// Campos adicionales para la UI
-	specialty?: string;
-	image?: string;
-	rating?: number;
-	totalServices?: number;
-	lastService?: string;
-	pets?: string[];
-	isAvailable?: boolean;
-	distance?: string;
-	bio?: string;
-	nextAvailable?: string;
-	specialties?: string[];
+export interface SitterProfileSummary {
+  id: number;
+  sitterName: string;
+  profileImageUrl?: string;
+  hourlyRate?: number;
+  averageRating?: number;
+  isVerified: boolean;
+  location?: string;
 }
 
+/**
+ * DTO para la respuesta de autenticación (importado o definido en auth.ts).
+ * Lo mantengo aquí como referencia de lo que se eliminó.
+ */
+// export interface AuthResponse { ... }
 
-export interface NewService {
-	sitterId: number;
-	serviceType: string;
-	name: 'caminata';
-	description: string;
-	price: number;
-	durationInMinutes: 120;
-}
+// =======================================================
+// La interfaz `ExtendedSitter` se mueve a la feature:
+// `src/features/sitters/types/index.ts`
+// =======================================================

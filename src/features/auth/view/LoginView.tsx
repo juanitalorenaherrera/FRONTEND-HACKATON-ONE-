@@ -1,46 +1,26 @@
-// src/pages/LoginPage.tsx (Versión Mejorada)
+// src/pages/LoginPage.tsx
 
 import { ArrowRight, Eye, EyeOff, Lock, Mail, PawPrint } from 'lucide-react';
 
+import type { LoginFormData } from '../../../types/auth';
+import { useAuthActions } from '../../auth/hooks/useAuthActions';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useAuthStore } from '../store/AuthStore';
-import { loginRequest } from '../services/authService';
-import { Role } from '../types/authStore';
-
-interface Login {
-	email: string;
-	password: string;
-}
 
 export function LoginPage() {
 	const navigate = useNavigate();
-	const { register, handleSubmit } = useForm<Login>();
-	const setToken = useAuthStore((state) => state.setToken);
-	const setProfile = useAuthStore((state) => state.setProfile);
-	const [error, setError] = useState<string | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
+	const { register, handleSubmit } = useForm<LoginFormData>();
+	const { handleLogin, isLoading, error, clearError } = useAuthActions();
 	const [showPassword, setShowPassword] = useState(false);
 
-	const handleLogin = async (data: Login) => {
-		setError(null);
-		setIsLoading(true);
-		try {
-			const res = await loginRequest(data.email, data.password);
-			const { token, userProfile } = res;
-			setToken(token);
-			setProfile(userProfile);
-			if (userProfile.role === Role.ADMIN) navigate('/AdminDashboard');
-			else if (userProfile.role === Role.SITTER)
-				navigate('/SitterDashboard');
-			else if (userProfile.role === Role.CLIENT) navigate('/dashboard');
-		} catch (err) {
-			setError('Error al iniciar sesión. Verifica tus credenciales.');
-			console.error(err);
-		} finally {
-			setIsLoading(false);
-		}
+	const onSubmit = async (data: LoginFormData) => {
+		await handleLogin(data);
+	};
+
+	// Limpiar error cuando el usuario comience a escribir
+	const handleInputChange = () => {
+		if (error) clearError();
 	};
 
 	return (
@@ -80,7 +60,7 @@ export function LoginPage() {
 
 					{/* Form Section */}
 					<form
-						onSubmit={handleSubmit(handleLogin)}
+						onSubmit={handleSubmit(onSubmit)}
 						className="space-y-6"
 					>
 						{/* Email Field */}
@@ -95,7 +75,10 @@ export function LoginPage() {
 									placeholder="tu@correo.com"
 									className="w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-gray-900 placeholder-gray-400"
 									required
-									{...register('email', { required: true })}
+									{...register('email', { 
+										required: true,
+										onChange: handleInputChange 
+									})}
 								/>
 							</div>
 						</div>
@@ -114,13 +97,12 @@ export function LoginPage() {
 									required
 									{...register('password', {
 										required: true,
+										onChange: handleInputChange
 									})}
 								/>
 								<button
 									type="button"
-									onClick={() =>
-										setShowPassword(!showPassword)
-									}
+									onClick={() => setShowPassword(!showPassword)}
 									className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
 								>
 									{showPassword ? (

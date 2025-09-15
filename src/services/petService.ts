@@ -1,221 +1,131 @@
-import axios from '../services/auth';
-import type { PetResponse, PetSummaryResponse, CreatePetRequest, PetStatsResponse } from '../types/pets';
+// src/services/petService.ts
+
+import type {
+    CreatePetRequest,
+    Pet,
+    PetStats,
+    PetSummary,
+    UpdatePetRequest
+} from '../types/pets';
+
+import authApi from './auth';
+
 const API_URL = '/api/pets';
+
+// --- QUERIES (Obtención de datos) ---
+
 /**
- * Obtiene todas las mascotas del usuario autenticado
+ * Obtiene todas las mascotas del usuario autenticado.
  */
-export const getAllPets = async (): Promise<PetResponse[]> => {
-    try {
-        const response = await axios.get<PetResponse[]>(`${API_URL}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching pets:', error);
-        throw new Error('No se pudieron cargar las mascotas');
-    }
+export const getAllPets = async (): Promise<Pet[]> => {
+  const { data } = await authApi.get<Pet[]>(API_URL);
+  return data;
 };
 
 /**
- * Obtiene un resumen de todas las mascotas
+ * Obtiene un resumen de todas las mascotas del usuario.
  */
-export const getPetsSummary = async (): Promise<PetSummaryResponse[]> => {
-    try {
-        const response = await axios.get<PetSummaryResponse[]>(`${API_URL}/summary`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching pets summary:', error);
-        throw new Error('No se pudo cargar el resumen de mascotas');
-    }
+export const getPetsSummary = async (): Promise<PetSummary[]> => {
+  const { data } = await authApi.get<PetSummary[]>(`${API_URL}/summary`);
+  return data;
 };
 
 /**
- * Obtiene una mascota específica por ID
+ * Obtiene una mascota específica por su ID.
  */
-export const getPetById = async (petId: number): Promise<PetResponse> => {
-    try {
-        const response = await axios.get<PetResponse>(`${API_URL}/${petId}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching pet by ID:', error);
-        throw new Error('No se pudo cargar la mascota');
-    }
+export const getPetById = async (petId: number): Promise<Pet> => {
+  const { data } = await authApi.get<Pet>(`${API_URL}/${petId}`);
+  return data;
 };
 
 /**
- * Obtiene mascotas de una cuenta específica
+ * Obtiene mascotas de una cuenta específica (ej. para admins).
  */
-export const getPetsByAccountId = async (accountId: number): Promise<PetResponse[]> => {
-    try {
-        const response = await axios.get<PetResponse[]>(`${API_URL}/account/${accountId}/active`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching pets by account ID:', error);
-        throw new Error('No se pudieron cargar las mascotas de la cuenta');
-    }
+export const getPetsByAccountId = async (accountId: number): Promise<Pet[]> => {
+  const { data } = await authApi.get<Pet[]>(`${API_URL}/account/${accountId}`);
+  return data;
 };
 
 /**
- * Obtiene solo las mascotas activas de una cuenta
+ * Obtiene estadísticas de mascotas.
  */
-export const getActivePetsByAccountId = async (accountId: number): Promise<PetResponse[]> => {
-    try {
-        const response = await axios.get<PetResponse[]>(`${API_URL}/active`, {
-            params: { accountId }
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching active pets by account ID:', error);
-        throw new Error('No se pudieron cargar las mascotas activas');
-    }
+export const getPetStats = async (): Promise<PetStats> => {
+  const { data } = await authApi.get<PetStats>(`${API_URL}/stats`);
+  return data;
+};
+
+// --- MUTATIONS (Creación, Actualización, Eliminación) ---
+
+/**
+ * Crea una nueva mascota.
+ */
+export const createPet = async (petData: CreatePetRequest): Promise<Pet> => {
+  const { data } = await authApi.post<Pet>(API_URL, petData);
+  return data;
 };
 
 /**
- * Crea una nueva mascota
+ * Función de compatibilidad para código existente con parámetros individuales
+ * @deprecated Usa createPet con un objeto petData en su lugar
  */
-
-export const createPet = async (
-	accountId: number,
-	name: string,
-	species?: string,
-	breed?: string,
-	age?: number,
-	weight?: number,
-	gender?: string,
-	color?: string,
-	physicalDescription?: string,
-	medications?: string,
-	allergies?: string,
-	specialNotes?: string
-) => {
-    try {
-		const response = await axios.post<PetResponse>(`${API_URL}`,
-			{
-				accountId,
-				name,
-				species,
-				breed,
-				age,
-				weight,
-				gender,
-				color,
-				physicalDescription,
-				medications,
-				allergies,
-				specialNotes
-			}
-		);
-        return response.data;
-    } catch (error) {
-        console.error('Error creating pet:', error);
-        throw new Error('No se pudo crear la mascota');
-    }
+export const createPetLegacy = async (
+  accountId: number,
+  name: string,
+  species?: string,
+  breed?: string,
+  age?: number,
+  weight?: number,
+  color?: string,
+  medications?: string,
+  allergies?: string,
+  specialNotes?: string
+): Promise<Pet> => {
+  return createPet({
+    accountId,
+    name,
+    species,
+    breed,
+    age,
+    weight,
+    color,
+    medications,
+    allergies,
+    specialNotes
+  });
 };
 
 /**
- * Actualiza una mascota existente
+ * Actualiza una mascota existente.
  */
-export const updatePet = async (petId: number, petData: CreatePetRequest): Promise<PetResponse> => {
-    try {
-        const response = await axios.put<PetResponse>(`${API_URL}/${petId}`, petData);
-        return response.data;
-    } catch (error) {
-        console.error('Error updating pet:', error);
-        throw new Error('No se pudo actualizar la mascota');
-    }
+export const updatePet = async (petId: number, petData: UpdatePetRequest): Promise<Pet> => {
+  const { data } = await authApi.put<Pet>(`${API_URL}/${petId}`, petData);
+  return data;
 };
 
 /**
- * Elimina una mascota
+ * Elimina una mascota por su ID.
  */
 export const deletePet = async (petId: number): Promise<void> => {
-    try {
-        await axios.delete(`${API_URL}/${petId}`);
-    } catch (error) {
-        console.error('Error deleting pet:', error);
-        throw new Error('No se pudo eliminar la mascota');
-    }
+  await authApi.delete(`${API_URL}/${petId}`);
 };
 
 /**
- * Cambia el estado activo/inactivo de una mascota
+ * Cambia el estado activo/inactivo de una mascota.
  */
-export const togglePetActive = async (petId: number): Promise<PetResponse> => {
-    try {
-        const response = await axios.put<PetResponse>(`${API_URL}/${petId}/toggle-active`, {});
-        return response.data;
-    } catch (error) {
-        console.error('Error toggling pet active status:', error);
-        throw new Error('No se pudo cambiar el estado de la mascota');
-    }
+export const togglePetActive = async (petId: number): Promise<Pet> => {
+  const { data } = await authApi.patch<Pet>(`${API_URL}/${petId}/toggle-active`);
+  return data;
 };
 
-/**
- * Busca mascotas por término de búsqueda
- */
-export const searchPets = async (searchTerm: string, activeOnly: boolean = false): Promise<PetResponse[]> => {
-    try {
-        const response = await axios.get<PetResponse[]>(`${API_URL}/search`, {
-            params: {
-                q: searchTerm,
-                activeOnly
-            }
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error searching pets:', error);
-        throw new Error('No se pudo realizar la búsqueda');
-    }
-};
-
-/**
- * Obtiene mascotas por especie
- */
-export const getPetsBySpecies = async (species: string): Promise<PetResponse[]> => {
-    try {
-        const response = await axios.get<PetResponse[]>(`${API_URL}/species/${species}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching pets by species:', error);
-        throw new Error('No se pudieron cargar las mascotas por especie');
-    }
-};
-
-/**
- * Obtiene estadísticas de mascotas (solo para admins)
- */
-export const getPetStats = async (): Promise<PetStatsResponse> => {
-    try {
-        const response = await axios.get<PetStatsResponse>(`${API_URL}/stats`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching pet stats:', error);
-        throw new Error('No se pudieron cargar las estadísticas');
-    }
-};
-
-/**
- * Verifica si un nombre está disponible para una cuenta
- */
-export const isPetNameAvailable = async (name: string, accountId: number): Promise<boolean> => {
-    try {
-        const response = await axios.get<boolean>(`${API_URL}/name-available`, {
-            params: { name, accountId }
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error checking pet name availability:', error);
-        throw new Error('No se pudo verificar la disponibilidad del nombre');
-    }
-};
-
-/**
- * Obtiene mascotas con necesidades especiales
- */
-export const getPetsWithSpecialNeeds = async (): Promise<PetResponse[]> => {
-    try {
-        const response = await axios.get<PetResponse[]>(`${API_URL}/special-needs`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching pets with special needs:', error);
-        throw new Error('No se pudieron cargar las mascotas con necesidades especiales');
-    }
+export default {
+  getAllPets,
+  getPetsSummary,
+  getPetById,
+  getPetsByAccountId,
+  getPetStats,
+  createPet,
+  createPetLegacy,
+  updatePet,
+  deletePet,
+  togglePetActive,
 };

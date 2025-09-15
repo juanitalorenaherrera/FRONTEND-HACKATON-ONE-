@@ -1,6 +1,6 @@
-import { useAuthStore } from '../store/AuthStore';
 import { Navigate, Outlet } from 'react-router';
 
+import { useAuthStore } from '../../../store/AuthStore';
 
 const ProtectedRoute = () => {
 	const user = useAuthStore((state) => state.profile);

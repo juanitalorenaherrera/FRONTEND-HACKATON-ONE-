@@ -1,9 +1,10 @@
 // ===========================================
 // MainDashboardView.tsx - Versión alineada
 // ===========================================
-import type { Appointment, Sitter } from '../../types/dashboardData';
+
+import type { Appointment, Sitter } from '../../types/dashboard';
+
 import { AlertCircle } from 'lucide-react';
-import { useNavigate } from 'react-router';
 import HeroBanner from './components/sections/MainDashboard/HeroBanner/HeroBanner';
 import MyPetsSection from './components/sections/MainDashboard/MyPets/MyPetsSection';
 import NextAppointmentCard from './components/sections/MainDashboard/NextBooking/NextBookingCard';
@@ -13,6 +14,7 @@ import RecommendationBanner from './components/sections/MainDashboard/Recommenda
 import StatsSection from './components/sections/MainDashboard/Stats/StatsSection';
 import UpcomingEventsCalendar from './components/sections/MainDashboard/UpcomingEvents/UpcomingEventsCalendar';
 import { useDashboardData } from './hooks/useDashboardData';
+import { useNavigate } from 'react-router';
 
 interface MainDashboardViewProps {
 	onPetSelect?: (petId: string) => void;
