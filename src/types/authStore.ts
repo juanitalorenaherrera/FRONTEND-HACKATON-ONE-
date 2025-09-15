@@ -24,3 +24,14 @@ export interface Profile {
 	role: Role;
 	initials: string;
 }
+
+export interface LoginResponse {
+	token: string;
+	userProfile: Profile;
+};
+
+export interface RegisterResponse {
+	token: string;
+	role: Role;
+	userProfile: Profile;
+}

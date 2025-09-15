@@ -1,58 +1,31 @@
 // src/services/authService.ts
-
-import type { User } from '../types/user';
 import axios from '../services/auth';
-import type { Profile, Role } from '../types/authStore';
-;
-
-// 1. (Opcional pero recomendado) Creamos una interfaz para la respuesta del login
-interface LoginResponse {
-	token: string;
-	userProfile: Profile;
-}
-
-export const loginRequest = async (email: string, password: string): Promise<LoginResponse> => {
-	const res = await axios.post<LoginResponse>('/api/users/login', {
-		email,
-		password,
-	});
-
-	console.log(res.data);
-	return res.data;
-};
+import type {
+	LoginResponse,
+	Profile,
+	RegisterResponse,
+} from '../types/authStore';
 
 /**
  * Inicia sesión, guarda el token y devuelve los datos del usuario.
  */
+export const loginRequest = async (
+	email: string,
+	password: string
+): Promise<LoginResponse> => {
+	const res = await axios.post<LoginResponse>('/api/users/login', {
+		email,
+		password,
+	});
+	return res.data;
+};
 /**
  * Obtiene el perfil del usuario autenticado a través del token.
  */
-export const getProfile = async (): Promise<User> => {
-	const token = localStorage.getItem('auth');
-	if (!token) {
-		throw new Error('No se encontró el token de autenticación.');
-	}
-
-	const response = await axios.get<User>(`/api/dashboard/profile`);
-
+export const getProfile = async (): Promise<Profile> => {
+	const response = await axios.get<Profile>(`/api/dashboard/profile`);
 	return response.data;
 };
-
-interface RegisterResponse {
-	token: string;
-	role: Role;
-	userProfile: Profile;
-}
-/*
-interface RegisterRequest {
-	firstName: string;
-	lastName: string;
-	email: string;
-	password: string;
-	address: string;
-	phoneNumber: string;
-}
-	*/
 /**
  * Registra un nuevo usuario. (Función que ya tenías)
  */
@@ -62,7 +35,7 @@ export const registerRequest = async (
 	email: string,
 	password: string,
 	address: string,
-	phoneNumber: string,
+	phoneNumber: string
 ): Promise<RegisterResponse> => {
 	const response = await axios.post<RegisterResponse>(`/api/users/register`, {
 		firstName,
@@ -70,7 +43,7 @@ export const registerRequest = async (
 		email,
 		password,
 		address,
-		phoneNumber
+		phoneNumber,
 	});
 	console.log(response.data);
 
