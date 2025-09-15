@@ -41,9 +41,8 @@ export default function App() {
                             <Route index element={<PetsOverview />} />
                             <Route path=":petId" element={<PetProfile />} />
                         </Route>
-						<Route path="pets/:petId" element={<PetProfile />
-							// id={useParams().petId} onBack={() => console.log('Go back')}
-} />
+						<Route path="pets/:petId" element={<PetProfile/>} />
+							{/* // id={useParams().petId} onBack={() => console.log('Go back')} */}
 						<Route path="find-sitters" element={<FindSittersView />} />
 						<Route path="bookings" element={<BookingsView />} />
 						{/* <Route path="favorites" element={<FavoritesView />} /> ... y así sucesivamente */}
