@@ -8,22 +8,21 @@ import { useState } from 'react';
 import { useAuthStore } from '../store/AuthStore';
 import { loginRequest } from '../services/authService';
 import { Role } from '../types/authStore';
-
-interface Login {
-	email: string;
-	password: string;
-}
+import { loginSchema, type LoginFormData } from '../schemas/loginSchema';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export function LoginPage() {
 	const navigate = useNavigate();
-	const { register, handleSubmit } = useForm<Login>();
+	const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+		resolver: zodResolver(loginSchema)
+	});
 	const setToken = useAuthStore((state) => state.setToken);
 	const setProfile = useAuthStore((state) => state.setProfile);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 
-	const handleLogin = async (data: Login) => {
+	const handleLogin = async (data: LoginFormData) => {
 		setError(null);
 		setIsLoading(true);
 		try {
@@ -93,10 +92,16 @@ export function LoginPage() {
 								<input
 									type="email"
 									placeholder="tu@correo.com"
-									className="w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-gray-900 placeholder-gray-400"
-									required
-									{...register('email', { required: true })}
+									className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 transition-all duration-200 text-gray-900 placeholder-gray-400 ${
+										errors.email
+											? 'border-red-500 focus:border-red-500'
+											: 'border-gray-200 focus:border-orange-500'
+									}`}
+									{...register('email')}
 								/>
+								{errors.email && (
+									<p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+								)}
 							</div>
 						</div>
 
@@ -110,11 +115,15 @@ export function LoginPage() {
 								<input
 									type={showPassword ? 'text' : 'password'}
 									placeholder="••••••••"
-									className="w-full pl-12 pr-12 py-4 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-gray-900 placeholder-gray-400"
-									required
-									{...register('password', {
-										required: true,
-									})}
+									className={`w-full pl-12 pr-12 py-4 bg-white border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 transition-all duration-200 text-gray-900 placeholder-gray-400 ${
+										errors.password
+											? 'border-red-500 focus:border-red-500'
+											: 'border-gray-200 focus:border-orange-500'
+									}`}
+									{...register('password')}
+									{...errors.password && (
+									<p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+								)}
 								/>
 								<button
 									type="button"
@@ -130,6 +139,9 @@ export function LoginPage() {
 									)}
 								</button>
 							</div>
+							{errors.password && (
+								<p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+							)}
 						</div>
 
 						{/* Error Message */}
