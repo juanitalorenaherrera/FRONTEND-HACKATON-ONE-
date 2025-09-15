@@ -6,7 +6,7 @@ const API_URL = '/api/pets';
  */
 export const getAllPets = async (): Promise<PetResponse[]> => {
     try {
-        const response = await axios.get(`${API_URL}`);
+        const response = await axios.get<PetResponse[]>(`${API_URL}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching pets:', error);
@@ -19,7 +19,7 @@ export const getAllPets = async (): Promise<PetResponse[]> => {
  */
 export const getPetsSummary = async (): Promise<PetSummaryResponse[]> => {
     try {
-        const response = await axios.get(`${API_URL}/summary`);
+        const response = await axios.get<PetSummaryResponse[]>(`${API_URL}/summary`);
         return response.data;
     } catch (error) {
         console.error('Error fetching pets summary:', error);
@@ -32,7 +32,7 @@ export const getPetsSummary = async (): Promise<PetSummaryResponse[]> => {
  */
 export const getPetById = async (petId: number): Promise<PetResponse> => {
     try {
-        const response = await axios.get(`${API_URL}/${petId}`);
+        const response = await axios.get<PetResponse>(`${API_URL}/${petId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching pet by ID:', error);
@@ -45,7 +45,7 @@ export const getPetById = async (petId: number): Promise<PetResponse> => {
  */
 export const getPetsByAccountId = async (accountId: number): Promise<PetResponse[]> => {
     try {
-        const response = await axios.get(`${API_URL}/account/${accountId}`);
+        const response = await axios.get<PetResponse[]>(`${API_URL}/account/${accountId}/active`);
         return response.data;
     } catch (error) {
         console.error('Error fetching pets by account ID:', error);
@@ -58,7 +58,9 @@ export const getPetsByAccountId = async (accountId: number): Promise<PetResponse
  */
 export const getActivePetsByAccountId = async (accountId: number): Promise<PetResponse[]> => {
     try {
-        const response = await axios.get(`${API_URL}/account/${accountId}/active`);
+        const response = await axios.get<PetResponse[]>(`${API_URL}/active`, {
+            params: { accountId }
+        });
         return response.data;
     } catch (error) {
         console.error('Error fetching active pets by account ID:', error);
@@ -85,7 +87,7 @@ export const createPet = async (
 	specialNotes?: string
 ) => {
     try {
-		const response = await axios.post<CreatePetRequest>(`${API_URL}`,
+		const response = await axios.post<PetResponse>(`${API_URL}`,
 			{
 				accountId,
 				name,
@@ -113,7 +115,7 @@ export const createPet = async (
  */
 export const updatePet = async (petId: number, petData: CreatePetRequest): Promise<PetResponse> => {
     try {
-        const response = await axios.put(`${API_URL}/${petId}`, petData);
+        const response = await axios.put<PetResponse>(`${API_URL}/${petId}`, petData);
         return response.data;
     } catch (error) {
         console.error('Error updating pet:', error);
@@ -138,7 +140,7 @@ export const deletePet = async (petId: number): Promise<void> => {
  */
 export const togglePetActive = async (petId: number): Promise<PetResponse> => {
     try {
-        const response = await axios.put(`${API_URL}/${petId}/toggle-active`, {});
+        const response = await axios.put<PetResponse>(`${API_URL}/${petId}/toggle-active`, {});
         return response.data;
     } catch (error) {
         console.error('Error toggling pet active status:', error);
@@ -151,7 +153,7 @@ export const togglePetActive = async (petId: number): Promise<PetResponse> => {
  */
 export const searchPets = async (searchTerm: string, activeOnly: boolean = false): Promise<PetResponse[]> => {
     try {
-        const response = await axios.get(`${API_URL}/search`, {
+        const response = await axios.get<PetResponse[]>(`${API_URL}/search`, {
             params: {
                 q: searchTerm,
                 activeOnly
@@ -169,7 +171,7 @@ export const searchPets = async (searchTerm: string, activeOnly: boolean = false
  */
 export const getPetsBySpecies = async (species: string): Promise<PetResponse[]> => {
     try {
-        const response = await axios.get(`${API_URL}/species/${species}`);
+        const response = await axios.get<PetResponse[]>(`${API_URL}/species/${species}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching pets by species:', error);
@@ -182,7 +184,7 @@ export const getPetsBySpecies = async (species: string): Promise<PetResponse[]> 
  */
 export const getPetStats = async (): Promise<PetStatsResponse> => {
     try {
-        const response = await axios.get(`${API_URL}/stats`);
+        const response = await axios.get<PetStatsResponse>(`${API_URL}/stats`);
         return response.data;
     } catch (error) {
         console.error('Error fetching pet stats:', error);
@@ -195,7 +197,7 @@ export const getPetStats = async (): Promise<PetStatsResponse> => {
  */
 export const isPetNameAvailable = async (name: string, accountId: number): Promise<boolean> => {
     try {
-        const response = await axios.get(`${API_URL}/name-available`, {
+        const response = await axios.get<boolean>(`${API_URL}/name-available`, {
             params: { name, accountId }
         });
         return response.data;
@@ -210,7 +212,7 @@ export const isPetNameAvailable = async (name: string, accountId: number): Promi
  */
 export const getPetsWithSpecialNeeds = async (): Promise<PetResponse[]> => {
     try {
-        const response = await axios.get(`${API_URL}/special-needs`);
+        const response = await axios.get<PetResponse[]>(`${API_URL}/special-needs`);
         return response.data;
     } catch (error) {
         console.error('Error fetching pets with special needs:', error);
