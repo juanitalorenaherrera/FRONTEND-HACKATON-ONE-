@@ -4,7 +4,7 @@ import type { SearchSuggestion } from '../features/sitters/components/SitterSear
 // En una aplicación real, esta función haría una llamada a un endpoint como `/api/search/suggestions?q=...`
 export async function getSitterSuggestions(query: string): Promise<SearchSuggestion[]> {
     try {
-        console.log(`🔍 Fetching suggestions for: "${query}"`);
+        console.log(`Fetching suggestions for: "${query}"`);
 
         // Simulamos un pequeño retraso de red
         await new Promise(resolve => setTimeout(resolve, 150));
