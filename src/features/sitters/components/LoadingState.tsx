@@ -1,7 +1,6 @@
 // ===========================================
 // components/LoadingState.tsx - Estado de carga
 // ===========================================
-import React from 'react';
 import { Skeleton } from '../../../components/ui/Skeleton';
 import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
 

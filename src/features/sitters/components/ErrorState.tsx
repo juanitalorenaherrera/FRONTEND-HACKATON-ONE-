@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSittersContext } from '../context/SittersContext';
 import { ErrorState as GenericErrorState } from '../../../components/ui/ErrorState'; // Importamos el componente genérico
 

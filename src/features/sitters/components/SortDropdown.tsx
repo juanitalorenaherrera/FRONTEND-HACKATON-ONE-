@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { useSittersContext } from '../context/SittersContext';
 import { SITTER_CONFIG, type SortOption } from '../../../features/sitters/config/sitters.config';
