@@ -1,203 +1,92 @@
-// src/features/dashboard/components/DashboardSidebar.tsx
-// Versión optimizada usando hook específico para sidebar
+import { FileText, Home, LogOut, PawPrint, Settings } from 'lucide-react';
 
-import { Link } from 'react-router-dom';
-import { NAV_ITEMS } from '../../../utils/NavItems';
-import { useAuthStore } from '../../../store/AuthStore';
-import { useSidebarData } from '../hooks/useSidebarData';
+import { NavLink } from 'react-router-dom';
+import type { PetSummaryResponse } from '../types/api_types'; // Asegúrate que tus tipos de API estén centralizados
+import type { UserProfileDTO } from '../types/user.types';
+import { cn } from '../lib/utils';
 
-interface ClientSidebarProps {
-    activeItem: string;
+interface SidebarProps {
+  user?: UserProfileDTO;
+  pets?: PetSummaryResponse[];
 }
 
-export function ClientSidebar({ activeItem }: ClientSidebarProps) {
-    // Datos de autenticación
-    const user = useAuthStore((state) => state.profile);
-    
-    // Hook optimizado para sidebar
-    const { 
-        pets, 
-        stats, 
-        isLoading,
-        error 
-    } = useSidebarData();
+// --- Reemplazo de NavItems y useSidebarData ---
+// Definimos los enlaces de navegación como un array constante aquí mismo.
+// Es más simple y directo, ya que no cambian dinámicamente.
+const navLinks = [
+  { to: '/dashboard', icon: Home, text: 'Dashboard' },
+  { to: '/pets', icon: PawPrint, text: 'Mis Mascotas' },
+  { to: '/billing', icon: FileText, text: 'Facturación' },
+  { to: '/settings', icon: Settings, text: 'Ajustes' },
+];
 
-    return (
-        <aside className="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
-            {/* Logo y título */}
-            <div className="p-6 border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <span className="text-white font-bold text-lg">🐾</span>
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold text-gray-900">PetCare</h2>
-                        <p className="text-xs text-gray-500">Dashboard</p>
-                    </div>
-                </div>
-            </div>
+export const Sidebar: React.FC<SidebarProps> = ({ pets = [] }) => {
+  // Lógica para cerrar sesión (puedes moverla a tu hook de auth si prefieres)
+  const handleLogout = () => {
+    // Aquí iría la lógica para limpiar el token del store y redirigir
+    console.log("Cerrando sesión...");
+    window.location.href = '/login'; // O usar navigate
+  };
 
-            {/* Menú de Navegación */}
-            <nav className="flex-1 p-4">
-                <div className="space-y-1">
-                    {NAV_ITEMS.map((item) => {
-                        const Icon = item.icon;
-                        const isActive = activeItem === item.id;
+  return (
+    <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-white border-r border-neutral-200/80 p-6">
+      {/* Logo */}
+      <div className="text-2xl font-bold text-pet-orange mb-12">
+        <NavLink to="/dashboard">PetCare <span className="text-pet-teal">Pro</span></NavLink>
+      </div>
 
-                        // Determinar si mostrar badge/contador
-                        let badgeCount: number | null = null;
-                        if (item.id === 'pets' && !isLoading && !error) {
-                            badgeCount = stats.totalPets;
-                        }
+      {/* Navegación Principal */}
+      <nav className="flex flex-col gap-2">
+        <span className="px-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Menú</span>
+        {navLinks.map(({ to, icon: Icon, text }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end // La prop 'end' asegura que solo la ruta exacta esté activa
+            className={({ isActive }) => cn(
+              "flex items-center gap-3.5 px-4 py-2.5 rounded-lg font-semibold transition-all duration-200 text-base",
+              isActive 
+                ? "bg-pet-teal/10 text-pet-teal shadow-sm" 
+                : "text-neutral-500 hover:bg-neutral-100/80 hover:text-neutral-900"
+            )}
+          >
+            <Icon className="w-5 h-5" />
+            <span>{text}</span>
+          </NavLink>
+        ))}
+      </nav>
+      
+      <div className="my-8 h-px w-full bg-neutral-200" />
 
-                        return (
-                            <Link
-                                key={item.id}
-                                to={item.path}
-                                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors group ${
-                                    isActive
-                                        ? 'bg-orange-50 text-orange-700 font-bold'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                }`}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <Icon
-                                        className={`w-5 h-5 ${
-                                            isActive
-                                                ? 'text-orange-600'
-                                                : 'text-gray-400 group-hover:text-gray-600'
-                                        }`}
-                                    />
-                                    <span>{item.label}</span>
-                                </div>
+      {/* Lista de Mascotas */}
+      <div className="flex flex-col gap-3 overflow-y-auto flex-1">
+         <span className="px-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Mascotas</span>
+         {pets.length > 0 ? (
+            pets.map(pet => (
+              <div key={pet.id} className="flex items-center gap-3 cursor-pointer group px-4 py-2 rounded-lg hover:bg-neutral-100/80">
+                <img 
+                  src={pet.imageUrl ?? `https://ui-avatars.com/api/?name=${pet.name}&background=random`} 
+                  alt={pet.name} 
+                  className="w-8 h-8 rounded-full object-cover transition-transform group-hover:scale-110"
+                />
+                <span className="text-sm font-medium text-neutral-600 group-hover:text-pet-orange transition-colors">{pet.name}</span>
+              </div>
+            ))
+         ) : (
+            <p className="px-4 text-sm text-neutral-400">No hay mascotas.</p>
+         )}
+      </div>
 
-                                {/* Badge con contador */}
-                                {badgeCount !== null && badgeCount > 0 && (
-                                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                                        isActive 
-                                            ? 'bg-orange-200 text-orange-800'
-                                            : 'bg-gray-200 text-gray-700 group-hover:bg-gray-300'
-                                    }`}>
-                                        {badgeCount}
-                                    </span>
-                                )}
-                            </Link>
-                        );
-                    })}
-                </div>
-            </nav>
-
-            {/* Pie de Página con Perfil de Usuario */}
-            <div className="p-4 border-t border-gray-100 mt-auto">
-                {user ? (
-                    <div className="p-3 rounded-lg bg-gray-50">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center shadow-md">
-                                <span className="text-white font-bold text-xs">
-                                    {user.firstName?.charAt(0)}
-                                    {user.lastName?.charAt(0)}
-                                </span>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-gray-900 text-sm truncate">
-                                    {`${user.firstName} ${user.lastName}`}
-                                </p>
-                                <p className="text-xs text-gray-500 capitalize">
-                                    {user.role?.toLowerCase()}
-                                </p>
-                            </div>
-                            <div
-                                className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"
-                                title="Online"
-                            ></div>
-                        </div>
-
-                        {/* Estadísticas rápidas */}
-                        <div className="mt-3 grid grid-cols-2 gap-2 text-center">
-                            {/* Total de mascotas */}
-                            <div className="bg-orange-100 rounded-lg p-2">
-                                {isLoading ? (
-                                    <div className="animate-pulse">
-                                        <div className="h-5 bg-orange-200 rounded mb-1"></div>
-                                        <div className="h-3 bg-orange-200 rounded"></div>
-                                    </div>
-                                ) : error ? (
-                                    <>
-                                        <p className="text-lg font-bold text-red-600">!</p>
-                                        <p className="text-xs text-red-700">Error</p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className="text-lg font-bold text-orange-600">
-                                            {stats.totalPets}
-                                        </p>
-                                        <p className="text-xs text-orange-700">
-                                            {stats.totalPets === 1 ? 'Mascota' : 'Mascotas'}
-                                        </p>
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Mascotas activas */}
-                            <div className="bg-green-100 rounded-lg p-2">
-                                {isLoading ? (
-                                    <div className="animate-pulse">
-                                        <div className="h-5 bg-green-200 rounded mb-1"></div>
-                                        <div className="h-3 bg-green-200 rounded"></div>
-                                    </div>
-                                ) : error ? (
-                                    <>
-                                        <p className="text-lg font-bold text-red-600">!</p>
-                                        <p className="text-xs text-red-700">Error</p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className="text-lg font-bold text-green-600">
-                                            {stats.activePets}
-                                        </p>
-                                        <p className="text-xs text-green-700">Activas</p>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Indicador de mascotas recientes */}
-                        {!isLoading && !error && stats.recentPets > 0 && (
-                            <div className="mt-2 text-center">
-                                <p className="text-xs text-blue-600">
-                                    +{stats.recentPets} este mes
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Mensaje de error discreto */}
-                        {error && (
-                            <div className="mt-2 text-center">
-                                <p className="text-xs text-red-600">
-                                    Error al cargar datos
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    // Skeleton cuando no hay usuario
-                    <div className="p-3 rounded-lg bg-gray-50">
-                        <div className="animate-pulse">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                                <div className="flex-1">
-                                    <div className="h-4 bg-gray-200 rounded mb-1"></div>
-                                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                                </div>
-                            </div>
-                            <div className="mt-3 grid grid-cols-2 gap-2">
-                                <div className="bg-gray-200 rounded-lg h-12"></div>
-                                <div className="bg-gray-200 rounded-lg h-12"></div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </aside>
-    );
-}
+      {/* Footer del Sidebar (Logout) */}
+      <div className="mt-8">
+         <button 
+            onClick={handleLogout}
+            className="flex items-center w-full gap-3.5 px-4 py-2.5 rounded-lg font-semibold text-neutral-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+         >
+            <LogOut className="w-5 h-5"/>
+            <span>Cerrar Sesión</span>
+         </button>
+      </div>
+    </aside>
+  );
+};

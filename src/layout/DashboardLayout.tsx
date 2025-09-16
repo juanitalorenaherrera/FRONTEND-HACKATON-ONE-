@@ -1,11 +1,11 @@
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { DashboardSkeleton } from '@/features/dashboard/components/DashboardSkeleton';
+import { DashboardSkeleton } from '../features/dashboard/components/DashboardSkeleton';
 import { Header } from './Header';
-import { Sidebar } from './Sidebar';
+import { Sidebar } from '../layout/Sidebar';
 import { motion } from 'framer-motion';
-import { useAuthStore } from '@/store/AuthStore';
-import { useDashboard } from '@/features/dashboard/hooks/useDashboard';
+import { useAuthStore } from '../store/AuthStore';
+import { useDashboard } from '../features/dashboard/hooks/useDashboard';
 import { useState } from 'react';
 
 export const DashboardLayout = () => {
