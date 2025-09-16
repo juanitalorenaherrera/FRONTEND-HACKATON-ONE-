@@ -1,4 +1,3 @@
-import React from 'react';
 import { SittersProvider, useSittersContext } from '../context/SittersContext';
 import { useSittersActions } from '../hooks/useSittersActions';
 import {
@@ -8,7 +7,7 @@ import {
     SittersLoadingState,
     SittersErrorState
 } from '../components';
-import type { ExtendedSitter } from '../../../services/sitterService';
+import type { ExtendedSitter } from '../../../types/sitter';
 
 /**
  * Componente interno que renderiza la UI.

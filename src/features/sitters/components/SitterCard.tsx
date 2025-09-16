@@ -1,6 +1,5 @@
-import React from 'react';
 import { Star, MapPin, ShieldCheck } from 'lucide-react';
-import type { ExtendedSitter } from '../../../services/sitterService';
+import type { ExtendedSitter } from '../../../types/sitter';
 import { SITTER_CONFIG } from '../../../features/sitters/config/sitters.config';
 
 interface SitterCardProps {
@@ -26,7 +25,7 @@ export function SitterCard({ sitter, onViewProfile, onHire }: SitterCardProps) {
                         {sitter.location}
                     </p>
                 </div>
-                {sitter.isVerified && <ShieldCheck className="w-6 h-6 text-blue-500 flex-shrink-0" title="Verificado" />}
+                {sitter.isVerified && <span title="Verificado"><ShieldCheck className="w-6 h-6 text-blue-500 flex-shrink-0" /></span>}
             </div>
 
             {/* Stats */}
@@ -36,7 +35,7 @@ export function SitterCard({ sitter, onViewProfile, onHire }: SitterCardProps) {
                     <span className="font-bold text-gray-800">{sitter.averageRating?.toFixed(1) || 'Nuevo'}</span>
                 </div>
                 <div><span className="font-bold text-gray-800">${sitter.hourlyRate}</span> / hora</div>
-                <div><span className="font-bold text-gray-800">{sitter.completedBookings || 0}</span> servicios</div>
+                <div><span className="font-bold text-gray-800">{sitter.totalServices || 0}</span> servicios</div>
             </div>
             
             {/* Bio */}

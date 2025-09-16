@@ -1,5 +1,4 @@
-import React from 'react';
-import type { ExtendedSitter } from '../../../services/sitterService';
+import type { ExtendedSitter } from '../../../types/sitter';
 import { EmptyState } from './EmptyState';
 import { SitterCard } from './SitterCard';
 
