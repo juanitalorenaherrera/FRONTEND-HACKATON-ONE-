@@ -1,92 +1,68 @@
+import { Pet } from '../types/common.types';
 import { create } from 'zustand';
-import { PETS_CONFIG } from '../features/pets/constants';
-import type { PetActions, PetsState } from '../types/petStore';
+import { petService } from '../services/petService';
 
-export const usePetsStore = create<PetsState & PetActions>((set, get) => ({
-	// Estado inicial
-	pets: [],
-	selectedPet: null,
-	stats: null,
-	isLoading: true,
-	error: null,
-	filters: {
-		search: '',
-		species: [],
-		activeOnly: true,
-		sortBy: PETS_CONFIG.DEFAULT_SORT_BY,
-		sortOrder: PETS_CONFIG.DEFAULT_SORT_ORDER,
-	},
-	modal: { type: null, data: null },
-	filteredPets: [],
+interface PetState {
+  pets: Pet[];
+  selectedPet: Pet | null;
+  isLoading: boolean;
+  error: string | null;
 
-	// Acciones o "mutations"
-	setLoading: (isLoading) => set({ isLoading, error: null }),
-	setError: (error) => set({ error, isLoading: false }),
-	setPetsData: ({ pets, stats }) => {
-		set({ pets, stats, isLoading: false, error: null });
-		// Después de actualizar las mascotas, volvemos a filtrar
-		get().updateFilteredPets();
-	},
-	setSelectedPet: (selectedPet) => set({ selectedPet }),
-	updateFilters: (newFilters) => {
-		set((state) => ({
-			filters: { ...state.filters, ...newFilters },
-		}));
-		// Volvemos a filtrar cada vez que los filtros cambian
-		get().updateFilteredPets();
-	},
-	clearFilters: () => {
-		set({
-			filters: {
-				search: '',
-				species: [],
-				activeOnly: true,
-				sortBy: PETS_CONFIG.DEFAULT_SORT_BY,
-				sortOrder: PETS_CONFIG.DEFAULT_SORT_ORDER,
-			},
-		});
-		get().updateFilteredPets();
-	},
-	addPet: (pet) => {
-		set((state) => ({ pets: [...state.pets, pet] }));
-		get().updateFilteredPets();
-	},
-	updatePet: (updatedPet) => {
-		set((state) => ({
-			pets: state.pets.map((p) =>
-				p.id === updatedPet.id ? updatedPet : p
-			),
-		}));
-		get().updateFilteredPets();
-	},
-	deletePet: (petId) => {
-		set((state) => ({
-			pets: state.pets.filter((p) => p.id !== petId),
-		}));
-		get().updateFilteredPets();
-	},
-	showModal: (type, data = null) => set({ modal: { type, data } }),
-	hideModal: () => set({ modal: { type: null, data: null } }),
+  // Actions
+  fetchPets: () => Promise<void>;
+  selectPet: (pet: Pet | null) => void;
+  addPet: (pet: Pet) => void;
+  updatePet: (updatedPet: Pet) => void;
+  removePet: (petId: string) => void;
+  clearError: () => void;
+}
 
-	// Lógica de filtrado
-	updateFilteredPets: () => {
-		const { pets, filters } = get();
-		const newFilteredPets = pets.filter((p) => {
-			const searchMatch =
-				!filters.search ||
-				(p.name?.toLowerCase() || '').includes(
-					filters.search.toLowerCase()
-				) ||
-				(p.breed?.toLowerCase() || '').includes(
-					filters.search.toLowerCase()
-				);
-			const speciesMatch =
-				!filters.species ||
-				filters.species.length === 0 ||
-				filters.species.includes(p.species);
-			const activeMatch = !filters.activeOnly || p.active;
-			return searchMatch && speciesMatch && activeMatch;
-		});
-		set({ filteredPets: newFilteredPets });
-	},
+export const usePetStore = create<PetState>((set, get) => ({
+  pets: [],
+  selectedPet: null,
+  isLoading: false,
+  error: null,
+
+  fetchPets: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const pets = await petService.getAll();
+      set({ pets, isLoading: false });
+    } catch (error: any) {
+      set({ 
+        error: error.response?.data?.message || 'Error al cargar las mascotas',
+        isLoading: false 
+      });
+    }
+  },
+
+  selectPet: (pet: Pet | null) => {
+    set({ selectedPet: pet });
+  },
+
+  addPet: (pet: Pet) => {
+    set((state) => ({
+      pets: [...state.pets, pet]
+    }));
+  },
+
+  updatePet: (updatedPet: Pet) => {
+    set((state) => ({
+      pets: state.pets.map(pet => 
+        pet.id === updatedPet.id ? updatedPet : pet
+      ),
+      selectedPet: state.selectedPet?.id === updatedPet.id ? updatedPet : state.selectedPet
+    }));
+  },
+
+  removePet: (petId: string) => {
+    set((state) => ({
+      pets: state.pets.filter(pet => pet.id !== petId),
+      selectedPet: state.selectedPet?.id === petId ? null : state.selectedPet
+    }));
+  },
+
+  clearError: () => {
+    set({ error: null });
+  },
 }));

@@ -1,11 +1,12 @@
-import React from 'react';
+// src/components/ui/ErrorState.tsx
+
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
 interface ErrorStateProps {
-    title: string;
-    message: string;
-    onRetry: () => void;
-    className?: string;
+    readonly title: string;
+    readonly message: string;
+    readonly onRetry: () => void;
+    readonly className?: string;
 }
 
 export function ErrorState({ title, message, onRetry, className = '' }: ErrorStateProps) {

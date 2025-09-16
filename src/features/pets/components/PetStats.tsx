@@ -3,12 +3,11 @@
 import { Activity, BarChart3, Clock, Heart, TrendingUp } from 'lucide-react';
 
 import { useMemo } from 'react';
-import { usePetsStore } from '../../../store/PetStore';
+import { usePetsActions } from '../hooks/usePetsActions';
 
 export function PetStats() {
-    // 1. Leemos el estado directamente del store.
-    const pets = usePetsStore((state) => state.pets);
-    const backendStats = usePetsStore((state) => state.stats);
+    // 1. Obtenemos el estado del hook refactorizado
+    const { pets, stats: backendStats } = usePetsActions();
 
     // 2. Centralizamos y memoizamos todos los cálculos derivados para eficiencia.
     const derivedStats = useMemo(() => {
@@ -29,7 +28,7 @@ export function PetStats() {
             activePets: activePetsCount,
             inactivePets: pets.length - activePetsCount,
             uniqueSpecies: new Set(pets.map(pet => pet.species)).size,
-            averageAge: (pets.reduce((sum, pet) => sum + pet.age, 0) / pets.length).toFixed(1),
+            averageAge: (pets.reduce((sum, pet) => sum + (pet.age || 0), 0) / pets.length).toFixed(1),
         };
     }, [pets]);
 
@@ -53,35 +52,79 @@ export function PetStats() {
             <div className="space-y-3">
                 {/* Total, Active, Inactive pets */}
                 <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2"><Heart className="w-4 h-4 text-gray-500" /> <span className="text-sm text-gray-600">Total de mascotas:</span></div>
+                    <div className="flex items-center gap-2">
+                        <Heart className="w-4 h-4 text-gray-500" /> 
+                        <span className="text-sm text-gray-600">Total de mascotas:</span>
+                    </div>
                     <span className="font-semibold text-gray-900">{totalPets}</span>
                 </div>
+                
                 <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2"><div className="w-2 h-2 bg-green-500 rounded-full"></div> <span className="text-sm text-gray-600">Mascotas activas:</span></div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div> 
+                        <span className="text-sm text-gray-600">Mascotas activas:</span>
+                    </div>
                     <span className="font-semibold text-green-600">{activePets}</span>
                 </div>
+                
                 {inactivePets > 0 && (
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2"><div className="w-2 h-2 bg-gray-400 rounded-full"></div> <span className="text-sm text-gray-600">Inactivas:</span></div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full"></div> 
+                            <span className="text-sm text-gray-600">Inactivas:</span>
+                        </div>
                         <span className="font-semibold text-gray-600">{inactivePets}</span>
                     </div>
                 )}
 
                 {/* Stats calculados localmente */}
                 <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2"><Activity className="w-4 h-4 text-gray-500" /> <span className="text-sm text-gray-600">Especies:</span></div>
+                    <div className="flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-gray-500" /> 
+                        <span className="text-sm text-gray-600">Especies diferentes:</span>
+                    </div>
                     <span className="font-semibold text-gray-900">{derivedStats.uniqueSpecies}</span>
                 </div>
+                
                 <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-gray-500" /> <span className="text-sm text-gray-600">Edad promedio:</span></div>
+                    <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-gray-500" /> 
+                        <span className="text-sm text-gray-600">Edad promedio:</span>
+                    </div>
                     <span className="font-semibold text-gray-900">{derivedStats.averageAge} años</span>
                 </div>
 
                 {/* Stats que solo vienen del backend */}
                 {backendStats?.petsRegisteredLast30Days !== undefined && (
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2"><TrendingUp className="w-4 h-4 text-blue-500" /> <span className="text-sm text-gray-600">Nuevas (30 días):</span></div>
+                        <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-blue-500" /> 
+                            <span className="text-sm text-gray-600">Nuevas (30 días):</span>
+                        </div>
                         <span className="font-semibold text-blue-600">{backendStats.petsRegisteredLast30Days}</span>
+                    </div>
+                )}
+
+                {backendStats?.petsRegisteredLast7Days !== undefined && (
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-green-500" /> 
+                            <span className="text-sm text-gray-600">Nuevas (7 días):</span>
+                        </div>
+                        <span className="font-semibold text-green-600">{backendStats.petsRegisteredLast7Days}</span>
+                    </div>
+                )}
+
+                {/* Mostrar distribución por especies si hay datos del backend */}
+                {backendStats?.petsBySpecies && Object.keys(backendStats.petsBySpecies).length > 0 && (
+                    <div className="pt-3 mt-3 border-t border-gray-200">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Por especies:</h4>
+                        {Object.entries(backendStats.petsBySpecies).map(([species, count]) => (
+                            <div key={species} className="flex justify-between items-center text-xs">
+                                <span className="text-gray-600 capitalize">{species}:</span>
+                                <span className="font-medium text-gray-900">{count}</span>
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>

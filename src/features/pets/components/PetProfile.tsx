@@ -3,11 +3,10 @@
 import { PetProfileHeader } from './profile/PetProfileHeader';
 import { PetProfileTabs } from './profile/PetProfileTabs';
 import { PetsLoadingState } from './states';
-import { usePetsStore } from '../../../store/PetStore';
+import { usePetsActions } from '../hooks/usePetsActions';
 
 export function PetProfile() {
-    const state = usePetsStore((store) => store);
-    const { selectedPet, isLoading } = state;
+    const { selectedPet, isLoading } = usePetsActions();
 
     // Si no hay mascota seleccionada, no se muestra nada.
     // Esto es manejado por el componente padre `PetsViewContent`.

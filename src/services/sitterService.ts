@@ -1,332 +1,195 @@
-// ===========================================
-// services/sitterService.ts - Servicio completo alineado con backend
-// ===========================================
+// src/services/sitterService.ts (VERSIÓN FINAL CON TIPOS CORREGIDOS)
 
-import axios from './auth';
+// 1. CORRECCIÓN: Importamos los nombres de tipo refactorizados desde sus ubicaciones correctas.
+
+import { ApiResponse, PaginatedResponse } from '../types/api.types';
+import type { CreateServiceRequest, Service } from '../types/service'; // Usamos los nuevos tipos de Service
 import type {
-	AuthResponse,
-	CreateSitterProfileRequest,
-	ExtendedSitter,
-	SitterProfileDTO,
-	SitterProfileSummary,
-	SitterRegisterRequest,
+    CreateSitterProfileRequest,
+    SearchSittersParams,
+    SitterProfile,
+    SitterProfileSummary,
+    SitterRegisterRequest
 } from '../types/sitter';
-import type { Service } from '../pages/SitterDashboard';
+import { Sitter, SitterFilters } from '../types/common.types';
 
-const API_URL = '/api/sitter-profiles';
+import type { LoginResponse } from '../types/auth';
+import type { UserSummary } from '../types/user';
+import { apiClient } from './api';
+import authApi from './auth';
+
+// Reutilizamos la respuesta de login
+         // Usamos el nuevo tipo UserSummary
+
+
+
+
+
+
+export class SitterService {
+  // GET /sitters - Lista de cuidadores disponibles
+  async getAll(filters?: SitterFilters): Promise<Sitter[]> {
+    const response = await apiClient.get<ApiResponse<Sitter[]>>('/sitters', {
+      params: filters
+    });
+    return response.data.data;
+  }
+
+  // GET /sitters/search - Búsqueda avanzada con paginación
+  async search(filters: SitterFilters, page = 1, pageSize = 10): Promise<PaginatedResponse<Sitter>> {
+    const response = await apiClient.get<ApiResponse<PaginatedResponse<Sitter>>>('/sitters/search', {
+      params: {
+        ...filters,
+        page,
+        pageSize
+      }
+    });
+    return response.data.data;
+  }
+
+  // GET /sitters/{id} - Perfil detallado de cuidador
+  async getById(id: string): Promise<Sitter> {
+    const response = await apiClient.get<ApiResponse<Sitter>>(`/sitters/${id}`);
+    return response.data.data;
+  }
+
+  // GET /sitters/{id}/reviews - Reseñas del cuidador
+  async getReviews(id: string): Promise<any[]> {
+    const response = await apiClient.get<ApiResponse<any[]>>(`/sitters/${id}/reviews`);
+    return response.data.data;
+  }
+
+  // GET /sitters/{id}/availability - Disponibilidad del cuidador
+  async getAvailability(id: string, startDate: string, endDate: string): Promise<any[]> {
+    const response = await apiClient.get<ApiResponse<any[]>>(`/sitters/${id}/availability`, {
+      params: { startDate, endDate }
+    });
+    return response.data.data;
+  }
+
+  // POST /sitters/{id}/contact - Contactar al cuidador
+  async contactSitter(id: string, message: string): Promise<void> {
+    await apiClient.post(`/sitters/${id}/contact`, { message });
+  }
+
+  // GET /sitters/nearby - Cuidadores cercanos
+  async getNearby(latitude: number, longitude: number, radius = 10): Promise<Sitter[]> {
+    const response = await apiClient.get<ApiResponse<Sitter[]>>('/sitters/nearby', {
+      params: { latitude, longitude, radius }
+    });
+    return response.data.data;
+  }
+
+  // POST /sitters/{id}/favorite - Agregar a favoritos
+  async addToFavorites(id: string): Promise<void> {
+    await apiClient.post(`/sitters/${id}/favorite`);
+  }
+
+  // DELETE /sitters/{id}/favorite - Remover de favoritos
+  async removeFromFavorites(id: string): Promise<void> {
+    await apiClient.delete(`/sitters/${id}/favorite`);
+  }
+
+  // GET /sitters/favorites - Lista de cuidadores favoritos
+  async getFavorites(): Promise<Sitter[]> {
+    const response = await apiClient.get<ApiResponse<Sitter[]>>('/sitters/favorites');
+    return response.data.data;
+  }
+}
+
+export const sitterService = new SitterService();
+const PROFILES_API_URL = '/api/sitter-profiles';
 const USERS_API_URL = '/api/users';
+const SERVICES_API_URL = '/api/services';
 
-// ========== SERVICIOS DE PERFILES ==========
+// ========== SERVICIOS DE PERFILES DE CUIDADOR ==========
 
-/**
- * Crea un perfil de cuidador para el usuario autenticado
- */
-export const createSitterProfile = async (
-	profileData: CreateSitterProfileRequest
-): Promise<SitterProfileDTO> => {
-	try {
-		const response = await axios.post<SitterProfileDTO>(API_URL, profileData);
-		return response.data;
-	} catch (error) {
-		console.error('Error creating sitter profile:', error);
-		throw new Error('No se pudo crear el perfil de cuidador');
-	}
+// 2. CORRECCIÓN: Usamos 'SitterProfile' en lugar de 'SitterProfileDTO'.
+export const createSitterProfile = async (profileData: CreateSitterProfileRequest): Promise<SitterProfile> => {
+  const { data } = await authApi.post<SitterProfile>(PROFILES_API_URL, profileData);
+  return data;
 };
 
-/**
- * Obtiene el perfil de un cuidador específico
- */
-export const getSitterProfile = async (
-	userId: number
-): Promise<SitterProfileDTO> => {
-	try {
-		const response = await axios.get<SitterProfileDTO>(
-			`${API_URL}/${userId}`
-		);
-		return response.data;
-	} catch (error) {
-		console.error('Error fetching sitter profile:', error);
-		throw new Error('No se pudo cargar el perfil del cuidador');
-	}
+export const getSitterProfile = async (userId: number): Promise<SitterProfile> => {
+  const { data } = await authApi.get<SitterProfile>(`${PROFILES_API_URL}/${userId}`);
+  return data;
 };
 
-/**
- * Obtiene todos los perfiles de cuidadores (solo admin)
- */
-export const getAllSitterProfiles = async (): Promise<SitterProfileDTO[]> => {
-	try {
-		const response = await axios.get<SitterProfileDTO[]>(API_URL);
-		return response.data;
-	} catch (error) {
-		console.error('Error fetching all sitter profiles:', error);
-		throw new Error('No se pudieron cargar los perfiles de cuidadores');
-	}
+export const getAllSitterProfiles = async (): Promise<SitterProfile[]> => {
+  const { data } = await authApi.get<SitterProfile[]>(PROFILES_API_URL);
+  return data;
 };
 
-/**
- * Actualiza un perfil de cuidador
- */
-export const updateSitterProfile = async (
-	userId: number,
-	profileData: CreateSitterProfileRequest
-): Promise<SitterProfileDTO> => {
-	try {
-		const response = await axios.put<SitterProfileDTO>(`${API_URL}/${userId}`, profileData);
-		return response.data;
-	} catch (error) {
-		console.error('Error updating sitter profile:', error);
-		throw new Error('No se pudo actualizar el perfil de cuidador');
-	}
+export const updateSitterProfile = async (userId: number, profileData: CreateSitterProfileRequest): Promise<SitterProfile> => {
+  const { data } = await authApi.put<SitterProfile>(`${PROFILES_API_URL}/${userId}`, profileData);
+  return data;
 };
 
-/**
- * Elimina un perfil de cuidador
- */
 export const deleteSitterProfile = async (userId: number): Promise<void> => {
-	try {
-		await axios.delete(`${API_URL}/${userId}`);
-	} catch (error) {
-		console.error('Error deleting sitter profile:', error);
-		throw new Error('No se pudo eliminar el perfil de cuidador');
-	}
+  await authApi.delete(`${PROFILES_API_URL}/${userId}`);
 };
 
-// ========== SERVICIOS DE USUARIOS/CUIDADORES ==========
-
-/**
- * Registra un nuevo cuidador
- */
-export const registerSitter = async (
-	sitterData: SitterRegisterRequest
-): Promise<AuthResponse> => {
-	try {
-		const response = await axios.post<AuthResponse>(
-			`${USERS_API_URL}/register-sitter`,
-			sitterData
-		);
-		return response.data;
-	} catch (error) {
-		console.error('Error registering sitter:', error);
-		throw new Error('No se pudo registrar el cuidador');
-	}
+export const searchSitters = async (params: SearchSittersParams): Promise<SitterProfileSummary[]> => {
+    const { data } = await authApi.get<SitterProfileSummary[]>(`${PROFILES_API_URL}/search`, { params });
+    return data;
 };
 
-/**
- * Obtiene todos los cuidadores (usuarios con rol SITTER)
- */
-export const getAllSitters = async (): Promise<SitterProfileSummary[]> => {
-	try {
-		const response = await axios.get(`${USERS_API_URL}/role/SITTER`);
-		// Los datos vienen como UserSummaryResponse, necesitamos mapearlos
-		return response.data.map(mapUserToSitter);
-	} catch (error) {
-		console.error('Error fetching sitters:', error);
-		throw new Error('No se pudieron cargar los cuidadores');
-	}
+// ========== SERVICIOS DE USUARIOS (ROL CUIDADOR) ==========
+
+// 3. CORRECCIÓN: Usamos 'LoginResponse' de auth.ts en lugar de 'AuthResponse'.
+export const registerSitter = async (sitterData: SitterRegisterRequest): Promise<LoginResponse> => {
+  const { data } = await authApi.post<LoginResponse>(`${USERS_API_URL}/register-sitter`, sitterData);
+  return data;
 };
 
-/**
- * Obtiene cuidadores activos con sus perfiles
- */
-export const getActiveSitters = async (): Promise<ExtendedSitter[]> => {
-	try {
-		// Obtener todos los perfiles de cuidadores
-		const profiles = await getAllSitterProfiles();
-
-		// Mapear a formato extendido con datos adicionales
-		return profiles
-			.filter((profile) => profile.availableForBookings)
-			.map(mapProfileToExtendedSitter);
-	} catch (error) {
-		console.error('Error fetching active sitters:', error);
-		return []; // Retornar array vacío en caso de error para no romper la UI
-	}
+export const getAllSittersAsUsers = async (): Promise<UserSummary[]> => {
+    const { data } = await authApi.get<UserSummary[]>(`${USERS_API_URL}/role/SITTER`);
+    return data;
 };
 
-/**
- * Busca cuidadores por filtros
- */
-export const searchSitters = async (filters: {
-	location?: string;
-	maxDistance?: number;
-	minRating?: number;
-	maxHourlyRate?: number;
-	availableOnly?: boolean;
-}): Promise<ExtendedSitter[]> => {
-	try {
-		// Por ahora obtenemos todos los cuidadores y filtramos en cliente
-		// En producción esto debería ser un endpoint específico con filtros en backend
-		const allSitters = await getActiveSitters();
+// ========== SERVICIOS OFRECIDOS POR CUIDADORES ==========
 
-		return allSitters.filter((sitter) => {
-			// Filtrar por disponibilidad
-			if (filters.availableOnly && !sitter.isAvailable) return false;
-
-			// Filtrar por rating mínimo
-			if (
-				filters.minRating &&
-				(sitter.averageRating || 0) < filters.minRating
-			)
-				return false;
-
-			// Filtrar por tarifa máxima
-			if (
-				filters.maxHourlyRate &&
-				(sitter.hourlyRate || 0) > filters.maxHourlyRate
-			)
-				return false;
-
-			// Filtrar por ubicación (búsqueda simple)
-			if (
-				filters.location &&
-				sitter.location &&
-				!sitter.location
-					.toLowerCase()
-					.includes(filters.location.toLowerCase())
-			)
-				return false;
-
-			return true;
-		});
-	} catch (error) {
-		console.error('Error searching sitters:', error);
-		throw new Error('No se pudo realizar la búsqueda de cuidadores');
-	}
+export const getSitterServices = async (sitterId: number): Promise<Service[]> => {
+  const { data } = await authApi.get<Service[]>(`${SERVICES_API_URL}/all/${sitterId}`);
+  return data;
 };
 
-// ========== FUNCIONES DE UTILIDAD ==========
-
-/**
- * Mapea UserSummaryResponse a SitterProfileSummary
- */
-const mapUserToSitter = (user: {
-	id: number;
-	firstName: string;
-	lastName: string;
-	emailVerified?: boolean;
-	address?: string;
-}): SitterProfileSummary => {
-	return {
-		id: user.id,
-		sitterName: `${user.firstName} ${user.lastName}`,
-		profileImageUrl: '', // Se completará con el perfil
-		hourlyRate: 0, // Se completará con el perfil
-		averageRating: 5.0, // Valor por defecto
-		isVerified: user.emailVerified || false,
-		location: user.address || 'Ubicación no especificada',
-	};
+export const addSitterService = async (sitterId: number, serviceData: CreateServiceRequest): Promise<Service> => {
+  const { data } = await authApi.post<Service>(`${SERVICES_API_URL}/create/${sitterId}`, serviceData);
+  return data;
 };
 
-/**
- * Mapea SitterProfileDTO a ExtendedSitter para la UI
- */
-const mapProfileToExtendedSitter = (
-	profile: SitterProfileDTO
-): ExtendedSitter => {
-	return {
-		id: profile.id || 0,
-		sitterName: 'Cuidador', // Se completará con datos del usuario
-		profileImageUrl: profile.profileImageUrl,
-		hourlyRate: profile.hourlyRate || 0,
-		averageRating: 4.5, // Valor por defecto
-		isVerified: profile.verified || false,
-		location: 'Santiago, Chile', // Valor por defecto
-
-		// Campos adicionales para ExtendedSitter
-		specialty: 'Cuidado General',
-		image: profile.profileImageUrl,
-		rating: 4.5,
-		totalServices: Math.floor(Math.random() * 50) + 5, // Datos de ejemplo
-		lastService: 'Hace ' + Math.floor(Math.random() * 7) + ' días',
-		pets: ['Max', 'Luna'], // Datos de ejemplo
-		isAvailable: profile.availableForBookings || false,
-		distance: (Math.random() * 5).toFixed(1) + ' km', // Datos de ejemplo
-		bio: profile.bio || 'Cuidador profesional con experiencia.',
-		nextAvailable:
-			'Hoy a las ' + (12 + Math.floor(Math.random() * 8)) + ':00',
-		specialties: ['Paseo', 'Cuidado', 'Compañía'], // Datos de ejemplo
-	};
+export const getActiveSitters = async (): Promise<SitterProfileSummary[]> => {
+  // Opción 1: Si tienes un endpoint específico para activos
+  try {
+    const { data } = await authApi.get<SitterProfileSummary[]>(`${PROFILES_API_URL}/active`);
+    return data;
+  } catch (error) {
+    // Fallback: obtener todos y filtrar activos
+    const allSitters = await getAllSitterProfiles();
+    return allSitters.filter(sitter => sitter.available) as SitterProfileSummary[];
+  }
 };
 
-/**
- * Verifica si el usuario actual tiene perfil de cuidador
- */
-export const hasActiveSitterProfile = async (): Promise<boolean> => {
-	try {
-		const token = localStorage.getItem('auth');
-		if (!token) return false;
-
-		const payload = JSON.parse(atob(token.split('.')[1]));
-		const userId = payload.id || payload.sub;
-
-		const profile = await getSitterProfile(userId);
-		return profile.availableForBookings || false;
-	} catch (error) {
-		console.error('Error checking sitter profile:', error);
-		return false; // No tiene perfil o error
-	}
+export const getSitterStats = async (): Promise<{
+  totalSitters: number;
+  activeSitters: number;
+  averageRating: number;
+  totalServices: number;
+}> => {
+  try {
+    // Opción 1: Si tienes endpoint de stats
+    const { data } = await authApi.get(`${PROFILES_API_URL}/stats`);
+    return data;
+  } catch (error) {
+    // Opción 2: Calcular stats basado en datos existentes
+    const sitters = await getAllSitterProfiles();
+    
+    return {
+      totalSitters: sitters.length,
+      activeSitters: sitters.filter(s => s.available).length,
+      averageRating: sitters.reduce((acc, s) => acc + (s.averageRating || 0), 0) / sitters.length || 0,
+      totalServices: sitters.reduce((acc, s) => acc + (s.serviceCount || 0), 0)
+    };
+  }
 };
-
-/**
- * Obtiene estadísticas de cuidadores para dashboard admin
- */
-export const getSitterStats = async () => {
-	try {
-		const [allProfiles, activeSitters] = await Promise.all([
-			getAllSitterProfiles(),
-			getActiveSitters(),
-		]);
-
-		const verifiedCount = allProfiles.filter((p) => p.verified).length;
-		const availableCount = allProfiles.filter(
-			(p) => p.availableForBookings
-		).length;
-
-		return {
-			totalSitters: allProfiles.length,
-			activeSitters: activeSitters.length,
-			verifiedSitters: verifiedCount,
-			availableSitters: availableCount,
-			averageHourlyRate:
-				allProfiles.reduce((sum, p) => sum + (p.hourlyRate || 0), 0) /
-					allProfiles.length || 0,
-		};
-	} catch (error) {
-		console.error('Error fetching sitter stats:', error);
-		return {
-			totalSitters: 0,
-			activeSitters: 0,
-			verifiedSitters: 0,
-			availableSitters: 0,
-			averageHourlyRate: 0,
-		};
-	}
-};
-
-export async function getMyServices(id: number): Promise<Service[]> {
-	// Lógica para obtener los servicios del cuidador desde la API
-	const response = await axios.get<Service[]>(`/api/services/all/${id}`);
-	return response.data;
-}
-
-export async function addMyService(
-	serviceType: string,
-	name: string,
-	description: string,
-	price: number,
-	durationInMinutes: number,
-	sitterId: number
-): Promise<Service> {
-	// Lógica para añadir un nuevo servicio a través de la API
-	const response = await axios.post<Service>(
-		`/api/services/create/${sitterId}`,
-		{
-			serviceType,
-			name,
-			description,
-			price,
-			durationInMinutes
-		}
-	);
-	return response.data;
-}

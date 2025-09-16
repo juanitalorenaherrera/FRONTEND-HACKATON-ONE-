@@ -1,11 +1,12 @@
-import React from 'react';
+// src/components/ui/LoadingSpinner.tsx
+
 import { Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface LoadingSpinnerProps {
-    title: string;
-    description?: string;
-    className?: string;
+    readonly title: string;
+    readonly description?: string;
+    readonly className?: string;
 }
 
 export function LoadingSpinner({ title, description, className }: LoadingSpinnerProps) {

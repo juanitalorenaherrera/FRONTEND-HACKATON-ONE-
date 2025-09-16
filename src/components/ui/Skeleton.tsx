@@ -1,7 +1,9 @@
 import React from 'react';
-import { cn } from '../../lib/utils';   // 'cn' es una utilidad para fusionar clases de Tailwind, muy recomendada.
+import { cn } from '../../lib/utils';
 
-interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+  readonly className?: string; 
+}
 
 export function Skeleton({ className, ...props }: SkeletonProps) {
   return (
