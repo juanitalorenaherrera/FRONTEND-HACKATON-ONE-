@@ -1,8 +1,8 @@
 // features/pets/components/profile/PetMedicalTab.tsx
 
-import { AlertTriangle, Heart, Info, Pill } from 'lucide-react';
+import { AlertTriangle, Heart, Pill } from 'lucide-react';
 
-import type { Pet } from '../../types';
+import type { Pet } from '@/features/pets/types';
 
 // ====================================================================
 // SUB-COMPONENTE REUTILIZABLE: Para mantener la consistencia en cada sección.

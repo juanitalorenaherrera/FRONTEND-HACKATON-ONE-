@@ -3,7 +3,7 @@
 // ===========================================
 
 import { PawPrint } from 'lucide-react';
-import type { Pet } from '../../../../../../types/dashboardData';
+import type { Pet } from '@/types/dashboardData';
 import { useNavigate } from 'react-router';
 import PetCard from './PetCard';
 import React from 'react';

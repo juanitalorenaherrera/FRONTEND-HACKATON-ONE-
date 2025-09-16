@@ -1,7 +1,7 @@
 // ===========================================
 // MainDashboardView.tsx - Versión alineada
 // ===========================================
-import type { Appointment, Sitter } from '../../types/dashboardData';
+import type { Appointment, Sitter } from '@/types/dashboardData';
 import { AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import HeroBanner from './components/sections/MainDashboard/HeroBanner/HeroBanner';

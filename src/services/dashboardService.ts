@@ -1,8 +1,8 @@
 // src/services/dashboardService.ts
-import type { DashboardData, Pet } from '../types/dashboardData';
-import type { DashboardStatsData } from '../types/DashboardStatsData';
-import type { PetSummaryResponse } from '../types/pets';
-import axios from '../services/auth';
+import type { DashboardData, Pet } from '@/types/dashboardData';
+import type { DashboardStatsData } from '@/types/DashboardStatsData';
+import type { PetSummaryResponse } from '@/types/pets';
+import axios from '@/services/auth';
 import { getMockDashboardData } from './mockDashboardService';
 
 const API_URL = '/api/dashboard';

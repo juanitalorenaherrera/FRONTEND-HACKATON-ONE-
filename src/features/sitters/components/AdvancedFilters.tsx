@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { MapPin, DollarSign, Star } from 'lucide-react';
-import { useSittersContext } from '../context/SittersContext';
-import { SITTER_CONFIG } from '../../../features/sitters/config/sitters.config';
-import type { SitterFilters } from '../../../features/sitters/types';
+import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
+import { SITTER_CONFIG } from '@/features/sitters/config/sitters.config';
+import type { SitterFilters } from '@/features/sitters/types';
 
 interface AdvancedFiltersProps {
 	onClose: () => void;

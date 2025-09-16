@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { SlidersHorizontal } from 'lucide-react';
-import { useSittersContext } from '../context/SittersContext';
-import { useDebounce } from '../../../hooks/useDebounce';
+import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
+import { useDebounce } from '@/hooks/useDebounce';
 import { SitterSearchBar } from './SitterSearchBar';
 import { SortDropdown } from './SortDropdown';
 import { AdvancedFilters } from './AdvancedFilters';
@@ -19,7 +19,7 @@ export function SearchFilters() {
         actions.updateFilter({ searchTerm: debouncedSearchTerm });
     }, [debouncedSearchTerm, actions]);
 
-    const hasActiveFilters = Object.keys(state.filters).filter(k => state.filters[k] !== undefined).length > 2; // >2 para ignorar sortBy/sortDirection por defecto
+    const hasActiveFilters = !!(state.filters.searchTerm || state.filters.maxDistance || state.filters.minRating || state.filters.maxHourlyRate || state.filters.specialty || state.filters.availableOnly);
 
     return (
         <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">

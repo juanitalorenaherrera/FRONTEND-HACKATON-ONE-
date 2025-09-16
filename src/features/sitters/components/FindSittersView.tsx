@@ -1,5 +1,5 @@
-import { SittersProvider, useSittersContext } from '../context/SittersContext';
-import { useSittersActions } from '../hooks/useSittersActions';
+import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
+import { useSittersActions } from '@/features/sitters/hooks/useSittersActions';
 import {
     SitterStats,
     SearchFilters,
@@ -7,7 +7,8 @@ import {
     SittersLoadingState,
     SittersErrorState
 } from '../components';
-import type { ExtendedSitter } from '../../../types/sitter';
+import type { ExtendedSitter } from '@/types/sitter';
+import { SittersProvider } from '@/features/sitters/context/SittersContext';
 
 /**
  * Componente interno que renderiza la UI.

@@ -6,12 +6,12 @@ import axios from './auth';
 import type {
 	AuthResponse,
 	CreateSitterProfileRequest,
-	ExtendedSitter,
 	SitterProfileDTO,
 	SitterProfileSummary,
 	SitterRegisterRequest,
 } from '../types/sitter';
-import type { Service } from '../pages/SitterDashboard';
+import type { ExtendedSitter } from '@/types/sitter';
+import type { Service } from '@/pages/SitterDashboard';
 
 const API_URL = '/api/sitter-profiles';
 const USERS_API_URL = '/api/users';

@@ -14,7 +14,7 @@ export { PetsView } from './view/PetsView';
 // 2. El proveedor de contexto.
 //    Se exporta principalmente para poder usarlo en entornos de prueba (como Storybook o Jest)
 //    donde necesitemos envolver componentes de forma aislada.
-export { PetsProvider } from './context/PetsContext';
+export { usePetsStore } from '@/store/PetStore';
 
 // 3. Los tipos de datos.
 //    Exportamos todos los tipos para que otras features (ej. Bookings) puedan

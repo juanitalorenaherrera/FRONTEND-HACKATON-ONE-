@@ -1,5 +1,5 @@
 import { Users, FilterX } from 'lucide-react';
-import { useSittersContext } from '../context/SittersContext';
+import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
 
 // El componente ya no necesita props.
 export function EmptyState() {
@@ -8,9 +8,7 @@ export function EmptyState() {
 
     // 2. Determinamos si hay filtros activos.
     // (Ignoramos las claves de ordenamiento que pueden estar por defecto).
-    const hasActiveFilters = Object.keys(state.filters).some(key => 
-        key !== 'sortBy' && key !== 'sortDirection' && state.filters[key] !== undefined
-    );
+    const hasActiveFilters = !!(state.filters.searchTerm || state.filters.maxDistance || state.filters.minRating || state.filters.maxHourlyRate || state.filters.specialty || state.filters.availableOnly);
 
     // 3. El componente ahora renderiza contenido diferente según el contexto.
     const Icon = hasActiveFilters ? FilterX : Users;

@@ -6,10 +6,10 @@ import type {
 	DashboardData,
 	Stats,
 	UserProfile,
-} from '../../../types/dashboardData';
+} from '@/types/dashboardData';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { getDashboardData } from '../../../services/dashboardService';
+import { getDashboardData } from '@/services/dashboardService';
 
 // --- Valores por Defecto usando los tipos correctos ---
 const defaultStats: Stats = {

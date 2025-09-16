@@ -1,5 +1,5 @@
-import { useSittersContext } from '../context/SittersContext';
-import { ErrorState as GenericErrorState } from '../../../components/ui/ErrorState'; // Importamos el componente genérico
+import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
+import { ErrorState as GenericErrorState } from '@/components/ui/ErrorState'; // Importamos el componente genérico
 
 export function SittersErrorState({ className = '' }: { className?: string }) {
     const { state, actions } = useSittersContext();

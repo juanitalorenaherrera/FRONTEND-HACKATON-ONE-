@@ -2,9 +2,12 @@
 // features/booking/utils/bookingUtils.ts - Utilities Completas
 // ===========================================
 
-import type { BookingFilters, BookingSummary } from '../types';
-
-import { BookingStatus } from '../../../services/bookingService';
+import type {
+	BookingFilters,
+	BookingSummary,
+	BookingDetail,
+} from '@/features/booking/types';
+import { BookingStatus } from '@/features/booking/types';
 
 export const shouldRefreshCache = (lastFetch: number | null, maxAge: number): boolean => {
     if (!lastFetch) return true;
@@ -15,19 +18,8 @@ export const filterAndSortBookings = (bookings: BookingSummary[], filters: Booki
     let filtered = [...bookings];
     
     // Filter by status
-    if (filters.status) {
-        filtered = filtered.filter(booking => booking.status === filters.status);
-    }
-    
-    // Filter by date range
-    if (filters.dateRange) {
-        const fromDate = new Date(filters.dateRange.from);
-        const toDate = new Date(filters.dateRange.to);
-        
-        filtered = filtered.filter(booking => {
-            const bookingDate = new Date(booking.startTime);
-            return bookingDate >= fromDate && bookingDate <= toDate;
-        });
+    if (filters.status && filters.status.length > 0) {
+        filtered = filtered.filter(booking => filters.status!.includes(booking.status));
     }
     
     // Filter by search term
@@ -50,9 +42,6 @@ export const filterAndSortBookings = (bookings: BookingSummary[], filters: Booki
             case 'totalPrice':
                 comparison = a.totalPrice - b.totalPrice;
                 break;
-            case 'status':
-                comparison = a.status.localeCompare(b.status);
-                break;
             case 'createdAt':
                 // Assuming we have createdAt in the future
                 comparison = a.id - b.id; // Fallback to ID for now
@@ -61,7 +50,7 @@ export const filterAndSortBookings = (bookings: BookingSummary[], filters: Booki
                 comparison = 0;
         }
         
-        return filters.sortDirection === 'desc' ? -comparison : comparison;
+        return filters.sortOrder === 'desc' ? -comparison : comparison;
     });
     
     return filtered;
@@ -134,7 +123,7 @@ export const getBookingTimeStatus = (booking: BookingSummary) => {
     };
 };
 
-export const validateBookingData = (data: Partial<BookingSummary | BookingDetail>): string | null => {
+export const validateBookingData = (data: Partial<BookingDetail>): string | null => {
     if (!data.petId) return 'La mascota es obligatoria.';
     if (!data.sitterId) return 'El cuidador es obligatorio.';
     if (!data.startTime) return 'La fecha y hora son obligatorias.';

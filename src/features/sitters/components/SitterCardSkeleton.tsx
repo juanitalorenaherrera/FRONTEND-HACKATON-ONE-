@@ -1,4 +1,4 @@
-import { Skeleton } from '../../../components/ui/Skeleton'; // 1. Importamos nuestro componente genérico
+import { Skeleton } from '@/components/ui/Skeleton'; // 1. Importamos nuestro componente genérico
 
 export function SitterCardSkeleton() {
 	return (

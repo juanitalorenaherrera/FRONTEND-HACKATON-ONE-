@@ -3,10 +3,10 @@
 // ===========================================
 
 import { ArrowRight } from 'lucide-react';
-import ImageWithFallback from '../../../../../../components/ui/ImageWithFallback';
-import type { Pet } from '../../../../../../types/dashboardData';
+import ImageWithFallback from '@/components/ui/ImageWithFallback';
+import type { Pet } from '@/types/dashboardData';
 import React from 'react';
-import { getPetImage } from '../../../../../../utils/dashboardUtils';
+import { getPetImage } from '@/utils/dashboardUtils';
 
 interface PetCardProps {
 	pet: Pet;

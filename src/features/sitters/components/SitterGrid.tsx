@@ -1,4 +1,4 @@
-import type { ExtendedSitter } from '../../../types/sitter';
+import type { ExtendedSitter } from '@/types/sitter';
 import { EmptyState } from './EmptyState';
 import { SitterCard } from './SitterCard';
 

@@ -4,7 +4,7 @@
 
 import { Calendar, Clock, MapPin, Phone, Plus, RefreshCw, AlertCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import type { BookingSummary, BookingStatus } from '@/features/booking/types';
+import { type BookingSummary, BookingStatus } from '@/features/booking/types';
 
 interface UpcomingBookingCardProps {
     className?: string;
