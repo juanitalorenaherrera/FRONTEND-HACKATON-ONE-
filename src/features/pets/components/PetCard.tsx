@@ -81,7 +81,7 @@ const PetInfo: React.FC<{ pet: Pet; variant: 'compact' | 'default' | 'detailed' 
                             <span className="text-xs text-blue-600">Cuidados especiales</span>
                         </div>
                     )}
-                    {statusInfo.ageCategory === 'senior' && (
+                    {statusInfo.ageCategory === 'Senior' && (
                         <div className="flex items-center gap-1" title="Mascota Senior">
                             <Calendar className="w-3 h-3 text-purple-500" />
                             <span className="text-xs text-purple-600">Senior</span>
