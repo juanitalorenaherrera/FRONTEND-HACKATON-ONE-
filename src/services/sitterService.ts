@@ -2,6 +2,7 @@
 
 // 1. CORRECCIÓN: Importamos los nombres de tipo refactorizados desde sus ubicaciones correctas.
 
+import { ApiResponse, PaginatedResponse } from '../types/api.types';
 import type { CreateServiceRequest, Service } from '../types/service'; // Usamos los nuevos tipos de Service
 import type {
     CreateSitterProfileRequest,
@@ -10,9 +11,11 @@ import type {
     SitterProfileSummary,
     SitterRegisterRequest
 } from '../types/sitter';
+import { Sitter, SitterFilters } from '../types/common.types';
 
 import type { LoginResponse } from '../types/auth';
 import type { UserSummary } from '../types/user';
+import { apiClient } from './api';
 import authApi from './auth';
 
 // Reutilizamos la respuesta de login
@@ -20,6 +23,81 @@ import authApi from './auth';
 
 
 
+
+
+
+export class SitterService {
+  // GET /sitters - Lista de cuidadores disponibles
+  async getAll(filters?: SitterFilters): Promise<Sitter[]> {
+    const response = await apiClient.get<ApiResponse<Sitter[]>>('/sitters', {
+      params: filters
+    });
+    return response.data.data;
+  }
+
+  // GET /sitters/search - Búsqueda avanzada con paginación
+  async search(filters: SitterFilters, page = 1, pageSize = 10): Promise<PaginatedResponse<Sitter>> {
+    const response = await apiClient.get<ApiResponse<PaginatedResponse<Sitter>>>('/sitters/search', {
+      params: {
+        ...filters,
+        page,
+        pageSize
+      }
+    });
+    return response.data.data;
+  }
+
+  // GET /sitters/{id} - Perfil detallado de cuidador
+  async getById(id: string): Promise<Sitter> {
+    const response = await apiClient.get<ApiResponse<Sitter>>(`/sitters/${id}`);
+    return response.data.data;
+  }
+
+  // GET /sitters/{id}/reviews - Reseñas del cuidador
+  async getReviews(id: string): Promise<any[]> {
+    const response = await apiClient.get<ApiResponse<any[]>>(`/sitters/${id}/reviews`);
+    return response.data.data;
+  }
+
+  // GET /sitters/{id}/availability - Disponibilidad del cuidador
+  async getAvailability(id: string, startDate: string, endDate: string): Promise<any[]> {
+    const response = await apiClient.get<ApiResponse<any[]>>(`/sitters/${id}/availability`, {
+      params: { startDate, endDate }
+    });
+    return response.data.data;
+  }
+
+  // POST /sitters/{id}/contact - Contactar al cuidador
+  async contactSitter(id: string, message: string): Promise<void> {
+    await apiClient.post(`/sitters/${id}/contact`, { message });
+  }
+
+  // GET /sitters/nearby - Cuidadores cercanos
+  async getNearby(latitude: number, longitude: number, radius = 10): Promise<Sitter[]> {
+    const response = await apiClient.get<ApiResponse<Sitter[]>>('/sitters/nearby', {
+      params: { latitude, longitude, radius }
+    });
+    return response.data.data;
+  }
+
+  // POST /sitters/{id}/favorite - Agregar a favoritos
+  async addToFavorites(id: string): Promise<void> {
+    await apiClient.post(`/sitters/${id}/favorite`);
+  }
+
+  // DELETE /sitters/{id}/favorite - Remover de favoritos
+  async removeFromFavorites(id: string): Promise<void> {
+    await apiClient.delete(`/sitters/${id}/favorite`);
+  }
+
+  // GET /sitters/favorites - Lista de cuidadores favoritos
+  async getFavorites(): Promise<Sitter[]> {
+    const response = await apiClient.get<ApiResponse<Sitter[]>>('/sitters/favorites');
+    return response.data.data;
+  }
+}
+
+export const sitterService = new SitterService();
 const PROFILES_API_URL = '/api/sitter-profiles';
 const USERS_API_URL = '/api/users';
 const SERVICES_API_URL = '/api/services';

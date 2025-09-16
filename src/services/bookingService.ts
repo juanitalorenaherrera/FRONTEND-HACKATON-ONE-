@@ -1,84 +1,84 @@
-// src/services/bookingService.ts
+import { Booking, BookingStatus, CreateBookingDTO } from '../types/common.types';
 
-import type {
-  BookingDetail,
-  BookingSummary,
-  CreateBookingRequest,
-  GetBookingsRequest,
-  PageResponse,
-  UpdateBookingRequest,
-  UpdateBookingStatusRequest,
-} from '../types/bookings';
+import { ApiResponse } from '../types/api.types';
+import { apiClient } from './api';
 
-import authApi from './auth';
+export class BookingService {
+  // GET /bookings - Historial de reservas del usuario
+  async getAll(): Promise<Booking[]> {
+    const response = await apiClient.get<ApiResponse<Booking[]>>('/bookings');
+    return response.data.data;
+  }
 
-const API_URL = '/api/bookings';
+  // GET /bookings/{id} - Detalle de reserva específica
+  async getById(id: string): Promise<Booking> {
+    const response = await apiClient.get<ApiResponse<Booking>>(`/bookings/${id}`);
+    return response.data.data;
+  }
 
-/**
- * Crea una nueva reserva.
- * @param bookingData - Objeto con los detalles para la nueva reserva.
- */
-export const createBooking = async (
-  bookingData: CreateBookingRequest
-): Promise<BookingDetail> => {
-  const { data } = await authApi.post<BookingDetail>(API_URL, bookingData);
-  return data;
-};
+  // POST /bookings - Crear nueva reserva
+  async create(bookingData: CreateBookingDTO): Promise<Booking> {
+    const response = await apiClient.post<ApiResponse<Booking>>('/bookings', bookingData);
+    return response.data.data;
+  }
 
-/**
- * Obtiene las reservas de un usuario con paginación y filtros.
- * @param params - Objeto con los parámetros de filtrado y paginación.
- */
-export const getBookingsByUser = async (
-  params: GetBookingsRequest
-): Promise<PageResponse<BookingSummary>> => {
-  // Axios se encarga de serializar el objeto 'params' en la URL
-  const { data } = await authApi.get<PageResponse<BookingSummary>>(API_URL, { params });
-  return data;
-};
+  // PUT /bookings/{id}/status - Actualizar estado de reserva
+  async updateStatus(id: string, status: BookingStatus): Promise<Booking> {
+    const response = await apiClient.put<ApiResponse<Booking>>(`/bookings/${id}/status`, { status });
+    return response.data.data;
+  }
 
-/**
- * Obtiene los detalles completos de una reserva por su ID.
- * @param bookingId - El ID de la reserva a obtener.
- */
-export const getBookingById = async (bookingId: number): Promise<BookingDetail> => {
-  const { data } = await authApi.get<BookingDetail>(`${API_URL}/${bookingId}`);
-  return data;
-};
+  // POST /bookings/{id}/cancel - Cancelar reserva
+  async cancel(id: string, reason?: string): Promise<void> {
+    await apiClient.post(`/bookings/${id}/cancel`, { reason });
+  }
 
-/**
- * Actualiza una reserva existente (ej. cambiar notas o fecha).
- * @param bookingId - El ID de la reserva a actualizar.
- * @param updateData - Los campos de la reserva a modificar.
- */
-export const updateBooking = async (
-  bookingId: number,
-  updateData: UpdateBookingRequest
-): Promise<BookingDetail> => {
-  const { data } = await authApi.put<BookingDetail>(`${API_URL}/${bookingId}`, updateData);
-  return data;
-};
+  // GET /bookings/upcoming - Próximas reservas
+  async getUpcoming(): Promise<Booking[]> {
+    const response = await apiClient.get<ApiResponse<Booking[]>>('/bookings/upcoming');
+    return response.data.data;
+  }
 
-/**
- * Cambia el estado de una reserva (ej. confirmar, cancelar).
- * @param bookingId - El ID de la reserva a modificar.
- * @param statusUpdate - Objeto con el nuevo estado y una razón opcional.
- */
-export const updateBookingStatus = async (
-  bookingId: number,
-  statusUpdate: UpdateBookingStatusRequest
-): Promise<BookingDetail> => {
-  const { data } = await authApi.patch<BookingDetail>(
-    `${API_URL}/${bookingId}/status`,
-    statusUpdate // El body ahora contiene los datos
-  );
-  return data;
-};
+  // GET /bookings/past - Reservas pasadas
+  async getPast(): Promise<Booking[]> {
+    const response = await apiClient.get<ApiResponse<Booking[]>>('/bookings/past');
+    return response.data.data;
+  }
 
-/**
- * Elimina una reserva.
- * @param bookingId - El ID de la reserva a eliminar.
- */
-export const deleteBooking = async (bookingId: number): Promise<void> => {
-  await authApi.delete(`${API_URL}/${bookingId}`);
-};
+  // GET /bookings/pending - Reservas pendientes de confirmación
+  async getPending(): Promise<Booking[]> {
+    const response = await apiClient.get<ApiResponse<Booking[]>>('/bookings/pending');
+    return response.data.data;
+  }
+
+  // POST /bookings/{id}/review - Dejar reseña después del servicio
+  async addReview(id: string, rating: number, comment: string): Promise<void> {
+    await apiClient.post(`/bookings/${id}/review`, { rating, comment });
+  }
+
+  // GET /bookings/{id}/messages - Mensajes con el cuidador
+  async getMessages(id: string): Promise<any[]> {
+    const response = await apiClient.get<ApiResponse<any[]>>(`/bookings/${id}/messages`);
+    return response.data.data;
+  }
+
+  // POST /bookings/{id}/messages - Enviar mensaje al cuidador
+  async sendMessage(id: string, message: string): Promise<void> {
+    await apiClient.post(`/bookings/${id}/messages`, { message });
+  }
+
+  // GET /bookings/calculate-price - Calcular precio de reserva
+  async calculatePrice(
+    sitterId: string,
+    service: string,
+    startDate: string,
+    endDate: string
+  ): Promise<{ amount: number; tax: number; total: number }> {
+    const response = await apiClient.get<ApiResponse<any>>('/bookings/calculate-price', {
+      params: { sitterId, service, startDate, endDate }
+    });
+    return response.data.data;
+  }
+}
+
+export const bookingService = new BookingService();
