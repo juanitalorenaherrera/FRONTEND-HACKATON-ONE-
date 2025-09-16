@@ -1,7 +1,7 @@
 import { useCallback, useRef, useEffect } from 'react';
-import { useSittersContext } from '../../sitters/context/SittersContext';
-import { getActiveSitters, getSitterStats, searchSitters } from '../../../services/sitterService';
-import type { SitterFilters } from '../types';
+import { useSittersContext } from './useSittersContext';
+import { getActiveSitters, getSitterStats, searchSitters } from '@/services/sitterService';
+import type { SitterFilters, ExtendedSitter } from '@/features/sitters/types';
 
 export function useSittersActions() {
     // 1. Obtenemos `dispatch` en lugar de `actions`.
@@ -23,7 +23,7 @@ export function useSittersActions() {
             if (signal.aborted) return;
             
             // 3. Despachamos una única acción con todos los datos.
-            dispatch({ type: 'SET_DATA', payload: { sitters: sittersData, stats: statsData } });
+            dispatch({ type: 'SET_DATA', payload: { sitters: sittersData as ExtendedSitter[], stats: statsData } });
 
         } catch (err) {
             if (signal.aborted) return;
