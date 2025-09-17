@@ -7,7 +7,7 @@ import { BookingsOverview } from '@/features/booking/components/BookingOverview'
 import { useAuthStore } from '@/store/AuthStore';
 import { useBookingsStore } from '@/store/BookingStore';
 
-function BookingsViewContent() {
+export function BookingsViewContent() {
 	const loadBookings = useBookingsStore((state) => state.loadBookings);
 	const isLoading = useBookingsStore((state) => state.isLoading);
 	const user = useAuthStore((state) => state.profile);
@@ -34,12 +34,5 @@ function BookingsViewContent() {
                 <BookingsOverview />
             </main>
         </div>
-    );
-}
-
-// El componente exportado que envuelve todo en su Provider.
-export function BookingsView() {
-    return (
-            <BookingsViewContent />
     );
 }

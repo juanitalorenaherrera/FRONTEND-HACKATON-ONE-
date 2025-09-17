@@ -6,7 +6,7 @@ import { usePetsActions } from '@/features/pets/hooks/usePetsActions';
 import { useAuthStore } from '@/store/AuthStore';
 import { usePetsStore } from '@/store/PetStore';
 
-function PetsViewContent() {
+export function PetsViewContent() {
 	const isLoading = usePetsStore((state) => state.isLoading);
 	const { loadPets } = usePetsActions();
 	const user = useAuthStore((state) => state.profile);
@@ -42,8 +42,4 @@ function PetsViewContent() {
 			</main>
 		</div>
 	);
-}
-
-export function PetsView() {
-	return <PetsViewContent />;
 }
