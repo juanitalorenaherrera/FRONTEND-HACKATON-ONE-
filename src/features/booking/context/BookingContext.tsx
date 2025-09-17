@@ -1,4 +1,6 @@
-import type { Booking, BookingDetail, BookingFilters, BookingStats, PaginationState } from '../types';
+/* eslint-disable react-refresh/only-export-components */
+import type { BookingSummary, BookingDetail, BookingFilters, BookingStats, PaginationState, PageResponse } from '@/features/booking/types';
+import { BookingStatus } from '@/features/booking/types';
 import React, { createContext, useMemo, useReducer } from 'react';
 
 import type { ReactNode } from 'react';
@@ -8,7 +10,7 @@ import type { ReactNode } from 'react';
 // ====================================================================
 
 interface BookingsState {
-    bookings: Booking[];
+    bookings: BookingSummary[];
     selectedBooking: BookingDetail | null;
     stats: BookingStats | null;
     isLoading: boolean;
@@ -21,17 +23,17 @@ interface BookingsState {
 type BookingsAction =
     | { type: 'SET_LOADING'; payload: boolean }
     | { type: 'SET_ERROR'; payload: string | null }
-    | { type: 'SET_DATA_SUCCESS'; payload: { page: any; stats: BookingStats } } // `any` para la página de Spring
+    | { type: 'SET_DATA_SUCCESS'; payload: { page: PageResponse<BookingSummary>; stats: BookingStats } }
     | { type: 'SET_SELECTED_BOOKING'; payload: BookingDetail | null }
     | { type: 'DELETE_BOOKING_SUCCESS'; payload: number } // id de la reserva
-    | { type: 'UPDATE_BOOKING_SUCCESS'; payload: Booking } // Resumen de la reserva
-    | { type: 'ADD_BOOKING_SUCCESS'; payload: Booking }
+    | { type: 'UPDATE_BOOKING_SUCCESS'; payload: BookingSummary } // Resumen de la reserva
+    | { type: 'ADD_BOOKING_SUCCESS'; payload: BookingSummary }
     | { type: 'SET_PAGE'; payload: number };
 
 export interface BookingContextValue {
     state: BookingsState;
     dispatch: React.Dispatch<BookingsAction>;
-    filteredBookings: Booking[];
+    filteredBookings: BookingSummary[];
 }
 
 // ====================================================================
@@ -45,7 +47,7 @@ const initialState: BookingsState = {
     isLoading: true,
     error: null,
     filters: {
-        status: ['PENDING', 'CONFIRMED'], // Ejemplo de filtro inicial
+        status: [BookingStatus.PENDING, BookingStatus.CONFIRMED], // Ejemplo de filtro inicial
         sortBy: 'startTime',
         sortOrder: 'asc',
     },
@@ -53,7 +55,7 @@ const initialState: BookingsState = {
         currentPage: 1,
         pageSize: 10,
         totalPages: 1,
-        totalItems: 0,
+        totalElements: 0,
         hasNext: false,
     },
 };
@@ -74,7 +76,7 @@ function bookingsReducer(state: BookingsState, action: BookingsAction): Bookings
                     ...state.pagination,
                     currentPage: action.payload.page.number + 1, // Spring pages son 0-indexed
                     totalPages: action.payload.page.totalPages,
-                    totalItems: action.payload.page.totalElements,
+                    totalElements: action.payload.page.totalElements,
                     hasNext: !action.payload.page.last,
                 },
             };
@@ -105,7 +107,7 @@ function bookingsReducer(state: BookingsState, action: BookingsAction): Bookings
 // ====================================================================
 
 export const BookingContext = createContext<BookingContextValue | undefined>(undefined);
-
+ 
 export function BookingsProvider({ children }: { readonly children: ReactNode }) {
     const [state, dispatch] = useReducer(bookingsReducer, initialState);
 

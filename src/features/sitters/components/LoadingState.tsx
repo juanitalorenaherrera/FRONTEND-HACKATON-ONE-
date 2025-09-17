@@ -1,9 +1,8 @@
 // ===========================================
 // components/LoadingState.tsx - Estado de carga
 // ===========================================
-import React from 'react';
-import { Skeleton } from '../../../components/ui/Skeleton';
-import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 // El componente ya no es genérico, es el estado de carga específico para los cuidadores.
 // Podemos renombrarlo para mayor claridad.

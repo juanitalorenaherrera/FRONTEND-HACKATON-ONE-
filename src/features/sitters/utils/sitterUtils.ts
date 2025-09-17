@@ -38,7 +38,12 @@ export function getAvailabilityColor(isAvailable?: boolean): string {
     return isAvailable ? 'text-green-600' : 'text-gray-500';
 }
 
-export function getAvailabilityText(sitter: any): string {
+interface SitterAvailability {
+    isAvailable?: boolean;
+    nextAvailable?: string;
+}
+
+export function getAvailabilityText(sitter: SitterAvailability): string {
     if (sitter.isAvailable) {
         return `✓ Disponible ${sitter.nextAvailable || 'ahora'}`;
     }
@@ -64,5 +69,4 @@ export interface SitterFilters {
     hasReviews?: boolean;
 }
 
-// Re-exportamos las funciones ya definidas anteriormente
-export { applySitterFilters, sortSitters } from './sitterUtils';
+

@@ -1,22 +1,23 @@
-import axios from 'axios';
+import axios from '../../services/auth';
 
-const API_URL = 'http://localhost:8088/api/pets';
+const API_URL = '/api/pets';
 
 interface PetData {
 	name: string;
 	type: string;
 }
 
-export const addPet = async (token: string, pet: PetData) => {
-	const res = await axios.post(API_URL, pet, {
-		headers: { Authorization: `Bearer ${token}` },
-	});
+export const addPet = async (name: string, type: string) => {
+	const res = await axios.post<PetData>(API_URL, 
+		{
+			name,
+			type
+		}
+	);
 	return res.data;
 };
 
-export const getPets = async (token: string) => {
-	const res = await axios.get(API_URL, {
-		headers: { Authorization: `Bearer ${token}` },
-	});
+export const getPets = async () => {
+	const res = await axios.get(API_URL);
 	return res.data;
 };

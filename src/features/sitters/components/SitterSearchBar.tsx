@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
-import { useSittersContext } from '../context/SittersContext';
-import { useDebounce } from '../../../hooks/useDebounce';
-import { getSitterSuggestions } from '../../../services/suggestionService';
-import { cn } from '../../../lib/utils'; 
+import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
+import { useDebounce } from '@/hooks/useDebounce';
+import { getSitterSuggestions } from '@/services/suggestionService';
+import { cn } from '@/lib/utils'; 
 
 // El tipo ahora vive aquí, junto al componente que lo usa.
 export interface SearchSuggestion {

@@ -1,59 +1,51 @@
 // src/services/authService.ts
-
-import type { User } from '../types/user';
 import axios from '../services/auth';
-import type { Profile } from '../types/authStore';
-;
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-// 1. (Opcional pero recomendado) Creamos una interfaz para la respuesta del login
-interface LoginResponse {
-	token: string;
-	userProfile: Profile;
-}
-
-export const loginRequest = async (email: string, password: string): Promise<LoginResponse> => {
-	const res = await axios.post<LoginResponse>('/api/users/login', {
-		email,
-		password,
-	});
-
-	console.log(res.data);
-	return res.data;
-};
+import type {
+	LoginResponse,
+	Profile,
+	RegisterResponse,
+} from '../types/authStore';
 
 /**
  * Inicia sesión, guarda el token y devuelve los datos del usuario.
  */
+export const loginRequest = async (
+	email: string,
+	password: string
+): Promise<LoginResponse> => {
+	const res = await axios.post<LoginResponse>('/api/users/login', {
+		email,
+		password,
+	});
+	return res.data;
+};
 /**
  * Obtiene el perfil del usuario autenticado a través del token.
  */
-export const getProfile = async (): Promise<User> => {
-	const token = localStorage.getItem('auth');
-	if (!token) {
-		throw new Error('No se encontró el token de autenticación.');
-	}
-
-	const response = await axios.get<User>(`/api/dashboard/profile`);
-
+export const getProfile = async (): Promise<Profile> => {
+	const response = await axios.get<Profile>(`/api/dashboard/profile`);
 	return response.data;
 };
-
 /**
  * Registra un nuevo usuario. (Función que ya tenías)
  */
-export const register = async (
-	name: string,
+export const registerRequest = async (
+	firstName: string,
+	lastName: string,
 	email: string,
 	password: string,
-	role: 'client' | 'sitter'
-): Promise<User> => {
-	const response = await axios.post<User>(`${API_URL}/api/users/register`, {
-		name,
+	address: string,
+	phoneNumber: string
+): Promise<RegisterResponse> => {
+	const response = await axios.post<RegisterResponse>(`/api/users/register`, {
+		firstName,
+		lastName,
 		email,
 		password,
-		role,
+		address,
+		phoneNumber,
 	});
+	console.log(response.data);
+
 	return response.data;
 };

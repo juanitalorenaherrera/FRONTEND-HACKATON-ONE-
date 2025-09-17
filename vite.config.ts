@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import path from 'path'
+import path from 'path';
 import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -13,4 +13,28 @@ export default defineConfig({
 		'@assets': path.resolve(__dirname, './src/assets'),
     },
     },
+	build: {
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					'vendor': ['react', 'react-dom'],
+					'router': ['react-router'],
+					'dashboard': [
+						'./src/features/dashboard/MainDashboardView',
+						'./src/layouts/DashboardLayout'
+					],
+					'pets': [
+						'./src/features/pets/components/PetProfile',
+						'./src/features/pets/components/PetsOverview',
+						'./src/features/pets/view/PetsView'
+					],
+					'booking': [
+						'./src/features/booking/views/BookingView',
+						'./src/pages/OwnerBooking'
+					],
+					'sitters': ['./src/features/sitters/components/FindSittersView']
+				}
+			}
+		}
+	}
 });

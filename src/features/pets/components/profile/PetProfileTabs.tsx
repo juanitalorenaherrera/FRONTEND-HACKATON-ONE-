@@ -1,7 +1,7 @@
 // features/pets/components/profile/PetProfileTabs.tsx
 
 import { Activity, Calendar, Heart } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import type { Pet } from '../../types';
 import { PetAppointmentsTab } from './PetAppointmentsTab';

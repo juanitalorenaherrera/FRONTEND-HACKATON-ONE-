@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Users, UserCheck, Award } from 'lucide-react';
-import { useSittersContext } from '../context/SittersContext';
-import { Skeleton } from '../../../components/ui/Skeleton';
+import type { LucideIcon } from 'lucide-react';
+import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 // 5. Creación de un sub-componente para evitar la repetición de JSX.
-const StatCard = ({ icon: Icon, value, label }) => (
+const StatCard = ({ icon: Icon, value, label }: { icon: LucideIcon; value: number; label: string }) => (
     <div className="bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-4">
         <div className="bg-orange-100 p-3 rounded-xl">
             <Icon className="w-6 h-6 text-orange-600" />

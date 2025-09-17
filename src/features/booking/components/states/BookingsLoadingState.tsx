@@ -1,6 +1,4 @@
 // features/booking/components/states/BookingsLoadingState.tsx
-
-import React from 'react';
 import { Skeleton } from '../../../../components/ui/Skeleton'; // Ajusta la ruta a tu componente
 
 // Un esqueleto que imita la forma de una tarjeta de cita

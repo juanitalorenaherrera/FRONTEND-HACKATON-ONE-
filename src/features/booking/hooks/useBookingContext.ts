@@ -1,6 +1,6 @@
 // features/booking/hooks/useBookingContext.ts
 
-import { BookingContext, BookingContextValue } from '../context/BookingContext';
+import { BookingContext } from '@/features/booking/context/BookingContext';
 
 import { useContext } from 'react';
 

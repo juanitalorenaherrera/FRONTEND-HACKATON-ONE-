@@ -1,8 +1,9 @@
 // src/services/dashboardService.ts
-import type { DashboardData, Pet } from '../types/dashboardData';
-import type { DashboardStatsData } from '../types/DashboardStatsData';
-import type { PetSummaryResponse } from '../types/pets';
-import axios from './auth';
+import type { DashboardData, Pet } from '@/types/dashboardData';
+import type { DashboardStatsData } from '@/types/DashboardStatsData';
+import type { PetSummaryResponse } from '@/types/pets';
+import axios from '@/services/auth';
+import { getMockDashboardData } from './mockDashboardService';
 
 const API_URL = '/api/dashboard';
 
@@ -12,7 +13,7 @@ const API_URL = '/api/dashboard';
  */
 export const getDashboardStats = async (): Promise<DashboardStatsData> => {
     try {
-        const response = await axios.get(`${API_URL}/stats`);
+        const response = await axios.get<DashboardStatsData>(`${API_URL}/stats`);
         return response.data;
     } catch (error) {
         console.error('Error fetching dashboard stats:', error);
@@ -21,55 +22,24 @@ export const getDashboardStats = async (): Promise<DashboardStatsData> => {
 };
 
 /**
- * Obtiene todos los datos del dashboard principal
+ * Obtiene todos los datos del dashboard principal optimizado
  * @returns Promise<DashboardData>
  */
 export const getDashboardData = async (): Promise<DashboardData> => {
     try {
-        // Llamar a múltiples endpoints en paralelo
-        const [dashboardResponse, userPets] = await Promise.all([
+        console.log('🔄 Iniciando carga de datos del dashboard...');
+        console.log('📡 API URL:', import.meta.env.VITE_API_URL);
+        
+        const [statsResponse, mainResponse, petsResponse, sittersResponse] = await Promise.all([
+            axios.get<DashboardStatsData>(`${API_URL}/stats`),
             axios.get(`${API_URL}/main`),
-            getUserPetsForDashboard()
+            axios.get<PetSummaryResponse[]>('/api/pets/summary'),
+            axios.get(`${API_URL}/sitter-profiles`)
         ]);
 
-        const dashboardData = dashboardResponse.data;
-        
-        return {
-            ...dashboardData,
-            userPets: userPets
-        };
-    } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        throw new Error('No se pudieron cargar los datos del dashboard');
-    }
-};
-
-/**
- * Obtiene la próxima cita del usuario
- * @returns Promise<Appointment | null>
- */
-export const getNextAppointment = async () => {
-    try {
-        const response = await axios.get(`${API_URL}/next-appointment`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching next appointment:', error);
-        throw new Error('No se pudo cargar la próxima cita');
-    }
-};
-
-/**
- * Obtiene las mascotas del usuario para el dashboard
- */
-export const getUserPetsForDashboard = async (): Promise<Pet[]> => {
-    try {
-        // Usar el servicio de mascotas para obtener datos reales
-        const pets = await getPetsSummary();
-        
-        // Convertir PetSummaryResponse a la interfaz Pet del dashboard
-        return pets
-            .filter(pet => pet.active) // Solo mascotas activas
-            .map(pet => ({
+        const userPets = petsResponse.data
+            .filter((pet: PetSummaryResponse) => pet.active)
+            .map((pet: PetSummaryResponse) => ({
                 id: pet.id,
                 accountId: pet.accountId,
                 accountName: pet.accountName,
@@ -80,37 +50,58 @@ export const getUserPetsForDashboard = async (): Promise<Pet[]> => {
                 createdAt: pet.createdAt,
                 active: pet.active
             }));
-    } catch (error) {
-        console.error('Error fetching user pets for dashboard:', error);
-        throw new Error('No se pudieron cargar las mascotas del usuario');
+        
+        console.log('✅ Datos del dashboard cargados correctamente');
+        return {
+            ...mainResponse.data,
+            stats: statsResponse.data,
+            userPets,
+            recentSitters: sittersResponse.data,
+            nextAppointment: null
+        };
+    } catch (error: unknown) {
+        const axiosError = error as { message?: string; response?: { status?: number; statusText?: string }; config?: { url?: string; baseURL?: string }; code?: string };
+        
+        console.error('❌ Error detallado:', {
+            message: axiosError.message,
+            status: axiosError.response?.status,
+            statusText: axiosError.response?.statusText,
+            url: axiosError.config?.url,
+            baseURL: axiosError.config?.baseURL
+        });
+        
+        if (axiosError.code === 'ECONNREFUSED' || axiosError.code === 'ERR_NETWORK' || axiosError.response?.status === 500) {
+            console.warn('⚠️ Backend no disponible o con errores, usando datos mock...');
+            return await getMockDashboardData();
+        }
+        
+        throw new Error(`No se pudieron cargar los datos del dashboard: ${axiosError.message || 'Error desconocido'}`);
     }
 };
 
-/**
- * Obtiene los cuidadores recientes
- * @returns Promise<Sitter[]>
- */
+// Funciones individuales mantenidas para compatibilidad pero optimizadas
+export const getNextAppointment = async () => {
+    const { nextAppointment } = await getDashboardData();
+    return nextAppointment;
+};
+
+export const getUserPetsForDashboard = async (): Promise<Pet[]> => {
+    const { userPets } = await getDashboardData();
+    return userPets;
+};
+
 export const getRecentSitters = async () => {
-    try {
-        const response = await axios.get(`${API_URL}/recent-sitters`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching recent sitters:', error);
-        throw new Error('No se pudieron cargar los cuidadores recientes');
-    }
+    const { recentSitters } = await getDashboardData();
+    return recentSitters;
 };
 
-/**
- * Obtiene el resumen de mascotas del usuario
- * @returns Promise<PetSummaryResponse[]>
- */
-async function getPetsSummary(): Promise<PetSummaryResponse[]> {
+export const getPetsSummary = async (): Promise<PetSummaryResponse[]> => {
     try {
-        const response = await axios.get('/api/pets/summary');
+        const response = await axios.get<PetSummaryResponse[]>('/api/pets/summary');
         return response.data;
     } catch (error) {
         console.error('Error fetching pets summary:', error);
         throw new Error('No se pudo cargar el resumen de mascotas');
     }
-}
+};
 

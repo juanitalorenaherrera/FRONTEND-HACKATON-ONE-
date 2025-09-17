@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
-import { useSittersContext } from '../context/SittersContext';
-import { SITTER_CONFIG, type SortOption } from '../../../features/sitters/config/sitters.config';
+import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
+import { SITTER_CONFIG, type SortOption } from '@/features/sitters/config/sitters.config';
 
 // 1. El componente ya no recibe props.
 export function SortDropdown() {
