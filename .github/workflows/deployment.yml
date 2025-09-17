@@ -1,14 +1,36 @@
 name: Deploy
 
-on:
-  push:
-    branches:
-    - main
-
+on: workflow_dispatch
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+    deploy:
+        runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v4
-  
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '18'
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 10
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Build
+              run: pnpm build
+
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v5.0.0
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: us-east-2
+                  role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+                  role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+                  role-duration-seconds: 1200
+                  role-session-name: MySessionName
