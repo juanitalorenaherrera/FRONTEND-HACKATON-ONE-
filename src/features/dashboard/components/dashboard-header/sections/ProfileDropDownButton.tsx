@@ -1,13 +1,13 @@
 import { ChevronDown } from 'lucide-react';
-import { getRoleColor } from '../../../../../utils/dashboardHeader';
-import { useAuthStore } from '../../../../../store/AuthStore';
+import { getRoleColor } from '@/utils/dashboardHeader';
+import { useAuthStore } from '@/store/AuthStore';
 
 interface ProfileDropDownButtonProps {
 	onClick: () => void;
 	showProfileMenu: boolean;
 }
 
-export default function ProfileDropDownButton({ onClick, showProfileMenu }: ProfileDropDownButtonProps) {
+export function ProfileDropDownButton({ onClick, showProfileMenu }: ProfileDropDownButtonProps) {
 
 	const user = useAuthStore((state) => state.profile);
 	const isLoading = useAuthStore(
