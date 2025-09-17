@@ -3,11 +3,7 @@
 // ===========================================
 
 import { BookingStatus } from '@/features/booking/types/index';
-import type { BookingsState, BookingStats, BookingSummary } from '@/features/booking/types';
-import { useBookingContext } from '@/features/booking/hooks/useBookingContext';
-import { useAuthStore } from '@/store/AuthStore';
-import { useCallback } from 'react';
-import { getBookingsByUser } from '@/services/bookingService';
+
 
 export const BOOKING_CONFIG = {
 	CACHE_DURATION: 3 * 60 * 1000, // 3 minutes (más frecuente que pets)
@@ -78,70 +74,4 @@ export const BOOKING_ACTIONS = {
 	RESCHEDULE: 'reschedule',
 } as const;
 
-export default function useBookingActions() {
-	const { state, dispatch } = useBookingContext();
-	const user = useAuthStore((state) => state.profile);
 
-	const loadBookings = useCallback(async () => {
-		if (!user)
-			return dispatch({
-				type: 'SET_ERROR',
-				payload: 'Usuario no autenticado.',
-			});
-
-		dispatch({ type: 'SET_LOADING', payload: true });
-		try {
-			const filters = {
-				page: (state as BookingsState).pagination.currentPage - 1,
-				size: (state as BookingsState).pagination.pageSize,
-				// ...otros filtros de state.filters
-			};
-			const bookingsPage = await getBookingsByUser(
-				user.id,
-				user.role,
-				filters
-			);
-
-			// La lógica para calcular stats es un buen candidato para un utilitario
-			const stats: BookingStats = bookingsPage.content.reduce(
-				(acc: BookingStats, booking: BookingSummary) => {
-					acc.totalCount++;
-					switch (booking.status) {
-						case BookingStatus.PENDING:
-							acc.pendingCount++;
-							break;
-						case BookingStatus.CONFIRMED:
-							acc.confirmedCount++;
-							break;
-						case BookingStatus.IN_PROGRESS:
-							acc.inProgressCount++;
-							break;
-						case BookingStatus.COMPLETED:
-							acc.upcomingCount++;
-							break;
-						case BookingStatus.CANCELLED:
-							break;
-					}
-					return acc;
-				},
-				{
-					totalCount: 0,
-					pendingCount: 0,
-					confirmedCount: 0,
-					inProgressCount: 0,
-					upcomingCount: 0,
-				}
-			);
-
-			dispatch({
-				type: 'SET_DATA_SUCCESS',
-				payload: { page: bookingsPage, stats },
-			});
-		} catch (error) {
-			// ...
-			console.log(error);
-		}
-	}, [user, dispatch, state]);
-
-	console.log(loadBookings);
-}
