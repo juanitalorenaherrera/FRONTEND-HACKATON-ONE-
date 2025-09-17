@@ -3,6 +3,8 @@ import { Suspense, lazy } from 'react';
 import { Role } from './types/authStore';
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
 
+const BookingPage = lazy(() => import('./pages/BookingPage'));
+
 // Lazy imports for code splitting
 const Home = lazy(() => import('./pages/home'));
 const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.LoginPage })));
@@ -65,10 +67,10 @@ export default function App() {
 							/>
 						}
 					>
-						{/* <Route
+						<Route
 								path="/book/:sitterId"
 								element={<BookingPage />}
-							/> */}
+							/>
 					</Route>
 
 					{/* Rutas solo para el rol 'owner' */}
