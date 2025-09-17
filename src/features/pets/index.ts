@@ -9,7 +9,7 @@
 
 // 1. El componente principal de la página.
 //    Este es el único componente que el router de la aplicación necesita conocer.
-export { PetsView } from './view/PetsView';
+export { PetsViewContent } from './view/PetsView';
 
 // 2. El proveedor de contexto.
 //    Se exporta principalmente para poder usarlo en entornos de prueba (como Storybook o Jest)
