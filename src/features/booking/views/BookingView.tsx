@@ -2,24 +2,22 @@
 
 import { useEffect } from 'react';
 
-import { BookingsOverview } from '../components/BookingOverview';
-import { BookingsProvider } from '../context/BookingContext';
+import { BookingsOverview } from '@/features/booking/components/BookingOverview';
 //import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
-import { useBookingActions } from '../hooks/useBookingActions';
-import { useBookingContext } from '../hooks/useBookingContext';
-import { useAuthStore } from '../../../store/AuthStore';
+import { useAuthStore } from '@/store/AuthStore';
+import { useBookingsStore } from '@/store/BookingStore';
 
 function BookingsViewContent() {
-    const { state: bookingsState } = useBookingContext();
-	const { loadBookings } = useBookingActions();
+	const loadBookings = useBookingsStore((state) => state.loadBookings);
+	const isLoading = useBookingsStore((state) => state.isLoading);
 	const user = useAuthStore((state) => state.profile);
 
     // LÓGICA DE CARGA CENTRALIZADA: Este es el lugar correcto para el useEffect.
     useEffect(() => {
-        if (user?.id && bookingsState.isLoading) {
+        if (user?.id && isLoading) {
             loadBookings();
         }
-    }, [user, bookingsState.isLoading, loadBookings]);
+    }, [user, isLoading, loadBookings]);
 
 
     if (!user) {
@@ -42,8 +40,6 @@ function BookingsViewContent() {
 // El componente exportado que envuelve todo en su Provider.
 export function BookingsView() {
     return (
-        <BookingsProvider>
             <BookingsViewContent />
-        </BookingsProvider>
     );
 }
