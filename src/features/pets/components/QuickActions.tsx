@@ -3,7 +3,7 @@
 import { Calendar, Heart, Plus, Search, Settings } from 'lucide-react';
 
 import { useNavigate } from 'react-router';
-import { usePetsActions } from '../hooks/usePetsActions'; // Aún no hemos definido todas las acciones, pero lo usaremos conceptualmente
+import { usePetsActions } from '@/features/pets/hooks/usePetsActions'; // Aún no hemos definido todas las acciones, pero lo usaremos conceptualmente
 
 // 1. LAS PROPS SE ELIMINAN. El componente ya no las necesita.
 export function QuickActions() {

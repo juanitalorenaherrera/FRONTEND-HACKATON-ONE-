@@ -3,7 +3,7 @@
 import { PetProfileHeader } from './profile/PetProfileHeader';
 import { PetProfileTabs } from './profile/PetProfileTabs';
 import { PetsLoadingState } from './states';
-import { usePetsStore } from '../../../store/PetStore';
+import { usePetsStore } from '@/store/PetStore';
 
 export function PetProfile() {
     const state = usePetsStore((store) => store);

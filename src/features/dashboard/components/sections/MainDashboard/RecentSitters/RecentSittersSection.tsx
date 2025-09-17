@@ -4,7 +4,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
-import type { Sitter } from '../../../../../../types/dashboardData';
+import type { Sitter } from '@/types/dashboardData';
 import SitterCard from './SitterCard';
 
 interface RecentSittersSectionProps {

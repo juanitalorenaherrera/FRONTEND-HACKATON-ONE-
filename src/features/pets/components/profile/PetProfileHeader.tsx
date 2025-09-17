@@ -2,8 +2,8 @@
 
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 
-import type { Pet } from '../../types';
-import { usePetsStore } from '../../../../store/PetStore';
+import type { Pet } from '@/features/pets/types';
+import { usePetsStore } from '@/store/PetStore';
 
 export function PetProfileHeader({ pet }: { pet: Pet }) {
     const setSelectedPet = usePetsStore((state) => state.setSelectedPet);

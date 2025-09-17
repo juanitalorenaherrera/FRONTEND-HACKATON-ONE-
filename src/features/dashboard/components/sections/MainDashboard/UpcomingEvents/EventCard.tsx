@@ -5,7 +5,7 @@
 import { Bell, Calendar, Clock, Heart, Scissors, Shield, Users } from 'lucide-react';
 
 import React from 'react';
-import type { UpcomingEvent } from '../../../../../../utils/dashboardUtils';
+import type { UpcomingEvent } from '@/utils/dashboardUtils';
 
 interface EventCardProps {
   event: UpcomingEvent;

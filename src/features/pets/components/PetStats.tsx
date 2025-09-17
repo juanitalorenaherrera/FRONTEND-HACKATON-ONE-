@@ -3,7 +3,7 @@
 import { Activity, BarChart3, Clock, Heart, TrendingUp } from 'lucide-react';
 
 import { useMemo } from 'react';
-import { usePetsStore } from '../../../store/PetStore';
+import { usePetsStore } from '@/store/PetStore';
 
 export function PetStats() {
     // 1. Leemos el estado directamente del store.

@@ -2,7 +2,7 @@
 // utils/dashboardUtils.ts - REFACTORIZADO Y ALINEADO
 // ===========================================
 
-import type { Appointment, Pet, Stats } from '../types/dashboardData';
+import type { Appointment, Pet, Stats } from '@/types/dashboardData';
 
 import { formatDateTime } from './dateUtils';
 

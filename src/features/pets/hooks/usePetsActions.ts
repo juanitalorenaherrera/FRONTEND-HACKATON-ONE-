@@ -1,16 +1,16 @@
-import type { CreatePetRequest, Pet } from '../types';
+import type { CreatePetRequest, Pet } from '@/features/pets/types';
 
-import { calculateUserStats } from '../utils/petUtils';
+import { calculateUserStats } from '@/features/pets/utils/petUtils';
 import {
 	getPetsByAccountId,
 	createPet,
 	updatePet,
 	deletePet as deletePetService,
-} from '../../../services/petService';
+} from '@/services/petService';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
-import { usePetsStore } from '../../../store/PetStore';
-import { Type } from '../../../types/petStore';
+import { usePetsStore } from '@/store/PetStore';
+import { Type } from '@/types/petStore';
 /**
  * Hook que encapsula toda la lógica de negocio y efectos secundarios
  * para la feature de mascotas. Es el único lugar que interactúa

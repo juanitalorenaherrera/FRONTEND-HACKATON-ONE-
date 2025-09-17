@@ -3,8 +3,8 @@
 // ===========================================
 import { Outlet, useLocation } from 'react-router';
 
-import { ClientSidebar } from '../features/dashboard/components/DashboardSidebar';
-import { DashboardHeader } from '../features/dashboard/components/dashboard-header/DashboardHeader';
+import { ClientSidebar } from '@/features/dashboard/components/DashboardSidebar';
+import { DashboardHeader } from '@/features/dashboard/components/dashboard-header/DashboardHeader';
 
 /**
  * Actúa como el layout principal para todas las vistas del cliente.

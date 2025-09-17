@@ -3,7 +3,7 @@
 // ===========================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { SITTER_CONFIG } from '../features/sitters/config/sitters.config';
+import { SITTER_CONFIG } from '@/features/sitters/config/sitters.config';
 
 interface GeolocationState {
     loading: boolean;

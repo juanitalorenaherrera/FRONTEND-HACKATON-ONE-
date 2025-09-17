@@ -5,10 +5,10 @@ import { ArrowRight, Eye, EyeOff, Lock, Mail, PawPrint } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
-import { useAuthStore } from '../store/AuthStore';
-import { loginRequest } from '../services/authService';
-import { Role } from '../types/authStore';
-import { loginSchema, type LoginFormData } from '../schemas/loginSchema';
+import { useAuthStore } from '@/store/AuthStore';
+import { loginRequest } from '@/services/authService';
+import { Role } from '@/types/authStore';
+import { loginSchema, type LoginFormData } from '@/schemas/loginSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 export function LoginPage() {

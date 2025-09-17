@@ -3,9 +3,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
 
-import { ErrorState } from '../../../../components/ui/ErrorState';
-import type { Pet } from '../../types';
-import { Skeleton } from '../../../../components/ui/Skeleton';
+import { ErrorState } from '@/components/ui/ErrorState';
+import type { Pet } from '@/features/pets/types';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 // 1. DEFINICIÓN DE TIPOS
 // Este tipo representaría un registro de vacunación que viene de la API.

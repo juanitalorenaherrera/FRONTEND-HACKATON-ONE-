@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAuthStore } from '../../../store/AuthStore';
-import { getAllPets } from '../../../services/petService';
-import type { PetResponse } from '../../../types/pets';
+import { useAuthStore } from '@/store/AuthStore';
+import { getAllPets } from '@/services/petService';
+import type { PetResponse } from '@/types/pets';
 
 export const useGetPets = () => {
 	const user = useAuthStore((state) => state.profile);

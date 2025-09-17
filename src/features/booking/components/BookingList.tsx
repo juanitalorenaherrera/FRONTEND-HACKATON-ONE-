@@ -1,7 +1,7 @@
 // features/booking/components/BookingsList.tsx
 
 import { BookingCard } from './BookingCard';
-import type { BookingSummary } from '../types';
+import type { BookingSummary } from '@/features/booking/types';
 
 interface BookingsListProps {
 	bookings: BookingSummary[];

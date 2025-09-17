@@ -1,8 +1,8 @@
-import { useAuthStore } from '../store/AuthStore';
-import { createPet } from '../services/petService';
+import { useAuthStore } from '@/store/AuthStore';
+import { createPet } from '@/services/petService';
 import { useForm } from 'react-hook-form';
-import type { CreatePetRequest } from '../types/pets';
-import { useGetPets } from '../features/pets/hooks/useGetPets';
+import type { CreatePetRequest } from '@/types/pets';
+import { useGetPets } from '@/features/pets/hooks/useGetPets';
 
 
 

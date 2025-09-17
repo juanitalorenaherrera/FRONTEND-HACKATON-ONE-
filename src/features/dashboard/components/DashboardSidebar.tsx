@@ -1,8 +1,8 @@
 // src/features/dashboard/components/DashboardSidebar.tsx
 import { Link } from 'react-router';
-import { usePetsStore } from '../../../store/PetStore';
-import { useAuthStore } from '../../../store/AuthStore';
-import { NAV_ITEMS } from '../../../utils/NavItems';
+import { usePetsStore } from '@/store/PetStore';
+import { useAuthStore } from '@/store/AuthStore';
+import { NAV_ITEMS } from '@/utils/NavItems';
 
 interface ClientSidebarProps {
 	activeItem: string;

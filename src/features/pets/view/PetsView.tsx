@@ -2,9 +2,9 @@
 import { useEffect } from 'react';
 //import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
 import { Outlet } from 'react-router';
-import { usePetsActions } from '../hooks/usePetsActions';
-import { useAuthStore } from '../../../store/AuthStore';
-import { usePetsStore } from '../../../store/PetStore';
+import { usePetsActions } from '@/features/pets/hooks/usePetsActions';
+import { useAuthStore } from '@/store/AuthStore';
+import { usePetsStore } from '@/store/PetStore';
 
 function PetsViewContent() {
 	const isLoading = usePetsStore((state) => state.isLoading);

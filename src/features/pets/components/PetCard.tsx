@@ -8,9 +8,14 @@ import {
 } from 'lucide-react';
 import type { Pet, PetCardProps } from '../types';
 import React, { memo } from 'react';
-import { formatPetAge, generatePetAvatar, getPetImageUrl, getPetStatusInfo } from '../utils/petUtils';
+import {
+	formatPetAge,
+	generatePetAvatar,
+	getPetImageUrl,
+	getPetStatusInfo,
+} from '@/features/pets/utils/petUtils';
 
-import ImageWithFallback from '../../../components/ui/ImageWithFallback';
+import ImageWithFallback from '@/components/ui/ImageWithFallback';
 
 // ====================================================================
 // 1. SUB-COMPONENTES INTERNOS: Abstraemos la complejidad en piezas más pequeñas.

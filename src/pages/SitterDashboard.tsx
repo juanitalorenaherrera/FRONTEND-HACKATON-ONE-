@@ -1,10 +1,10 @@
 import 'react-calendar/dist/Calendar.css';
 
-import { addMyService, getMyServices } from '../services/sitterService';
+import { addMyService, getMyServices } from '@/services/sitterService';
 import { useEffect, useState } from 'react';
 
 import Calendar from 'react-calendar';
-import { useAuthStore } from '../store/AuthStore';
+import { useAuthStore } from '@/store/AuthStore';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 

@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from 'react';
 
-import { PET_SPECIES_OPTIONS } from '../constants';
-import type { PetFilters } from '../types';
+import { PET_SPECIES_OPTIONS } from '@/features/pets/constants';
+import type { PetFilters } from '@/features/pets/types';
 import { Search } from 'lucide-react';
-import { usePetsStore } from '../../../store/PetStore';
+import { usePetsStore } from '@/store/PetStore';
 
 interface PetsFiltersProps {
     className?: string;

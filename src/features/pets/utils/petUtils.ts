@@ -1,5 +1,5 @@
-import type { Pet } from '../types';
-import type { PetStats } from '../types';
+import type { Pet } from '@/features/pets/types';
+import type { PetStats } from '@/features/pets/types';
 
 /**
  * Formatea la edad de una mascota (en años) a un string legible.

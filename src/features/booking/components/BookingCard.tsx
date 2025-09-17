@@ -3,7 +3,7 @@
 import { Calendar, Dog, User } from 'lucide-react';
 
 import { BOOKING_STATUS_CONFIG } from '@/features/booking/constants/config'; // Asumiendo que creas este archivo
-import type { BookingSummary } from '../types';
+import type { BookingSummary } from '@/features/booking/types';
 
 // import { formatBookingDateTime } from '../utils/bookingUtils'; // Asumiendo que creas este archivo
 

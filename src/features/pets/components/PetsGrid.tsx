@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 
-import type { Pet } from '../types';
+import type { Pet } from '@/features/pets/types';
 import { PetCard } from './PetCard';
 
 // 1. LAS PROPS SE SIMPLIFICAN. Ya no necesita callbacks de eventos.

@@ -1,5 +1,5 @@
 // features/booking/components/states/BookingsErrorState.tsx
-import { ErrorState as GenericErrorState } from '../../../../components/ui/ErrorState'; // Renombramos para evitar colisiones
+import { ErrorState as GenericErrorState } from '@/components/ui/ErrorState'; // Renombramos para evitar colisiones
 
 interface BookingsErrorStateProps {
     error: string;

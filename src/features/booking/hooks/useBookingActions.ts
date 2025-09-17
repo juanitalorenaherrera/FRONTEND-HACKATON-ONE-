@@ -1,11 +1,14 @@
-import * as bookingService from '../../../services/bookingService';
+import * as bookingService from '@/services/bookingService';
 
-import type { BookingStatus, CreateBookingRequest } from '../types';
+import type {
+	BookingStatus,
+	CreateBookingRequest,
+} from '@/features/booking/types';
 
-import { useBookingContext } from '../hooks/useBookingContext';
+import { useBookingContext } from '@/features/booking/hooks/useBookingContext';
 import { useCallback } from 'react';
-import { useAuthStore } from '../../../store/AuthStore';
-import type { Role } from '../../../types/authStore';
+import { useAuthStore } from '@/store/AuthStore';
+import type { Role } from '@/types/authStore';
 /**
  * Hook que encapsula las funciones para interactuar con la feature de reservas.
  */

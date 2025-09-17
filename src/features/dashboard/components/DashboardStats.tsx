@@ -6,9 +6,9 @@ import {
 	TrendingDown,
 	TrendingUp,
 } from 'lucide-react';
-import { useFetchStats } from '../hooks/useFetchStats';
-import { getDisplayStats } from '../../../utils/stats';
-import { getColorClasses } from '../../../utils/colorClasses';
+import { useFetchStats } from '@/features/dashboard/hooks/useFetchStats';
+import { getDisplayStats } from '@/utils/stats';
+import { getColorClasses } from '@/utils/colorClasses';
 
 /*************  ✨ Windsurf Command ⭐  *************/
 /**

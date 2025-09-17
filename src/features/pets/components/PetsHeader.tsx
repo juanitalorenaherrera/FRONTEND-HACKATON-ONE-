@@ -3,9 +3,9 @@
 import { Heart, Plus, RefreshCw } from 'lucide-react';
 
 import { useMemo } from 'react';
-import { usePetsActions } from '../hooks/usePetsActions';
-import { useAuthStore } from '../../../store/AuthStore';
-import { usePetsStore } from '../../../store/PetStore';
+import { usePetsActions } from '@/features/pets/hooks/usePetsActions';
+import { useAuthStore } from '@/store/AuthStore';
+import { usePetsStore } from '@/store/PetStore';
 
 export function PetsHeader() {
 	const state = usePetsStore((store) => store);

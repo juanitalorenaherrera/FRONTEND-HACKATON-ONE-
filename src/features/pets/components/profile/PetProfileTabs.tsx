@@ -3,7 +3,7 @@
 import { Activity, Calendar, Heart } from 'lucide-react';
 import { useState } from 'react';
 
-import type { Pet } from '../../types';
+import type { Pet } from '@/features/pets/types';
 import { PetAppointmentsTab } from './PetAppointmentsTab';
 import { PetMedicalTab } from './PetMedicalTab';
 

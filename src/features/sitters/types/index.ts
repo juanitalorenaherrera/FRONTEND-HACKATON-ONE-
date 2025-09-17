@@ -1,4 +1,4 @@
-import type { SITTER_CONFIG } from '../config/sitters.config';
+import type { SITTER_CONFIG } from '@/features/sitters/config/sitters.config';
 
 // ===================================================================
 // 1. TIPOS DERIVADOS DE LA CONFIGURACIÓN

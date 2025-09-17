@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
-import type { Pet } from '../../types';
-import { Skeleton } from '../../../../components/ui/Skeleton';
+import type { Pet } from '@/features/pets/types';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 // Placeholder para los datos de citas
 type Booking = { id: number; service: string; date: string; };

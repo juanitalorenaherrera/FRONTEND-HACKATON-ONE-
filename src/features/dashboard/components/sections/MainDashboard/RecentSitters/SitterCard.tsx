@@ -4,10 +4,10 @@
 
 import { Clock, Shield, Star, Users } from 'lucide-react';
 
-import ImageWithFallback from '../../../../../../components/ui/ImageWithFallback';
+import ImageWithFallback from '@/components/ui/ImageWithFallback';
 import React from 'react';
-import type { Sitter } from '../../../../../../types/dashboardData';
-import { generateDefaultAvatar } from '../../../../../../utils/dashboardUtils';
+import type { Sitter } from '@/types/dashboardData';
+import { generateDefaultAvatar } from '@/utils/dashboardUtils';
 
 interface SitterCardProps {
   sitter: Sitter;

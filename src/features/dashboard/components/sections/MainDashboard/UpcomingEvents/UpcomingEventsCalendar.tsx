@@ -2,12 +2,12 @@
 // sections/UpcomingEvents/UpcomingEventsCalendar.tsx
 // ===========================================
 
-import type { Appointment, Stats } from '../../../../../../types/dashboardData';
+import type { Appointment, Stats } from '@/types/dashboardData';
 
 import { Calendar } from 'lucide-react';
 import EventCard from './EventCard';
 import React from 'react';
-import { generateUpcomingEvents } from '../../../../../../utils/dashboardUtils';
+import { generateUpcomingEvents } from '@/utils/dashboardUtils';
 
 interface UpcomingEventsCalendarProps {
   stats: Stats;

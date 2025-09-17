@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { PETS_CONFIG } from '../features/pets/constants';
-import type { PetActions, PetsState } from '../types/petStore';
+import { PETS_CONFIG } from '@/features/pets/constants';
+import type { PetActions, PetsState } from '@/types/petStore';
 
 export const usePetsStore = create<PetsState & PetActions>((set, get) => ({
 	// Estado inicial

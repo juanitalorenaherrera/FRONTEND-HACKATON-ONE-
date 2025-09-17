@@ -5,10 +5,10 @@ import { PetsEmptyState, PetsErrorState, PetsLoadingState } from './states';
 import { PetsFilters } from './PetsFilters';
 import { PetsGrid } from './PetsGrid';
 import { PetsHeader } from './PetsHeader';
-import { useAuthStore } from '../../../store/AuthStore';
+import { useAuthStore } from '@/store/AuthStore';
 //import { useMemo } from 'react';
-import { usePetsActions } from '../hooks/usePetsActions';
-import { usePetsStore } from '../../../store/PetStore';
+import { usePetsActions } from '@/features/pets/hooks/usePetsActions';
+import { usePetsStore } from '@/store/PetStore';
 
 export function PetsOverview({ className = '' }: { className?: string }) {
     const { state, filteredPets } = usePetsStore((store) => ({

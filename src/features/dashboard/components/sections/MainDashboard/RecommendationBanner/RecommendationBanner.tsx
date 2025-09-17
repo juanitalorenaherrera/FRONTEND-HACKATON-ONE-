@@ -4,9 +4,9 @@
 
 import { ArrowRight, Heart, PawPrint, Zap } from 'lucide-react';
 
-import type { Pet } from '../../../../../../types/dashboardData';
+import type { Pet } from '@/types/dashboardData';
 import React from 'react';
-import { getRecommendation } from '../../../../../../utils/dashboardUtils';
+import { getRecommendation } from '@/utils/dashboardUtils';
 
 interface RecommendationBannerProps {
   userPets: Pet[];

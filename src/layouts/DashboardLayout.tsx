@@ -1,8 +1,8 @@
 import { Outlet, useLocation } from 'react-router';
 import { useMemo } from 'react';
 
-import { ClientSidebar } from '../features/dashboard/components/DashboardSidebar';
-import { DashboardHeader } from '../features/dashboard/components/dashboard-header/DashboardHeader';
+import { ClientSidebar } from '@/features/dashboard/components/DashboardSidebar';
+import { DashboardHeader } from '@/features/dashboard/components/dashboard-header/DashboardHeader';
 
 const ROUTE_MAP: Record<string, string> = {
 	'pets': 'pets',

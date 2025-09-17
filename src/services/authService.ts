@@ -1,10 +1,10 @@
 // src/services/authService.ts
-import axios from '../services/auth';
+import axios from '@/services/auth';
 import type {
 	LoginResponse,
 	Profile,
 	RegisterResponse,
-} from '../types/authStore';
+} from '@/types/authStore';
 
 /**
  * Inicia sesión, guarda el token y devuelve los datos del usuario.

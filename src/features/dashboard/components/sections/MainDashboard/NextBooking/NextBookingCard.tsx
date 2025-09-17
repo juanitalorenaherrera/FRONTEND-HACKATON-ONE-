@@ -3,12 +3,12 @@
 // ===========================================
 
 import { Calendar, Clock, MapPin, PawPrint } from 'lucide-react';
-import { formatDateTime, getTimeUntilAppointment } from '../../../../../../utils/dateUtils';
+import { formatDateTime, getTimeUntilAppointment } from '@/utils/dateUtils';
 
-import type{ Appointment } from '../../../../../../types/dashboardData';
+import type{ Appointment } from '@/types/dashboardData';
 import BookingActions from './BookingActions';
 import React from 'react';
-import { getStatusColor } from '../../../../../../utils/dashboardUtils';
+import { getStatusColor } from '@/utils/dashboardUtils';
 
 interface NextAppointmentCardProps {
   nextAppointment: Appointment;
