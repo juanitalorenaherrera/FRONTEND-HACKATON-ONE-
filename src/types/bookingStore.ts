@@ -1,5 +1,4 @@
-import type { BookingDetail, BookingFilters, BookingStats, BookingSummary, PaginationState } from "@/features/booking/types";
-import { BookingStatus, type PageResponse } from "./bookings";
+import { type BookingDetail, type BookingFilters, type BookingStats, type BookingSummary, type PaginationState, type CreateBookingRequest, BookingStatus, type PageResponse } from "@/features/booking/types";
 
 export interface BookingsState {
 	bookings: BookingSummary[];
@@ -10,6 +9,16 @@ export interface BookingsState {
 	filters: BookingFilters;
 	pagination: PaginationState;
 	filteredBookings: BookingSummary[];
+	// Nuevos campos para funcionalidades avanzadas
+	lastFetch: Date | null;
+	optimisticTimeouts: Map<number, NodeJS.Timeout>;
+	autoRefreshInterval: NodeJS.Timeout | null;
+}
+
+interface BookingActionOptions {
+	skipCache?: boolean;
+	silent?: boolean;
+	optimistic?: boolean;
 }
 
 export interface BookingsAction {
@@ -27,6 +36,31 @@ export interface BookingsAction {
 	setPage: (page: number) => void;
 	// Acciones para la lógica de filtrado si se necesitara en el frontend.
 	applyFilters: () => void;
+	
+	// Funciones de API avanzadas
+	loadBookings: (options?: BookingActionOptions) => Promise<void>;
+	refreshBookings: (accountId: number) => Promise<void>;
+	createBooking: (bookingData: CreateBookingRequest, options?: BookingActionOptions) => Promise<BookingDetail>;
+	deleteBookingById: (bookingId: number, options?: BookingActionOptions) => Promise<void>;
+	updateStatus: (bookingId: number, newStatus: BookingStatus, reason?: string, options?: BookingActionOptions) => Promise<BookingDetail>;
+	selectBooking: (bookingId: number | null) => Promise<BookingDetail | void>;
+	
+	// Auto-refresh
+	startAutoRefresh: () => void;
+	stopAutoRefresh: () => void;
+	
+	// Utility functions
+	clearError: () => void;
+	resetState: () => void;
+	cleanup: () => void;
+	
+	// Computed getters
+	getPendingBookings: () => BookingSummary[];
+	getUpcomingBookings: () => BookingSummary[];
+	getTotalBookings: () => number;
+	getHasNextPage: () => boolean;
+	getHasPreviousPage: () => boolean;
+	getShouldRefresh: () => boolean;
 }
 
 export const initialState: BookingsState = {
@@ -48,4 +82,8 @@ export const initialState: BookingsState = {
 		hasNext: false,
 	},
 	filteredBookings: [],
+	// Nuevos campos
+	lastFetch: null,
+	optimisticTimeouts: new Map(),
+	autoRefreshInterval: null,
 };
