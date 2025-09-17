@@ -3,7 +3,6 @@ import { useSittersStore } from '@/store/SitterStore';
 
 export function useSittersActions() {
 	// 1. Acceso a las acciones del store
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { fetchSitters, setFilters } = useSittersStore();
 	const filters = useSittersStore((state) => state.filters);
 
