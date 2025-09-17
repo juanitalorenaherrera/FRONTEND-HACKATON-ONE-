@@ -10,7 +10,7 @@ export const registerSchema = z.object({
 	email: z.email('Ingresa un email válido'),
 	password: z
 		.string({error: 'La contraseña es obligatoria'})
-		.min(8, 'La contraseña debe tener al menos 6 caracteres'),
+		.min(8, 'La contraseña debe tener al menos 8 caracteres'),
 	address: z.string().min(5, 'La dirección debe tener al menos 5 caracteres'),
 	phoneNumber: z
 		.string()
