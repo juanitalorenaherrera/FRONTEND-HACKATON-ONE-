@@ -1,18 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
-import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
 import { SITTER_CONFIG, type SortOption } from '@/features/sitters/config/sitters.config';
+import { useSittersStore } from '@/store/SitterStore';
 
 // 1. El componente ya no recibe props.
 export function SortDropdown() {
     // 2. Obtenemos el estado y las acciones directamente del contexto.
-    const { state, actions } = useSittersContext();
+	const updateFilter = useSittersStore((state) => state.updateFilter);
+	const filters = useSittersStore((state) => state.filters)
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // 3. La lógica para encontrar la opción actual ahora usa el estado del contexto.
     const currentSort = SITTER_CONFIG.SORT_OPTIONS.find(option => 
-        option.sortBy === state.filters.sortBy && option.sortDirection === state.filters.sortDirection
+        option.sortBy === filters.sortBy && option.sortDirection === filters.sortDirection
     ) || SITTER_CONFIG.SORT_OPTIONS[0];
 
     // El hook para cerrar al hacer clic fuera se mantiene igual, es lógica de UI local.
@@ -28,7 +29,7 @@ export function SortDropdown() {
 
     // 4. El handler ahora llama a la acción `updateFilter` del contexto.
     const handleSortChange = (option: SortOption) => {
-        actions.updateFilter({
+        updateFilter({
             sortBy: option.sortBy,
             sortDirection: option.sortDirection
         });

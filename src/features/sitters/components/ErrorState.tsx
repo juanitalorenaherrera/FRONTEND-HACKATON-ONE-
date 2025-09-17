@@ -1,18 +1,18 @@
-import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
-import { ErrorState as GenericErrorState } from '@/components/ui/ErrorState'; // Importamos el componente genérico
+import { ErrorState as GenericErrorState } from '@/components/ui/ErrorState';
+import { useSittersStore } from '@/store/SitterStore';
 
 export function SittersErrorState({ className = '' }: { className?: string }) {
-    const { state, actions } = useSittersContext();
+    const { error, clearFilters } = useSittersStore((state) => state);
 
-    if (!state.error) {
+    if (!error) {
         return null;
     }
 
     return (
         <GenericErrorState
             title="Error al Cargar Cuidadores"
-            message={state.error}
-            onRetry={actions.clearFilters}
+            message={error}
+            onRetry={clearFilters}
             className={className}
         />
     );

@@ -1,50 +1,22 @@
-import { useCallback, useRef, useEffect } from 'react';
-import { useSittersContext } from './useSittersContext';
-import { getActiveSitters, getSitterStats, searchSitters } from '@/services/sitterService';
-import type { SitterFilters, ExtendedSitter } from '@/features/sitters/types';
+import { useEffect } from 'react';
+import { useSittersStore } from '@/store/SitterStore';
 
 export function useSittersActions() {
-    // 1. Obtenemos `dispatch` en lugar de `actions`.
-    const { state, dispatch } = useSittersContext();
-    const abortControllerRef = useRef<AbortController | null>(null);
+	// 1. Acceso a las acciones del store
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const { fetchSitters, setFilters } = useSittersStore();
+	const filters = useSittersStore((state) => state.filters);
 
-    const fetchData = useCallback(async (filters: SitterFilters, signal: AbortSignal) => {
-        // 2. Usamos `dispatch` para enviar acciones al reducer.
-        dispatch({ type: 'SET_LOADING', payload: true });
-        
-        try {
-            const hasActiveSearch = Object.keys(filters).length > 0 && filters.searchTerm;
-            
-            const [sittersData, statsData] = await Promise.all([
-                hasActiveSearch ? searchSitters(filters) : getActiveSitters(),
-                getSitterStats()
-            ]);
+	// 2. Uso de useEffect para la carga inicial y el cambio de filtros
+	useEffect(() => {
+		fetchSitters();
+	}, [filters, fetchSitters]); // La dependencia de 'filters' dispara la recarga
 
-            if (signal.aborted) return;
-            
-            // 3. Despachamos una única acción con todos los datos.
-            dispatch({ type: 'SET_DATA', payload: { sitters: sittersData as ExtendedSitter[], stats: statsData } });
+	const refetch = () => {
+		setFilters({}); // Usa setFilters para resetear y recargar
+	};
 
-        } catch (err) {
-            if (signal.aborted) return;
-            const message = err instanceof Error ? err.message : 'Error al obtener los cuidadores';
-            dispatch({ type: 'SET_ERROR', payload: message });
-        }
-    }, [dispatch]);
-
-    useEffect(() => {
-        abortControllerRef.current?.abort();
-        abortControllerRef.current = new AbortController();
-        fetchData(state.filters, abortControllerRef.current.signal);
-        return () => abortControllerRef.current?.abort();
-    }, [state.filters, fetchData]);
-
-    const refetch = useCallback(() => {
-        // La acción de refetch sigue funcionando igual, pero a través de dispatch.
-        dispatch({ type: 'CLEAR_FILTERS' });
-    }, [dispatch]);
-
-    return {
-        refetch,
-    };
+	return {
+		refetch,
+	};
 }

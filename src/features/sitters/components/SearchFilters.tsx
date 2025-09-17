@@ -1,25 +1,26 @@
 import { useState, useEffect } from 'react';
 import { SlidersHorizontal } from 'lucide-react';
-import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
 import { useDebounce } from '@/hooks/useDebounce';
 import { SitterSearchBar } from './SitterSearchBar';
 import { SortDropdown } from './SortDropdown';
 import { AdvancedFilters } from './AdvancedFilters';
+import { useSittersStore } from '@/store/SitterStore';
 
 export function SearchFilters() {
-    const { state, actions } = useSittersContext();
-    const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const filters = useSittersStore((state) => state.filters);
+	const updateFilter = useSittersStore((state) => state.updateFilter);
     
     // Estado local para el input de búsqueda para no actualizar el contexto en cada tecleo
-    const [localSearchTerm] = useState(state.filters.searchTerm || '');
+    const [localSearchTerm] = useState(filters.searchTerm || '');
     const debouncedSearchTerm = useDebounce(localSearchTerm, 500); // 500ms de debounce
 
     // Efecto que actualiza el filtro global solo cuando el término de búsqueda "debounced" cambia.
     useEffect(() => {
-        actions.updateFilter({ searchTerm: debouncedSearchTerm });
-    }, [debouncedSearchTerm, actions]);
+        updateFilter({ searchTerm: debouncedSearchTerm });
+    }, [debouncedSearchTerm, updateFilter]);
 
-    const hasActiveFilters = !!(state.filters.searchTerm || state.filters.maxDistance || state.filters.minRating || state.filters.maxHourlyRate || state.filters.specialty || state.filters.availableOnly);
+    const hasActiveFilters = !!(filters.searchTerm || filters.maxDistance || filters.minRating || filters.maxHourlyRate || filters.specialty || filters.availableOnly);
 
     return (
         <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">

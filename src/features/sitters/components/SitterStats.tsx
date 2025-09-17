@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { Users, UserCheck, Award } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useSittersStore } from '@/store/SitterStore';
 
 // 5. Creación de un sub-componente para evitar la repetición de JSX.
 const StatCard = ({ icon: Icon, value, label }: { icon: LucideIcon; value: number; label: string }) => (
@@ -20,23 +20,24 @@ const StatCard = ({ icon: Icon, value, label }: { icon: LucideIcon; value: numbe
 // 1. El componente ya no recibe props para los datos.
 export function SitterStats({ className = '' }: { className?: string }) {
     // 2. Conexión directa al contexto para obtener el estado.
-    const { state } = useSittersContext();
+	const sitters = useSittersStore((state) => state.sitters)
+	const stats = useSittersStore((state) => state.stats)
 
     // 3. Memoización de cálculos derivados para optimizar el rendimiento.
     //    El componente calcula estos valores por sí mismo a partir del estado global.
     const availableCount = useMemo(() => 
-        state.sitters.filter(sitter => sitter.isAvailable).length,
-        [state.sitters]
+        sitters.filter(sitter => sitter.isAvailable).length,
+        [sitters]
     );
 
     const topRatedCount = useMemo(() => 
-        state.sitters.filter(sitter => (sitter.averageRating || 0) >= 4.8).length,
-        [state.sitters]
+        sitters.filter(sitter => (sitter.averageRating || 0) >= 4.8).length,
+        [sitters]
     );
 
     // 4. Manejo del estado de carga inicial con un esqueleto.
     //    Se muestra mientras `state.stats` aún no ha sido cargado por la API.
-    if (!state.stats) {
+    if (!stats) {
         return (
             <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 ${className}`}>
                 {Array.from({ length: 4 }).map((_, index) => (
@@ -53,10 +54,10 @@ export function SitterStats({ className = '' }: { className?: string }) {
     }
     
     const statsList = [
-        { icon: Users, value: state.stats.totalSitters, label: 'Cuidadores Totales' },
+        { icon: Users, value: stats.totalSitters, label: 'Cuidadores Totales' },
         { icon: UserCheck, value: availableCount, label: 'Disponibles Ahora' },
         { icon: Award, value: topRatedCount, label: 'Mejor Valorados' },
-        { icon: Users, value: state.stats.verifiedSitters, label: 'Perfiles Verificados' }
+        { icon: Users, value: stats.verifiedSitters, label: 'Perfiles Verificados' }
     ];
 
     return (

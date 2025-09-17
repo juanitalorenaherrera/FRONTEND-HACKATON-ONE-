@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
-import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
 import { useDebounce } from '@/hooks/useDebounce';
 import { getSitterSuggestions } from '@/services/suggestionService';
 import { cn } from '@/lib/utils'; 
+import { useSittersStore } from '@/store/SitterStore';
 
 // El tipo ahora vive aquí, junto al componente que lo usa.
 export interface SearchSuggestion {
@@ -15,10 +15,11 @@ export interface SearchSuggestion {
 
 export function SitterSearchBar({ placeholder = "Buscar cuidadores...", className = "" }) {
     // 1. Conexión al contexto para obtener el estado global y las acciones.
-    const { state, actions } = useSittersContext();
+	const filters = useSittersStore((state) => state.filters);
+	const updateFilter = useSittersStore((state) => state.updateFilter);
 
     // 2. Estado local para el valor del input. Esto permite una escritura fluida sin actualizar el estado global en cada tecleo.
-    const [inputValue, setInputValue] = useState(state.filters.searchTerm || '');
+    const [inputValue, setInputValue] = useState(filters.searchTerm || '');
     
     // 3. Estado local para las sugerencias y su carga.
     const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
@@ -30,8 +31,8 @@ export function SitterSearchBar({ placeholder = "Buscar cuidadores...", classNam
 
     // 4. Efecto para actualizar el filtro GLOBAL cuando el valor "debounced" cambia.
     useEffect(() => {
-        actions.updateFilter({ searchTerm: debouncedValue });
-    }, [debouncedValue, actions]);
+        updateFilter({ searchTerm: debouncedValue });
+    }, [debouncedValue, updateFilter]);
 
     // 5. Efecto para obtener sugerencias desde el servicio.
     useEffect(() => {
@@ -63,7 +64,7 @@ export function SitterSearchBar({ placeholder = "Buscar cuidadores...", classNam
 
     const handleSuggestionClick = (suggestion: SearchSuggestion) => {
         setInputValue(suggestion.value); // Actualiza el input local
-        actions.updateFilter({ searchTerm: suggestion.value }); // Actualiza el filtro global inmediatamente
+        updateFilter({ searchTerm: suggestion.value }); // Actualiza el filtro global inmediatamente
         setIsOpen(false);
     };
 

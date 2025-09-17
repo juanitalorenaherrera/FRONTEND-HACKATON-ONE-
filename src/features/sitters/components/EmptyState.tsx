@@ -1,14 +1,14 @@
+import { useSittersStore } from '@/store/SitterStore';
 import { Users, FilterX } from 'lucide-react';
-import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
 
 // El componente ya no necesita props.
 export function EmptyState() {
     // 1. Obtenemos el estado y las acciones directamente del contexto.
-    const { state, actions } = useSittersContext();
+    const { filters, clearFilters } = useSittersStore((state) => state);
 
     // 2. Determinamos si hay filtros activos.
     // (Ignoramos las claves de ordenamiento que pueden estar por defecto).
-    const hasActiveFilters = !!(state.filters.searchTerm || state.filters.maxDistance || state.filters.minRating || state.filters.maxHourlyRate || state.filters.specialty || state.filters.availableOnly);
+    const hasActiveFilters = !!(filters.searchTerm || filters.maxDistance || filters.minRating || filters.maxHourlyRate || filters.specialty || filters.availableOnly);
 
     // 3. El componente ahora renderiza contenido diferente según el contexto.
     const Icon = hasActiveFilters ? FilterX : Users;
@@ -33,7 +33,7 @@ export function EmptyState() {
                 {hasActiveFilters && (
                     <button 
                         // La acción viene directamente del contexto, no de una prop.
-                        onClick={actions.clearFilters}
+                        onClick={clearFilters}
                         className="px-6 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium"
                     >
                         Limpiar Filtros

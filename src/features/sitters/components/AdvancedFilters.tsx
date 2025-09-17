@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { MapPin, DollarSign, Star } from 'lucide-react';
-import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
 import { SITTER_CONFIG } from '@/features/sitters/config/sitters.config';
 import type { SitterFilters } from '@/features/sitters/types';
+import { useSittersStore } from '@/store/SitterStore';
 
 interface AdvancedFiltersProps {
 	onClose: () => void;
@@ -10,11 +10,11 @@ interface AdvancedFiltersProps {
 
 export function AdvancedFilters({ onClose }: AdvancedFiltersProps) {
 	// 1. Lee el estado global y las acciones directamente del contexto.
-	const { state, actions } = useSittersContext();
+	const { filters, setFilters, clearFilters } = useSittersStore((state) => state);
 
 	// 2. El estado local se inicializa con los filtros del contexto global.
 	const [localFilters, setLocalFilters] = useState<SitterFilters>(
-		state.filters
+		filters
 	);
 
 	// Función para manejar cambios en filtros locales
@@ -24,7 +24,7 @@ export function AdvancedFilters({ onClose }: AdvancedFiltersProps) {
 
 	// 3. La función de "Aplicar" ahora despacha una única acción al contexto.
 	const handleApply = () => {
-		actions.setFilters(localFilters);
+		setFilters(localFilters);
 		onClose();
 	};
 
@@ -38,7 +38,7 @@ export function AdvancedFilters({ onClose }: AdvancedFiltersProps) {
 		setLocalFilters(defaultFilters);
 
 		// Llama a la acción global que hace lo mismo
-		actions.clearFilters();
+		clearFilters();
 		onClose(); // Cierra el modal después de limpiar
 	};
 
