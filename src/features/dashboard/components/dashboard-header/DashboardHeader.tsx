@@ -3,7 +3,7 @@ import LeftSection from './sections/LeftSection';
 import SearchBar from './sections/SearchBar';
 import QuickActions from './sections/QuickActions';
 import Notifications from './sections/Notifications';
-import ProfileDropDownButton from './sections/ProfileDropDownButton';
+import { ProfileDropDownButton } from './sections/ProfileDropDownButton';
 import UserInfoHeader from './sections/UserInfoHeader';
 import MenuItems from './sections/MenuItems';
 import MobileSearch from './sections/MobileSearch';
