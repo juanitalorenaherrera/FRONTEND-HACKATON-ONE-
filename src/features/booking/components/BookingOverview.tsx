@@ -4,9 +4,9 @@ import { BookingsEmptyState } from '../components/states/BookingEmptyState';
 import { BookingsErrorState } from '../components/states/BookingErrorState';
 import { BookingsList } from './BookingList';
 import { BookingsLoadingState } from '../components/states/BookingsLoadingState';
+import { useAuthStore } from '../../../store/AuthStore';
 import { useBookingActions } from '../hooks/useBookingActions'; // <-- Obtiene las acciones
 import { useBookingContext } from '../hooks/useBookingContext'; // <-- Obtiene el estado
-import { useAuthStore } from '../../../store/AuthStore';
 
 export function BookingsOverview() {
     // SEPARACIÓN CORRECTA: El estado y las acciones vienen de hooks diferentes.
@@ -18,7 +18,9 @@ export function BookingsOverview() {
     
     const handleRetry = () => {
         if (user?.id) {
-            refreshBookings(user.id);
+            refreshBookings();
+
+
         }
     };
 

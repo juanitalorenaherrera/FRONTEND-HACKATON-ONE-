@@ -1,9 +1,9 @@
 // features/pets/pages/PetsView.tsx - VERSIÓN FINAL Y CORRECTA
-import { useEffect } from 'react';
-//import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
+
 import { Outlet } from 'react-router';
-import { usePetsActions } from '../hooks/usePetsActions';
 import { useAuthStore } from '../../../store/AuthStore';
+import { useEffect } from 'react';
+import { usePetsActions } from '../hooks/usePetsActions';
 import { usePetsStore } from '../../../store/PetStore';
 
 function PetsViewContent() {

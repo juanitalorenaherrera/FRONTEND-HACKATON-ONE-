@@ -1,5 +1,6 @@
-import { Star, MapPin, ShieldCheck } from 'lucide-react';
-import type { ExtendedSitter } from '@/types/sitter';
+import { MapPin, ShieldCheck, Star } from 'lucide-react';
+
+import type { ExtendedSitter } from '@/features/sitters/types';
 import { SITTER_CONFIG } from '@/features/sitters/config/sitters.config';
 
 interface SitterCardProps {

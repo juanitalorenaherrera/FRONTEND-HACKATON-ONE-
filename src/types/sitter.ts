@@ -67,23 +67,7 @@ export interface AuthResponse {
 	};
 }
 
-/**
- * Interface para cuidador con información extendida (para FindSittersView)
- */
-export interface ExtendedSitter extends SitterProfileSummary {
-	// Campos adicionales para la UI
-	specialty?: string;
-	image?: string;
-	rating?: number;
-	totalServices?: number;
-	lastService?: string;
-	pets?: string[];
-	isAvailable?: boolean;
-	distance?: string;
-	bio?: string;
-	nextAvailable?: string;
-	specialties?: string[];
-}
+
 
 
 export interface NewService {

@@ -11,7 +11,8 @@ export { AdvancedFilters } from './AdvancedFilters';
 
 // Componentes de Estado Específicos
 export { SittersLoadingState } from './LoadingState';
-export { SittersErrorState } from './ErrorState'; // El wrapper que usa el componente genérico
+export { SittersErrorState } from './ErrorState'; 
+export { EmptyState as SittersEmptyState } from './EmptyState';
 
 // Componentes de Estadísticas
 export { SitterStats } from './SitterStats';

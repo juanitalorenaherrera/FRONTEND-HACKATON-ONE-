@@ -22,38 +22,32 @@ export default function Register () {
 	const onSubmit = async (data: RegisterFormData) => {
 		setError(null);
 		setIsLoading(true);
-		try {
-			const response = await registerRequest(
-				data.firstName,
-				data.lastName,
-				data.email,
-				data.password,
-				data.address,
-				data.phoneNumber
-			);
-		
-			if (!response.token) {
-				throw new Error('Error en el registro');
-			}
+		 try {
+        const res = await registerRequest(
+            data.firstName,
+            data.lastName,
+            data.email,
+            data.password,
+            data.address,
+            data.phoneNumber
+        );
+        
+        setToken(res.token);
+        setProfile(res.userProfile);
 
-			setToken(response.token);
-			setProfile(response.userProfile);
-
-			if (response.userProfile.role === Role.ADMIN) {
-				navigate('/AdminDashboard');
-				return;
+        if (res.userProfile && res.userProfile.role) {
+				if (res.userProfile.role === Role.ADMIN) {
+					navigate('/AdminDashboard');
+				} else if (res.userProfile.role === Role.SITTER) {
+					navigate('/SitterDashboard');
+				} else {
+					navigate('/dashboard');
+				}
+			} else {
+				// Si por alguna razón no hay perfil, redirige a una página segura
+				console.error("Registro exitoso pero no se recibió el perfil de usuario.", res);
+				navigate('/login'); 
 			}
-			if (response.userProfile.role === Role.SITTER) {
-				navigate('/SitterDashboard');
-				return;
-			}
-
-			if (response.userProfile.role === Role.CLIENT) {
-				navigate('/ClientDashboard');
-				return;
-			}
-			navigate('/dashboard');
-
 		} catch (err) {
 			setError('Error en el registro. Verifica tus datos.');
 			console.error('Error en el registro:', err);

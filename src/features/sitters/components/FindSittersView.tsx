@@ -1,68 +1,95 @@
-import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
-import { useSittersActions } from '@/features/sitters/hooks/useSittersActions';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-    SitterStats,
-    SearchFilters,
-    SitterGrid,
-    SittersLoadingState,
-    SittersErrorState
+  SearchFilters,
+  SitterGrid,
+  SitterStats,
+  SittersEmptyState,
+  SittersErrorState,
+  SittersLoadingState
 } from '../components';
-import type { ExtendedSitter } from '@/types/sitter';
-import { SittersProvider } from '@/features/sitters/context/SittersContext';
+
+import type { ExtendedSitter } from '@/features/sitters/types';
+import { SittersProvider } from '@/features/sitters/context/SittersContext.tsx';
+import { useNavigate } from 'react-router-dom';
+import { useSittersActions } from '@/features/sitters/hooks/useSittersActions';
+import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
 
 /**
  * Componente interno que renderiza la UI.
- * Se asegura de que siempre se renderice dentro del SittersProvider.
+ * Funciona como el "orquestador" de la vista.
  */
 function SittersViewContent() {
-    // 1. Obtiene el estado y el estado derivado (`filteredSitters`) del contexto.
+    const navigate = useNavigate();
+    
+    // 1. Obtenemos el estado y los cuidadores filtrados del contexto.
     const { state, filteredSitters } = useSittersContext();
+    
+    // ✨ CORRECCIÓN CLAVE:
+    // Llamamos al hook y guardamos el objeto que devuelve (que contiene `refetch`)
+    // en una constante llamada `actions`. El hook se encarga por sí solo de la carga inicial de datos.
+    const actions = useSittersActions(); 
 
-    // 2. Activa el hook de lógica. Este hook se encargará de reaccionar
-    //    a los cambios en `state.filters` y de hacer las llamadas a la API.
-    useSittersActions();
-
-    // 3. Define los manejadores de acciones que pasarás a los componentes hijos.
-    //    Este es el límite de la "feature", un buen lugar para la lógica de navegación.
     const handleViewProfile = (sitter: ExtendedSitter) => {
         console.log(`Navegando al perfil de: ${sitter.sitterName} (ID: ${sitter.id})`);
-        // Lógica de navegación real iría aquí. Ej: navigate(`/cuidadores/${sitter.id}`);
+        // navigate(`/cuidadores/${sitter.id}`);
     };
 
     const handleHireSitter = (sitter: ExtendedSitter) => {
-        console.log(`Iniciando contratación de: ${sitter.sitterName}`);
-        // Lógica para mostrar un modal de contratación o navegar a una página de reserva.
+        navigate('/dashboard/new-booking', { state: { sitterId: sitter.id } });
     };
 
-    // 4. Renderizado condicional basado en el estado del contexto.
-    //    El esqueleto solo se muestra en la carga inicial (cuando no hay cuidadores en el estado).
+    // --- Lógica de Renderizado Robusta ---
+
+    // 1. Muestra el esqueleto de carga SÓLO la primera vez.
+    // ✨ CORRECCIÓN: Usamos `state.isLoading` que es el nombre correcto de la propiedad.
     if (state.isLoading && state.sitters.length === 0) {
         return <SittersLoadingState />;
     }
 
-    //    El estado de error se muestra si la propiedad `error` en el estado tiene un valor.
+    // 2. Si el reducer recibe un error, muestra el estado de error.
+    // ✨ CORRECCIÓN: `actions` ahora existe y `actions.refetch` es accesible.
     if (state.error) {
-        return <SittersErrorState />;
+        return <SittersErrorState error={state.error} onRetry={actions.refetch} />;
     }
-
-    //    Una vez cargado, se muestra el layout principal.
+    
+    // 3. Si ya hay datos (o no hay), muestra el layout principal.
     return (
-        <div className="space-y-8">
+        <motion.div 
+            className="space-y-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+        >
             <SitterStats />
             <SearchFilters />
-            <SitterGrid
-                sitters={filteredSitters}
-                onHire={handleHireSitter}
-                onViewProfile={handleViewProfile}
-            />
-        </div>
+            
+            <AnimatePresence mode="wait">
+                {!state.isLoading && filteredSitters.length === 0 ? (
+                    <motion.div
+                        key="empty-state"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                    >
+                        <SittersEmptyState />
+                    </motion.div>
+                ) : (
+                    <motion.div key="sitter-grid">
+                        <SitterGrid
+                            sitters={filteredSitters}
+                            isLoading={state.isLoading} 
+                            onViewProfile={handleViewProfile}
+                            onHire={handleHireSitter}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 }
 
-
 /**
- * Componente exportado. Su única responsabilidad es
- * envolver la lógica y la UI en el `SittersProvider`.
+ * Componente exportado. Envuelve la vista en su propio proveedor de estado.
  */
 export function FindSittersView() {
     return (

@@ -1,171 +1,145 @@
 import type { CreatePetRequest, Pet } from '../types';
-
-import { calculateUserStats } from '../utils/petUtils';
 import {
-	getPetsByAccountId,
 	createPet,
-	updatePet,
 	deletePet as deletePetService,
+	getPetsByAccountId,
+	updatePet as updatePetService,
 } from '../../../services/petService';
+
+import { Type } from '../../../types/petStore';
+import { calculateUserStats } from '../utils/petUtils';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { usePetsStore } from '../../../store/PetStore';
-import { Type } from '../../../types/petStore';
-/**
- * Hook que encapsula toda la lógica de negocio y efectos secundarios
- * para la feature de mascotas. Es el único lugar que interactúa
- * con los servicios y despacha acciones complejas al contexto.
- */
+
 export function usePetsActions() {
 	const pets = usePetsStore((state) => state.pets);
 	const error = usePetsStore((state) => state.error);
-	const setPetsData = usePetsStore((state) => state.setPetsData);
-	const setLoading = usePetsStore((state) => state.setLoading);
-	const setError = usePetsStore((state) => state.setError);
-	const addPetSuccess = usePetsStore((state) => state.addPet);
-	const updatePetSuccess = usePetsStore((state) => state.updatePet);
-	const deletePetSuccess = usePetsStore((state) => state.deletePet);
-	const setSelectedPet = usePetsStore((state) => state.setSelectedPet);
-	const showModal = usePetsStore((state) => state.showModal);
-	const hideModal = usePetsStore((state) => state.hideModal);
 	const navigate = useNavigate();
-	/**
-	 * Carga la lista inicial de mascotas y calcula sus estadísticas.
-	 * Requiere el ID de la cuenta. No volverá a cargar si los datos ya existen.
-	 */
+
 	const loadPets = useCallback(
 		async (accountId: number) => {
 			if (pets.length > 0 && !error) return;
 
-			setLoading(true);
-			try {
-				// 1. Obtenemos las mascotas para la cuenta específica.
-				const petsData = await getPetsByAccountId(accountId);
-				// 2. Calculamos las estadísticas en el cliente con los datos obtenidos.
-				const stats = calculateUserStats(petsData);
-				// 3. Guardamos ambos en el estado global.
-				setPetsData({ pets: petsData, stats });
-			} catch (error) {
-				const message =
-					error instanceof Error
-						? error.message
-						: 'Error desconocido';
-				setError(message);
-			}
-		},
-		[pets.length, error, setLoading, setPetsData, setError]
-	);
-	/**
-	 * Fuerza la recarga de los datos desde la API para una cuenta específica.
-	 */
-	const refreshPets = useCallback(
-		async (accountId: number) => {
+			// Usamos getState() para no crear dependencias inestables
+			const { setLoading, setPetsData, setError } =
+				usePetsStore.getState();
 			setLoading(true);
 			try {
 				const petsData = await getPetsByAccountId(accountId);
 				const stats = calculateUserStats(petsData);
 				setPetsData({ pets: petsData, stats });
-			} catch (error) {
+			} catch (err) {
 				const message =
-					error instanceof Error
-						? error.message
-						: 'Error desconocido';
+					err instanceof Error
+						? err.message
+						: 'Error desconocido al cargar mascotas';
 				setError(message);
 			}
 		},
-		[setLoading, setPetsData, setError]
+		[pets.length, error] // Dependencias mínimas y estables
 	);
 
-	/**
-	 * Crea una nueva mascota, actualiza el estado y navega a su perfil.
-	 */
+    // ... (resto de las funciones refactorizadas como en el mensaje anterior)
+    const refreshPets = useCallback(async (accountId: number) => {
+		const { setLoading, setPetsData, setError } = usePetsStore.getState();
+		setLoading(true);
+		try {
+			const petsData = await getPetsByAccountId(accountId);
+			const stats = calculateUserStats(petsData);
+			setPetsData({ pets: petsData, stats });
+		} catch (err) {
+			const message =
+				err instanceof Error ? err.message : 'Error desconocido al refrescar';
+			setError(message);
+		}
+	}, []);
+
 	const addPet = useCallback(
-		async (petData: CreatePetRequest) => {
-			const newPet = await createPet(
-				petData.accountId,
-				petData.name,
-				petData.species,
-				petData.breed,
-				petData.age,
-				petData.weight,
-				petData.color,
-				petData.medications,
-				petData.allergies,
-				petData.specialNotes
-			);
-			addPetSuccess(newPet as Pet);
-			hideModal();
-			setSelectedPet(newPet as Pet);
-		},
-		[addPetSuccess, hideModal, setSelectedPet]
-	);
-	/**
-	 * Actualiza una mascota existente y actualiza el estado.
-	 */
+        async (petData: CreatePetRequest) => {
+            const { addPet, hideModal, setSelectedPet, setError } =
+                usePetsStore.getState();
+            try {
+                const newPet = await createPet(
+                    petData.accountId,
+                    petData.name,
+                    petData.species,
+                    petData.breed,
+                    petData.age,
+                    petData.weight,
+                    petData.color,
+                    petData.medications,
+                    petData.allergies,
+                    petData.specialNotes
+                );
+                addPet(newPet as Pet);
+                hideModal();
+                setSelectedPet(newPet as Pet);
+                
+                // ✅ AÑADE ESTA LÍNEA
+                return newPet; 
+
+            } catch (err) {
+                console.error('Error al crear la mascota:', err);
+                setError('No se pudo crear la mascota.');
+                // Relanza el error para que el 'catch' en la vista pueda manejarlo
+                throw err;
+            }
+        }, []);
+
 	const updatePetAction = useCallback(
 		async (petId: number, petData: Partial<CreatePetRequest>) => {
+			const { updatePet, hideModal, setError } = usePetsStore.getState();
 			try {
-				const updatedPet = await updatePet(
+				const updatedPet = await updatePetService(
 					petId,
 					petData as CreatePetRequest
 				);
-				updatePetSuccess(updatedPet);
+				updatePet(updatedPet);
 				hideModal();
-			} catch (error) {
-				console.error('Error updating pet:', error);
-				setError('Error updating pet');
+			} catch (err) {
+				console.error('Error al actualizar la mascota:', err);
+				setError('No se pudo actualizar la mascota.');
 			}
 		},
-		[updatePetSuccess, hideModal, setError]
+		[]
 	);
-	/**
-	 * Elimina una mascota, actualiza el estado y navega a la vista principal.
-	 */
+
 	const deletePet = useCallback(
 		async (petId: number) => {
 			if (
-				window.confirm(
-					'¿Estás seguro de que quieres eliminar esta mascota?'
-				)
+				window.confirm('¿Estás seguro de que quieres eliminar esta mascota?')
 			) {
+				const { deletePet, setError } = usePetsStore.getState();
 				try {
 					await deletePetService(petId);
-					deletePetSuccess(petId);
-					// Si eliminamos la mascota, ya no podemos estar en su perfil, volvemos a la lista.
+					deletePet(petId);
 					navigate('/pets');
-				} catch (error) {
+				} catch (err) {
 					const message =
-						error instanceof Error
-							? error.message
-							: 'Error desconocido';
-					setError(`createPetNo se pudo eliminar: ${message}`);
+						err instanceof Error ? err.message : 'Error desconocido';
+					setError(`No se pudo eliminar: ${message}`);
 				}
 			}
 		},
-		[deletePetSuccess, setError, navigate]
+		[navigate]
 	);
-	// --- Acciones de UI (no asíncronas) ---
-	const selectPet = useCallback(
-		(pet: Pet | null) => {
-			setSelectedPet(pet);
-		},
-		[setSelectedPet]
-	);
+
+	const selectPet = useCallback((pet: Pet | null) => {
+		usePetsStore.getState().setSelectedPet(pet);
+	}, []);
 
 	const showAddPetModal = useCallback(() => {
-		showModal(Type.ADD);
-	}, [showModal]);
+		usePetsStore.getState().showModal(Type.ADD);
+	}, []);
 
-	const showEditPetModal = useCallback(
-		(pet: Pet) => {
-			showModal(Type.EDIT, pet);
-		},
-		[showModal]
-	);
+	const showEditPetModal = useCallback((pet: Pet) => {
+		usePetsStore.getState().showModal(Type.EDIT, pet);
+	}, []);
 
 	const hideModalAction = useCallback(() => {
-		hideModal();
-	}, [hideModal]);
+		usePetsStore.getState().hideModal();
+	}, []);
 
 	return {
 		loadPets,

@@ -1,5 +1,10 @@
 // features/booking/types/index.ts
 
+import type { ExtendedSitter } from "@/features/sitters/types";
+import type { NewService } from "@/types/sitter";
+import type { PetResponse } from "@/types/pets"; // Asumiendo que Pet es PetResponse
+import { z } from 'zod';
+
 /**
  * Representa los posibles estados de una reserva, alineado con el enum del backend.
  */
@@ -144,4 +149,54 @@ export interface BookingStats {
   confirmedCount: number;
   inProgressCount: number;
   upcomingCount: number;
+}
+
+/**
+ * Representa los datos necesarios para popular los selectores del formulario.
+ */
+export interface BookingCreationData {
+  sitters: ExtendedSitter[]; // Reutilizamos el tipo de la feature 'sitters'
+  pets: PetResponse[]; // Reutilizamos el tipo de la feature 'pets'
+  services: NewService[]; // Necesitarás crear este tipo si no existe
+  //platformFee: number;
+}
+
+// Asegúrate de tener este tipo, si no existe créalo en un archivo de tipos relevante
+export interface ServiceOffering {
+  id: number;
+  serviceType: string;
+  price: number;
+  description: string;
+}
+
+export const bookingSchema = z.object({
+  petId: z.number().nullable().refine(val => val !== null, "Debes seleccionar una mascota."),
+  sitterId: z.number().nullable().refine(val => val !== null, "Debes seleccionar un cuidador."),
+  serviceId: z.number().nullable().refine(val => val !== null, "Debes seleccionar un servicio."),
+  startDate: z.date().nullable().refine(val => val !== null, "La fecha y hora de inicio son obligatorias."),
+  endDate: z.date().nullable().refine(val => val !== null, "La fecha y hora de fin son obligatorias."),
+  additionalNotes: z.string().optional(),
+}).refine(data => {
+  if (data.endDate && data.startDate) {
+    return data.endDate > data.startDate;
+  }
+  return true;
+}, {
+  message: "La fecha de fin debe ser posterior a la fecha de inicio.",
+  path: ["endDate"],
+});
+
+export type BookingFormData = z.infer<typeof bookingSchema>;
+
+export interface BookingCreationData {
+  sitters: ExtendedSitter[];
+  pets: PetResponse[];
+  
+}
+
+export interface ServiceOffering {
+  id: number;
+  serviceType: string;
+  price: number;
+  description: string;
 }

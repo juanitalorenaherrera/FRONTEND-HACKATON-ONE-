@@ -1,11 +1,14 @@
 // services/bookingService.ts
+
 import type {
 	BookingDetail,
+	BookingFormData,
 	BookingStatus,
 	BookingSummary,
 	PageResponse,
-	UpdateBookingRequest,
+	UpdateBookingRequest
 } from '@/features/booking/types';
+
 import type { Role } from '@/types/authStore';
 import axios from './auth';
 
@@ -14,44 +17,33 @@ const API_URL = '/api/bookings';
  * Crea una nueva reserva.
  * Corresponde a: POST /api/bookings
  */
-export async function createBooking(
-	petId: number,
-	sitterId: number,
-	serviceOfferingId: number,
-	startTime: string, // Formato ISO: "YYYY-MM-DDTHH:mm:ss"
-	notes?: string
-) {
-	const { data } = await axios.post<BookingDetail>(API_URL, {
-		petId,
-		sitterId,
-		serviceOfferingId,
-		startTime,
-		notes,
-	});
-	return data;
+export async function createBooking(data: BookingFormData): Promise<BookingDetail> {
+    const payload = {
+        petId: data.petId,
+        sitterId: data.sitterId,
+        serviceOfferingId: data.serviceId, // Mapea el nombre del campo
+        startTime: data.startDate?.toISOString(),
+        endTime: data.endDate?.toISOString(),
+        notes: data.additionalNotes,
+    };
+    
+    const { data: responseData } = await axios.post<BookingDetail>(API_URL, payload);
+    return responseData;
 }
 /**
  * Obtiene las reservas de un usuario específico con paginación y filtros.
  * Corresponde a: GET /api/bookings/user/{userId}
  */
 export async function getBookingsByUser(
-	userId: number,
-	role: Role,
-	filters: { status?: string; page?: number; size?: number }
+    userId: number,
+    role: Role,
+    filters: { status?: string; page?: number; size?: number }
 ): Promise<PageResponse<BookingSummary>> {
-	const { data } = await axios.get<PageResponse<BookingSummary>>(
-		`${API_URL}`,
-		{
-			params: {
-				userId,
-				role,
-				status: filters.status,
-				page: filters.page,
-				size: filters.size,
-			},
-		}
-	);
-	return data;
+    const { data } = await axios.get<PageResponse<BookingSummary>>(
+        `${API_URL}`,
+        { params: { userId, role, ...filters } }
+    );
+    return data;
 }
 /**
  * Obtiene los detalles completos de una reserva por su ID.
@@ -102,3 +94,10 @@ export async function updateBookingStatus(
 export async function deleteBooking(bookingId: number): Promise<void> {
 	await axios.delete(`${API_URL}/${bookingId}`);
 }
+
+// Método para obtener la tarifa de la plataforma.
+export const getPlatformFee = async (): Promise<{ percentage: number }> => {
+  const response = await axios.get<{ percentage: number }>(`${API_URL}/platform-fees/latest`);
+  return response.data;
+};
+

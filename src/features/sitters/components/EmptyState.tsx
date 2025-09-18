@@ -1,45 +1,67 @@
-import { Users, FilterX } from 'lucide-react';
+import { FilterX, Users } from 'lucide-react';
+
+import { Button } from '@/components/ui/Button';
+import { motion } from 'framer-motion';
 import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
 
-// El componente ya no necesita props.
-export function EmptyState() {
-    // 1. Obtenemos el estado y las acciones directamente del contexto.
+export const EmptyState = () => {
+    // 1. Obtenemos estado y acciones del contexto (tu lógica original)
     const { state, actions } = useSittersContext();
 
-    // 2. Determinamos si hay filtros activos.
-    // (Ignoramos las claves de ordenamiento que pueden estar por defecto).
-    const hasActiveFilters = !!(state.filters.searchTerm || state.filters.maxDistance || state.filters.minRating || state.filters.maxHourlyRate || state.filters.specialty || state.filters.availableOnly);
+    // 2. Determinamos si hay filtros activos
+    const hasActiveFilters = !!(
+        state.filters.searchTerm || 
+        state.filters.maxDistance || 
+        state.filters.minRating || 
+        state.filters.maxHourlyRate || 
+        state.filters.specialty || 
+        state.filters.availableOnly
+    );
 
-    // 3. El componente ahora renderiza contenido diferente según el contexto.
+    // 3. Definimos el contenido dinámicamente
     const Icon = hasActiveFilters ? FilterX : Users;
     const title = hasActiveFilters 
         ? "Ningún cuidador coincide con tus filtros" 
-        : "No se encontraron cuidadores";
+        : "Aún no hay cuidadores disponibles";
     const description = hasActiveFilters
-        ? "Prueba ajustar o limpiar los filtros para ampliar tu búsqueda."
-        : "Parece que aún no hay cuidadores disponibles en la plataforma. Vuelve a intentarlo más tarde.";
+        ? "Prueba ajustar o eliminar los filtros para ampliar tu búsqueda y encontrar al cuidador perfecto."
+        : "Parece que no hay cuidadores activos en tu área por ahora. ¡Vuelve a comprobarlo más tarde!";
 
     return (
-        <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div className="max-w-md mx-auto">
-                <Icon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {title}
-                </h3>
-                <p className="text-gray-600 mb-6">
-                    {description}
-                </p>
-                {/* El botón solo aparece si hay filtros que limpiar */}
-                {hasActiveFilters && (
-                    <button 
-                        // La acción viene directamente del contexto, no de una prop.
-                        onClick={actions.clearFilters}
-                        className="px-6 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium"
-                    >
-                        Limpiar Filtros
-                    </button>
-                )}
+        <motion.div
+            className="flex flex-col items-center justify-center text-center p-8 md:p-12 rounded-3xl bg-glass-neutral border border-white/20 backdrop-blur-lg"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+            <div className="p-4 bg-pet-teal/10 rounded-full mb-6">
+                <Icon className="w-12 h-12 text-pet-teal" strokeWidth={1.5} />
             </div>
-        </div>
+            <h2 className="text-2xl font-bold text-neutral-800 mb-2">
+                {title}
+            </h2>
+            <p className="text-neutral-500 max-w-md mb-6">
+                {description}
+            </p>
+
+            {/* 4. Mostramos un botón de acción específico para cada caso */}
+            {hasActiveFilters ? (
+                <Button 
+                    variant="secondary" 
+                    onClick={actions.clearFilters}
+                >
+                    <FilterX className="w-4 h-4 mr-2" />
+                    Limpiar Filtros
+                </Button>
+            ) : (
+                <Button 
+                    variant="outline"
+                    onClick={() => window.location.reload()}
+                >
+                    <Users className="w-4 h-4 mr-2" />
+                    Refrescar Búsqueda
+                </Button>
+            )}
+        </motion.div>
     );
-}
+};

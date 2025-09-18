@@ -1,5 +1,7 @@
+import type { CreatePetRequest, PetResponse, PetStatsResponse, PetSummaryResponse } from '../types/pets';
+
 import axios from '../services/auth';
-import type { PetResponse, PetSummaryResponse, CreatePetRequest, PetStatsResponse } from '../types/pets';
+
 const API_URL = '/api/pets';
 /**
  * Obtiene todas las mascotas del usuario autenticado

@@ -1,17 +1,16 @@
 import * as bookingService from '../../../services/bookingService';
 
-import type { BookingStatus, CreateBookingRequest } from '../types';
+import type { BookingFormData, BookingStatus } from '../types';
 
+import type { Role } from '../../../types/authStore';
+import { toast } from 'sonner';
+import { useAuthStore } from '../../../store/AuthStore';
 import { useBookingContext } from '../hooks/useBookingContext';
 import { useCallback } from 'react';
-import { useAuthStore } from '../../../store/AuthStore';
-import type { Role } from '../../../types/authStore';
-/**
- * Hook que encapsula las funciones para interactuar con la feature de reservas.
- */
+
 export function useBookingActions() {
-	const { state, dispatch } = useBookingContext();
-	const user = useAuthStore((state) => state.profile);
+    const { state, dispatch } = useBookingContext();
+    const user = useAuthStore((state) => state.profile);
 
     const loadBookings = useCallback(async () => {
         if (!user) return dispatch({ type: 'SET_ERROR', payload: 'Usuario no autenticado.' });
@@ -19,65 +18,40 @@ export function useBookingActions() {
         dispatch({ type: 'SET_LOADING', payload: true });
         try {
             const filters = {
-                page: state.pagination.currentPage - 1, // Spring es 0-indexed
-                size: state.pagination.pageSize,
-                // ...otros filtros de state.filters
-            };
-            const bookingsPage = await bookingService.getBookingsByUser(user.id, user.role as Role, filters);
-
-            // La lógica para calcular stats es un buen candidato para un utilitario
-            const stats = {
-                totalCount: 0,
-                pendingCount: 0,
-                confirmedCount: 0,
-                inProgressCount: 0,
-                upcomingCount: 0
-            };
-
-            dispatch({ type: 'SET_DATA_SUCCESS', payload: { page: bookingsPage, stats } });
-        } catch (error) {
-            const message = error instanceof Error ? error.message : 'Error desconocido';
-            dispatch({ type: 'SET_ERROR', payload: message });
-        }
-    }, [user, dispatch, state.pagination.currentPage, state.pagination.pageSize]);
-
-    const refreshBookings = useCallback(async (accountId: number) => {
-        if (!user) return dispatch({ type: 'SET_ERROR', payload: 'Usuario no autenticado.' });
-        
-        dispatch({ type: 'SET_LOADING', payload: true });
-        try {
-            const filters = {
                 page: state.pagination.currentPage - 1,
                 size: state.pagination.pageSize,
             };
-            const bookingsPage = await bookingService.getBookingsByUser(accountId, user.role as Role, filters);
+            const bookingsPage = await bookingService.getBookingsByUser(user.id, user.role as Role, filters);
+            
+            // Suponemos que las stats se calcularán en el frontend o vendrán en otra llamada
             const stats = {
-                totalCount: 0,
-                pendingCount: 0,
-                confirmedCount: 0,
-                inProgressCount: 0,
-                upcomingCount: 0
+                totalCount: bookingsPage.totalElements,
+                pendingCount: 0, // Placeholder
+                confirmedCount: 0, // Placeholder
+                inProgressCount: 0, // Placeholder
+                upcomingCount: 0 // Placeholder
             };
+
             dispatch({ type: 'SET_DATA_SUCCESS', payload: { page: bookingsPage, stats } });
         } catch (error) {
-            const message = error instanceof Error ? error.message : 'Error desconocido';
+            const message = error instanceof Error ? error.message : 'Error desconocido al cargar reservas';
             dispatch({ type: 'SET_ERROR', payload: message });
         }
     }, [user, dispatch, state.pagination.currentPage, state.pagination.pageSize]);
 
-    const createBooking = useCallback(async (bookingData: CreateBookingRequest) => {
+    const refreshBookings = useCallback(async () => {
+        await loadBookings();
+    }, [loadBookings]);
+
+    const createBooking = useCallback(async (bookingFormData: BookingFormData) => {
         try {
-            await bookingService.createBooking(
-                bookingData.petId,
-                bookingData.sitterId,
-                bookingData.serviceOfferingId,
-                bookingData.startTime,
-                bookingData.notes
-            );
-            await loadBookings(); // Recargamos para ver el nuevo dato
-        } catch {
+            await bookingService.createBooking(bookingFormData);
+            toast.success("Reserva creada con éxito.");
+            await loadBookings();
+        } catch (error) {
             const message = 'Error al crear la reserva';
             dispatch({ type: 'SET_ERROR', payload: message });
+            toast.error(message);
             throw new Error(message);
         }
     }, [dispatch, loadBookings]);
@@ -85,18 +59,24 @@ export function useBookingActions() {
     const deleteBooking = useCallback(async (bookingId: number) => {
         try {
             await bookingService.deleteBooking(bookingId);
+            toast.success("Reserva eliminada.");
             dispatch({ type: 'DELETE_BOOKING_SUCCESS', payload: bookingId });
         } catch {
-            dispatch({ type: 'SET_ERROR', payload: 'No se pudo eliminar la reserva' });
+            const message = 'No se pudo eliminar la reserva';
+            dispatch({ type: 'SET_ERROR', payload: message });
+            toast.error(message);
         }
     }, [dispatch]);
     
     const updateStatus = useCallback(async (bookingId: number, newStatus: BookingStatus, reason?: string) => {
         try {
             await bookingService.updateBookingStatus(bookingId, newStatus, reason);
-            await loadBookings(); // Reload to get updated data
+            toast.success(`Estado actualizado a ${newStatus}.`);
+            await loadBookings();
         } catch {
-            dispatch({ type: 'SET_ERROR', payload: 'No se pudo actualizar el estado' });
+            const message = 'No se pudo actualizar el estado';
+            dispatch({ type: 'SET_ERROR', payload: message });
+            toast.error(message);
         }
     }, [dispatch, loadBookings]);
     
@@ -108,18 +88,17 @@ export function useBookingActions() {
             const bookingDetail = await bookingService.getBookingById(bookingId);
             dispatch({ type: 'SET_SELECTED_BOOKING', payload: bookingDetail });
         } catch {
-            dispatch({ type: 'SET_ERROR', payload: 'Error al cargar detalles' });
+            const message = 'Error al cargar los detalles';
+            dispatch({ type: 'SET_ERROR', payload: message });
+            toast.error(message);
         }
     }, [dispatch]);
-
-
     
     const setPage = useCallback((page: number) => {
         dispatch({ type: 'SET_PAGE', payload: page });
     }, [dispatch]);
 
     return {
-        // Solo retornamos las funciones. El estado se consume con `useBookingContext`.
         loadBookings,
         refreshBookings, 
         createBooking,

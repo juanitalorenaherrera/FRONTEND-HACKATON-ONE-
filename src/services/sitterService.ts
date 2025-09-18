@@ -2,19 +2,32 @@
 // services/sitterService.ts - Servicio completo alineado con backend
 // ===========================================
 
-import axios from './auth';
 import type {
-	AuthResponse,
-	CreateSitterProfileRequest,
-	SitterProfileDTO,
-	SitterProfileSummary,
-	SitterRegisterRequest,
+    AuthResponse,
+    CreateSitterProfileRequest,
+    SitterProfileDTO,
+    SitterProfileSummary,
+    SitterRegisterRequest,
 } from '../types/sitter';
-import type { ExtendedSitter } from '@/types/sitter';
+
+import type { ExtendedSitter } from '@/features/sitters/types';
 import type { Service } from '@/pages/SitterDashboard';
+import type { ServiceOffering } from '@/features/booking/types';
+import axios from './auth';
+
+// AHORA (Correcto 👍)
+
+
+
+
+
+// 👇 1. Importa el tipo ServiceOffering que creamos
+
 
 const API_URL = '/api/sitter-profiles';
 const USERS_API_URL = '/api/users';
+const SERVICE_OFFERINGS_URL = '/api/services'; // URL base para servicios
+
 
 // ========== SERVICIOS DE PERFILES ==========
 
@@ -94,6 +107,51 @@ export const deleteSitterProfile = async (userId: number): Promise<void> => {
 // ========== SERVICIOS DE USUARIOS/CUIDADORES ==========
 
 /**
+ * Obtiene cuidadores activos con sus perfiles
+ */
+export const getActiveSitters = async (): Promise<ExtendedSitter[]> => {
+    try {
+        // Tu lógica actual aquí es funcional. Obtiene todos los perfiles y los mapea.
+        const profiles = await getAllSitterProfiles();
+        return profiles
+            .filter((profile) => profile.availableForBookings)
+            .map(mapProfileToExtendedSitter); // Asegúrate que esta función mapee bien los datos
+    } catch (error) {
+        console.error('Error fetching active sitters:', error);
+        return [];
+    }
+};
+
+/**
+ * ✅ 2. Obtiene los servicios ofrecidos por un cuidador específico.
+ * Esta es la función clave que necesita `useCreateBooking`.
+ */
+export const getServicesBySitter = async (sitterId: number): Promise<ServiceOffering[]> => {
+    try {
+        const response = await axios.get<ServiceOffering[]>(`${SERVICE_OFFERINGS_URL}/${sitterId}`);
+        const data = response.data;
+
+    // ✅ ESTA ES LA LÓGICA CLAVE:
+    // Si la respuesta de la API (data) es un array, la devolvemos tal cual.
+    if (Array.isArray(data)) {
+      return data;
+    }
+    // Si la respuesta es un objeto (y no es nulo), lo metemos dentro de un nuevo array y lo devolvemos.
+    if (data && typeof data === 'object') {
+      return [data];
+    }
+    
+    // Si la respuesta es cualquier otra cosa (null, undefined, etc.), devolvemos un array vacío.
+    return [];
+
+  } catch (error) {
+    console.error(`Error fetching services for sitter ${sitterId}:`, error);
+    // En caso de error, siempre devolvemos un array vacío para no romper la UI.
+    return []; 
+  }
+};
+
+/**
  * Registra un nuevo cuidador
  */
 export const registerSitter = async (
@@ -122,24 +180,6 @@ export const getAllSitters = async (): Promise<SitterProfileSummary[]> => {
 	} catch (error) {
 		console.error('Error fetching sitters:', error);
 		throw new Error('No se pudieron cargar los cuidadores');
-	}
-};
-
-/**
- * Obtiene cuidadores activos con sus perfiles
- */
-export const getActiveSitters = async (): Promise<ExtendedSitter[]> => {
-	try {
-		// Obtener todos los perfiles de cuidadores
-		const profiles = await getAllSitterProfiles();
-
-		// Mapear a formato extendido con datos adicionales
-		return profiles
-			.filter((profile) => profile.availableForBookings)
-			.map(mapProfileToExtendedSitter);
-	} catch (error) {
-		console.error('Error fetching active sitters:', error);
-		return []; // Retornar array vacío en caso de error para no romper la UI
 	}
 };
 

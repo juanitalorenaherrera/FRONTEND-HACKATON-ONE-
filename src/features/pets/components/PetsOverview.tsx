@@ -1,46 +1,46 @@
-// features/pets/components/PetsOverview.tsx
-
 import { PetsEmptyState, PetsErrorState, PetsLoadingState } from './states';
 
 import { PetsFilters } from './PetsFilters';
 import { PetsGrid } from './PetsGrid';
 import { PetsHeader } from './PetsHeader';
 import { useAuthStore } from '../../../store/AuthStore';
-//import { useMemo } from 'react';
 import { usePetsActions } from '../hooks/usePetsActions';
 import { usePetsStore } from '../../../store/PetStore';
 
 export function PetsOverview({ className = '' }: { className?: string }) {
-    const { state, filteredPets } = usePetsStore((store) => ({
-		state: store,
-		filteredPets: store.filteredPets,
-	}));
+    // ✅ Solución: Seleccionamos cada pieza del estado de forma individual.
+    // Esto evita re-renders innecesarios y rompe el bucle infinito.
+    const isLoading = usePetsStore((state) => state.isLoading);
+    const pets = usePetsStore((state) => state.pets);
+    const error = usePetsStore((state) => state.error);
+    const filteredPets = usePetsStore((state) => state.filteredPets);
 
-	const { refreshPets } = usePetsActions();
-	const user = useAuthStore((state) => state.profile);
+    const { refreshPets } = usePetsActions();
+    const user = useAuthStore((state) => state.profile);
 
     const handleRetry = () => {
-        // Usamos el 'user' del AuthContext para obtener el accountId
-        if (user?.id) {
-            refreshPets(user.id);
+        // Usamos accountId para la llamada al servicio.
+        if (user?.accountId) {
+            refreshPets(user.accountId);
         }
     };
-    
-    // He movido el cálculo de los totales aquí usando useMemo para que PetsHeader sea más "tonto"
-    //const totalActivePets = useMemo(() => state.pets.filter(p => p.active).length, [state.pets]);
 
     const renderContent = () => {
-
-        console.log("Renderizando con el estado:", state);
-        if (state.isLoading && state.pets.length === 0) {
+        // La condición de carga es más precisa ahora:
+        // Muestra el spinner solo si está cargando Y aún no hay mascotas.
+        if (isLoading && pets.length === 0) {
             return <PetsLoadingState />;
         }
-        if (state.error) {
-            return <PetsErrorState error={state.error} onRetry={handleRetry} />;
+
+        if (error) {
+            return <PetsErrorState error={error} onRetry={handleRetry} />;
         }
-        if (state.pets.length === 0) {
+
+        if (pets.length === 0) {
             return <PetsEmptyState />;
         }
+
+        // Si hay mascotas, mostramos los filtros y la cuadrícula.
         return (
             <>
                 <PetsFilters />

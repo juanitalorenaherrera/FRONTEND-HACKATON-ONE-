@@ -1,5 +1,9 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { Suspense, lazy } from 'react';
+
+import { AddPetView } from './features/pets/view/AddPetView';
+import { BillingView } from './features/billing/view/BillingView';
+import { CreateBookingView } from '@/features/booking/views/CreateBookingView';
 import { Role } from './types/authStore';
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
 
@@ -41,6 +45,7 @@ export default function App() {
 							<Route index element={<PetsOverview />} />
 							<Route path=":petId" element={<PetProfile />} />
 						</Route>
+						<Route path="add-pet" element={<AddPetView />} />
 						<Route path="pets/:petId" element={<PetProfile />} />
 						{/* // id={useParams().petId} onBack={() => console.log('Go back')} */}
 						<Route
@@ -48,6 +53,10 @@ export default function App() {
 							element={<FindSittersView />}
 						/>
 						<Route path="bookings" element={<BookingsView />} />
+						<Route path="billing" element={<BillingView />} />
+						<Route path="new-booking" element={<CreateBookingView />} />
+
+						
 						{/* <Route path="favorites" element={<FavoritesView />} /> ... y así sucesivamente */}
 					</Route>
 

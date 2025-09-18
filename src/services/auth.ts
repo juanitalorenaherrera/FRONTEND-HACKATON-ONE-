@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/AuthStore';
 
-const baseURL = import.meta.env.VITE_API_URL;
+const baseURL = "http://44.207.65.254:8088";
 
 const authApi = axios.create({
 	baseURL: baseURL,

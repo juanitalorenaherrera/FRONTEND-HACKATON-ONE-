@@ -23,6 +23,7 @@ export interface Profile {
 	email: string;
 	role: Role;
 	initials: string;
+	accountId: number;
 }
 
 export interface LoginResponse {

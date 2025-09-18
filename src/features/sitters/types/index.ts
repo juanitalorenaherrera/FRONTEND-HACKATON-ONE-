@@ -84,13 +84,33 @@ export interface SitterStats {
  * datos adicionales (algunos simulados) necesarios para la `SitterCard`.
  */
 export interface ExtendedSitter extends SitterProfileSummary {
-    specialty?: SitterSpecialty;
+     specialty?: 
+    | 'Paseo de perros' 
+    | 'Cuidado nocturno' 
+    | 'Cuidado diurno' 
+    | 'Administración de medicamentos' 
+    | 'Entrenamiento básico' 
+    | 'Compañía y socialización' 
+    | 'Transporte veterinario' 
+    | 'Cuidado de cachorros' 
+    | 'Cuidado de mascotas mayores' 
+    | 'Cuidado de mascotas exóticas' 
+    | 'Fotografía de mascotas' 
+    | 'Alojamiento en casa del cuidador' 
+    | 'Visitas a domicilio' 
+    | 'Cuidado de gatos' 
+    | 'Servicios de emergencia'
+    | 'Cuidado General';
+    image?: string;
+    rating?: number;
     totalServices?: number;
+    lastService?: string;
+    pets?: string[];
     isAvailable?: boolean;
-    distance?: string; // ej: "2.5 km"
+    distance?: string;
     bio?: string;
-    nextAvailable?: string; // ej: "Hoy a las 18:00"
-    specialties?: SitterSpecialty[];
+    nextAvailable?: string;
+    specialties?: string[];
 }
 
 
@@ -129,3 +149,25 @@ export interface AuthResponse {
         lastName: string;
     };
 }
+
+// ===================================================================
+// 6. TIPOS PARA EL CONTEXTO Y REDUCER (SittersContext)
+// ===================================================================
+// Define el estado y las acciones para el manejo de la feature de cuidadores.
+
+/** La estructura completa del estado que maneja SittersContext. */
+export interface SittersState {
+  sitters: ExtendedSitter[];
+  stats: SitterStats | null;
+  filters: SitterFilters;
+  isLoading: boolean;
+  error: string | null;
+}
+
+/** Las acciones que el sittersReducer puede procesar. */
+export type SittersAction =
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_DATA'; payload: { sitters: ExtendedSitter[]; stats: SitterStats } }
+  | { type: 'SET_ERROR'; payload: string }
+  | { type: 'SET_FILTERS'; payload: Partial<SitterFilters> }
+  | { type: 'CLEAR_FILTERS' };
