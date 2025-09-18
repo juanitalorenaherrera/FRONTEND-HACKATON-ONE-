@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 export default function Footer(): React.ReactElement {
+
+	useEffect(() => {
+		const yearElement = document.getElementById('year');
+		if (yearElement) {
+			yearElement.textContent = new Date().getFullYear().toString();
+		}
+	}, []);
+
 	return (
 		<footer>
 			<div className="container footer-grid">
