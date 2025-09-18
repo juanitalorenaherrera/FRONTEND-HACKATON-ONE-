@@ -11,8 +11,21 @@ export default function Contact(): React.ReactElement {
 			<p className="subtle">
 				Recibe descuentos y tips de cuidado una vez por semana.
 			</p>
-			<form className="hero-card grid rounded-2xl shadow-lg grid-cols-[1fr_auto] gap-3 items-center max-w-2xl mx-auto">
-				<label htmlFor="email" className="subtle grid-column: 1 / -1">
+			<form
+				className="hero-card"
+				style={{
+					display: 'grid',
+					gridTemplateColumns: '1fr auto',
+					gap: '.6rem',
+					alignItems: 'center',
+					maxWidth: '640px',
+				}}
+			>
+				<label
+					htmlFor="email"
+					className="subtle"
+					style={{ gridColumn: '1 / -1' }}
+				>
 					Tu correo
 				</label>
 				<input
@@ -21,7 +34,14 @@ export default function Contact(): React.ReactElement {
 					type="email"
 					placeholder="tu@email.com"
 					required
-					className="px-3.5 py-4 rounded-full border-2 solid border-[rgba(255,255,255,.14)] bg-[#0f1115]; color-(--text) outline-0"
+					style={{
+						padding: '.9rem 1rem',
+						borderRadius: '999px',
+						border: '1px solid rgba(255,255,255,.14)',
+						background: '#0f1115',
+						color: 'var(--text)',
+						outline: 'none',
+					}}
 				/>
 				<button className="btn" type="submit">
 					Suscribirme
