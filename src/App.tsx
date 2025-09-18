@@ -2,12 +2,13 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 import { Suspense, lazy } from 'react';
 import { Role } from './types/authStore';
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
+import LandingPage from './components/landing-page/LandingPage';
 const SitterDashboard = lazy(() => import('./pages/SitterDashboard'));
 
 const BookingPage = lazy(() => import('./pages/BookingPage'));
 
 // Lazy imports for code splitting
-const Home = lazy(() => import('./pages/home'));
+//const Home = lazy(() => import('./pages/home'));
 const LoginPage = lazy(() =>
 	import('./pages/LoginPage').then((module) => ({
 		default: module.LoginPage,
@@ -62,7 +63,7 @@ export default function App() {
 				>
 					<Routes>
 						{/* --- Rutas Públicas (accesibles para todos) --- */}
-						<Route path="/" element={<Home />} />
+						<Route path="/" element={<LandingPage />} />
 						<Route path="/login" element={<LoginPage />} />
 						<Route path="/register" element={<RegisterPage />} />
 						{/* <Route path="/OwnerDashboard" element={<OwnerDashboard />} /> */}
