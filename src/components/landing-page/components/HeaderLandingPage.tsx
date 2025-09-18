@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 export default function HeaderLandingPage(): React.ReactElement {
 	return (
@@ -18,11 +19,7 @@ export default function HeaderLandingPage(): React.ReactElement {
 					id="nav-toggle"
 					aria-label="Abrir menú"
 				/>
-				<label
-					htmlFor="nav-toggle"
-					className="burger"
-					aria-hidden="true"
-				>
+				<label htmlFor="nav-toggle" className="burger" aria-hidden="true">
 					☰
 				</label>
 
@@ -31,9 +28,9 @@ export default function HeaderLandingPage(): React.ReactElement {
 					<a href="#servicios">Servicios</a>
 					<a href="#adopcion">Adopción</a>
 					<a href="#contacto">Contacto</a>
-					<a className="btn" href="#shop">
-						Comprar ahora
-					</a>
+					<Link className="btn" to="/login">
+						Iniciar Sesión
+					</Link>
 				</nav>
 			</div>
 		</header>
