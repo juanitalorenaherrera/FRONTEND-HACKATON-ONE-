@@ -4,8 +4,13 @@ import { Suspense, lazy } from 'react';
 import { AddPetView } from './features/pets/view/AddPetView';
 import { BillingView } from './features/billing/view/BillingView';
 import { CreateBookingView } from '@/features/booking/views/CreateBookingView';
+import { FavoritesView } from './features/favorites/FavoritesView';
+import  LandingPage  from '@/pages/LadingPage';
+import { NotificationsView } from './features/notification/NotificationsView';
+import { ProfileView } from './features/profile/view/ProfileView';
 import { Role } from './types/authStore';
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
+import { SettingsView } from './features/settings/SettingsView';
 
 // Lazy imports for code splitting
 const Home = lazy(() => import('./pages/home'));
@@ -28,6 +33,7 @@ export default function App() {
 					<Routes>
 					{/* --- Rutas Públicas (accesibles para todos) --- */}
 					<Route path="/" element={<Home />} />
+					<Route path="/landingPage" element={<LandingPage />} />
 					<Route path="/login" element={<LoginPage />} />
 					<Route path="/register" element={<RegisterPage />} />
 					{/* <Route path="/OwnerDashboard" element={<OwnerDashboard />} /> */}
@@ -56,7 +62,12 @@ export default function App() {
 						<Route path="billing" element={<BillingView />} />
 						<Route path="new-booking" element={<CreateBookingView />} />
 
-						
+						<Route path="profile" element={<ProfileView />} />
+
+						{/* --- NUEVAS RUTAS ESTÁTICAS --- */}
+						<Route path="favorites" element={<FavoritesView />} />
+						<Route path="notifications" element={<NotificationsView />} />
+						<Route path="settings" element={<SettingsView />} />
 						{/* <Route path="favorites" element={<FavoritesView />} /> ... y así sucesivamente */}
 					</Route>
 

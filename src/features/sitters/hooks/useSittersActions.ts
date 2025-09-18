@@ -1,19 +1,20 @@
-import { useCallback, useRef, useEffect } from 'react';
-import { useSittersContext } from './useSittersContext';
+// src/features/sitters/hooks/useSittersActions.ts
+
+import type { ExtendedSitter, SitterFilters } from '@/features/sitters/types';
 import { getActiveSitters, getSitterStats, searchSitters } from '@/services/sitterService';
-import type { SitterFilters, ExtendedSitter } from '@/features/sitters/types';
+import { useCallback, useEffect, useRef } from 'react';
+
+import { useSittersContext } from './useSittersContext';
 
 export function useSittersActions() {
-    // 1. Obtenemos `dispatch` en lugar de `actions`.
     const { state, dispatch } = useSittersContext();
     const abortControllerRef = useRef<AbortController | null>(null);
 
     const fetchData = useCallback(async (filters: SitterFilters, signal: AbortSignal) => {
-        // 2. Usamos `dispatch` para enviar acciones al reducer.
         dispatch({ type: 'SET_LOADING', payload: true });
         
         try {
-            const hasActiveSearch = Object.keys(filters).length > 0 && filters.searchTerm;
+            const hasActiveSearch = Object.values(filters).some(value => value !== '' && value !== null && value !== undefined);
             
             const [sittersData, statsData] = await Promise.all([
                 hasActiveSearch ? searchSitters(filters) : getActiveSitters(),
@@ -22,7 +23,6 @@ export function useSittersActions() {
 
             if (signal.aborted) return;
             
-            // 3. Despachamos una única acción con todos los datos.
             dispatch({ type: 'SET_DATA', payload: { sitters: sittersData as ExtendedSitter[], stats: statsData } });
 
         } catch (err) {
@@ -32,15 +32,23 @@ export function useSittersActions() {
         }
     }, [dispatch]);
 
+    // --- CORRECCIÓN CLAVE ---
+    // Creamos una dependencia estable serializando el objeto de filtros.
+    // JSON.stringify crea un string que SÓLO cambia si los valores dentro de
+    // state.filters cambian, rompiendo así el bucle de referencia.
+    const stableFilters = JSON.stringify(state.filters);
+
     useEffect(() => {
         abortControllerRef.current?.abort();
         abortControllerRef.current = new AbortController();
+        
+        // Usamos state.filters directamente aquí, pero el useEffect depende de la versión estable.
         fetchData(state.filters, abortControllerRef.current.signal);
+        
         return () => abortControllerRef.current?.abort();
-    }, [state.filters, fetchData]);
+    }, [stableFilters, fetchData]); // <-- El bucle se rompe aquí
 
     const refetch = useCallback(() => {
-        // La acción de refetch sigue funcionando igual, pero a través de dispatch.
         dispatch({ type: 'CLEAR_FILTERS' });
     }, [dispatch]);
 

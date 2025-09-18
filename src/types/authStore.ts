@@ -24,6 +24,8 @@ export interface Profile {
 	role: Role;
 	initials: string;
 	accountId: number;
+	phoneNumber?: string;
+	address?: string;
 }
 
 export interface LoginResponse {
