@@ -20,7 +20,7 @@ export default function Hero(): React.ReactElement {
 						Reservar servicio
 					</a>
 				</div>
-				<div className="hero-grid mt-5">
+				<div className="hero-grid" style={{marginTop: '1.2rem'}}>
 					<div className="stat">
 						<b>+4.9★</b>
 						<div>Opiniones felices</div>
@@ -43,7 +43,7 @@ export default function Hero(): React.ReactElement {
 				<img
 					src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1200&auto=format&fit=crop"
 					alt="Perro feliz con correa"
-					className="rounded-2xl aspect-[4/3] object-cover"
+					style={{borderRadius: '14px', aspectRatio: '4/3', objectFit: 'cover'}}
 				/>
 			</div>
 		</section>
