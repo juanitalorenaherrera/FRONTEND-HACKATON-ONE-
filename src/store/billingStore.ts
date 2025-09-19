@@ -1,56 +1,148 @@
+// store/billingStore.ts
+
 import type { Invoice, PaymentMethod } from '@/types';
 
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 
 interface BillingState {
-    invoices: Invoice[];
+    // State
     paymentMethods: PaymentMethod[];
-    isLoading: boolean;
+    invoices: Invoice[];
+    loading: boolean;
     error: string | null;
-    
+
     // Actions
-    setData: (data: { invoices: Invoice[]; paymentMethods: PaymentMethod[] }) => void;
+    setData: (data: { paymentMethods?: PaymentMethod[]; invoices?: Invoice[] }) => void;
     setLoading: (loading: boolean) => void;
     setError: (error: string | null) => void;
+    
+    // Payment Methods
+    addPaymentMethod: (method: PaymentMethod) => void;
+    updatePaymentMethod: (updatedMethod: PaymentMethod) => void;
+    removePaymentMethod: (methodId: number) => void;
+    
+    // Invoices
     updateInvoice: (updatedInvoice: Invoice) => void;
-
-    // Derived state (selectors)
-    getPendingInvoices: () => Invoice[];
-    getPaidInvoices: () => Invoice[];
+    
+    // Reset
+    reset: () => void;
 }
 
-export const useBillingStore = create<BillingState>((set, get) => ({
-    // Initial State
-    invoices: [],
+const initialState = {
     paymentMethods: [],
-    isLoading: true,
+    invoices: [],
+    loading: false,
     error: null,
+};
 
-    // Actions
-    setData: (data) => set({ ...data, isLoading: false, error: null }),
-    setLoading: (loading) => set({ isLoading: loading }),
-    setError: (error) => set({ error, isLoading: false }),
-    updateInvoice: (updatedInvoice) => set((state) => ({
-        invoices: state.invoices.map((inv) => 
-            inv.id === updatedInvoice.id ? updatedInvoice : inv
-        ),
-    })),
+export const useBillingStore = create<BillingState>()(
+    devtools(
+        (set, get) => ({
+            ...initialState,
 
-    // ✅ Derived state con salvaguarda
-    getPendingInvoices: () => {
-        const { invoices } = get();
-        // Si `invoices` no es un array, devuelve uno vacío para evitar el crash.
-        if (!Array.isArray(invoices)) {
-            return [];
+            setData: (data) => {
+                set((state) => ({
+                    ...state,
+                    paymentMethods: data.paymentMethods ?? state.paymentMethods,
+                    invoices: data.invoices ?? state.invoices,
+                    loading: false,
+                    error: null,
+                }));
+            },
+
+            setLoading: (loading) => {
+                set((state) => ({ ...state, loading }));
+            },
+
+            setError: (error) => {
+                set((state) => ({ 
+                    ...state, 
+                    error, 
+                    loading: false 
+                }));
+            },
+
+            // Payment Methods Actions
+            addPaymentMethod: (method) => {
+                set((state) => {
+                    // Si es el primer método o se marca como predeterminado, 
+                    // actualizar los otros métodos
+                    let updatedMethods = state.paymentMethods;
+                    
+                    if (method.isDefault) {
+                        updatedMethods = state.paymentMethods.map(m => ({
+                            ...m,
+                            isDefault: false
+                        }));
+                    }
+
+                    return {
+                        ...state,
+                        paymentMethods: [...updatedMethods, method],
+                    };
+                });
+            },
+
+            updatePaymentMethod: (updatedMethod) => {
+                set((state) => {
+                    let updatedMethods = state.paymentMethods.map((method) =>
+                        method.id === updatedMethod.id ? updatedMethod : method
+                    );
+
+                    // Si se marca como predeterminado, desmarcar los otros
+                    if (updatedMethod.isDefault) {
+                        updatedMethods = updatedMethods.map((method) =>
+                            method.id !== updatedMethod.id
+                                ? { ...method, isDefault: false }
+                                : method
+                        );
+                    }
+
+                    return {
+                        ...state,
+                        paymentMethods: updatedMethods,
+                    };
+                });
+            },
+
+            removePaymentMethod: (methodId) => {
+                set((state) => {
+                    const remainingMethods = state.paymentMethods.filter(
+                        (method) => method.id !== methodId
+                    );
+
+                    // Si se eliminó el método predeterminado y hay otros métodos,
+                    // marcar el primero como predeterminado
+                    if (remainingMethods.length > 0 && 
+                        !remainingMethods.some(m => m.isDefault)) {
+                        remainingMethods[0].isDefault = true;
+                    }
+
+                    return {
+                        ...state,
+                        paymentMethods: remainingMethods,
+                    };
+                });
+            },
+
+            // Invoice Actions
+            updateInvoice: (updatedInvoice) => {
+                set((state) => ({
+                    ...state,
+                    invoices: state.invoices.map((invoice) =>
+                        invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+                    ),
+                }));
+            },
+
+            // Reset
+            reset: () => {
+                set(initialState);
+            },
+        }),
+        {
+            name: 'billing-store', // nombre para DevTools
         }
-        return invoices.filter(inv => inv.status === 'PENDING');
-    },
-    getPaidInvoices: () => {
-        const { invoices } = get();
-        // Si `invoices` no es un array, devuelve uno vacío para evitar el crash.
-        if (!Array.isArray(invoices)) {
-            return [];
-        }
-        return invoices.filter(inv => inv.status === 'PAID');
-    },
-}));
+    )
+);

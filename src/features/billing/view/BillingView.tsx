@@ -1,132 +1,182 @@
-import { CreditCard, FileWarning, History } from 'lucide-react';
+// features/billing/BillingView.tsx
 
-import { ErrorCard } from '@/components/ui/ErrorCard';
-import { InvoiceCard } from '../components/InvoiceCard';
-import { LoadingPaws } from '@/components/ui/LoadingPaws';
-import { PaymentMethodCard } from '../components/PaymentMethodCard';
-import type { Variants } from 'framer-motion';
+import { CreditCard, FileText, Loader2, Plus } from 'lucide-react';
+import type { Invoice, PaymentMethod } from '@/types';
+import React, { useState } from 'react';
+
+import { Button } from '@/components/ui/Button';
+import { InvoiceCard } from '@/features/billing/components/InvoiceCard';
+import { InvoiceDetailModal } from '@/features/billing/components/InvoideDetailModal';
+import { PaymentMethodCard } from '@/features/billing/components/PaymentMethodCard';
+import { PaymentMethodForm } from '@/features/billing/components/PaymentMethodForm';
 import { motion } from 'framer-motion';
-import { useBilling } from '../hooks/useBilling';
+import { useBilling } from '@/features/billing/hooks/useBilling';
 import { useBillingStore } from '@/store/billingStore';
 
-// Variantes de animación para las listas
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: {
-    opacity: 0,
-    y: 20,
-  },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: 'spring',
-      stiffness: 100,
-    },
-  },
-};
-
-
 export const BillingView = () => {
-    useBilling(); 
+    const { paymentMethods, invoices, loading, error } = useBillingStore();
+    const {
+        handlePayInvoice,
+        handleDeletePaymentMethod,
+        handleAddPaymentMethod,
+        handleSetDefaultPaymentMethod,
+        handleDownloadInvoice,
+    } = useBilling();
 
-    const { isLoading, error, getPendingInvoices, getPaidInvoices, paymentMethods } = useBillingStore();
-    const pendingInvoices = getPendingInvoices();
-    const paidInvoices = getPaidInvoices();
+    const [showPaymentForm, setShowPaymentForm] = useState(false);
+    const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
+    const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+    const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
-    if (isLoading) return <LoadingPaws message="Cargando tu facturación..." />;
-    if (error) return <ErrorCard error={error} />;
+    const handleViewInvoice = (invoice: Invoice) => {
+        setSelectedInvoice(invoice);
+        setShowInvoiceModal(true);
+    };
+
+    const handleEditPaymentMethod = (method: PaymentMethod) => {
+        setEditingMethod(method);
+        setShowPaymentForm(true);
+    };
+
+    const handleClosePaymentForm = () => {
+        setShowPaymentForm(false);
+        setEditingMethod(null);
+    };
+
+    const handleCloseInvoiceModal = () => {
+        setShowInvoiceModal(false);
+        setSelectedInvoice(null);
+    };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-pet-teal mx-auto mb-4" />
+                    <p className="text-gray-600">Cargando información de facturación...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-8">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+                    <p className="text-red-600">{error}</p>
+                    <Button 
+                        className="mt-4" 
+                        onClick={() => window.location.reload()}
+                    >
+                        Reintentar
+                    </Button>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <motion.div 
-            className="min-h-screen bg-gradient-to-br from-neutral-50 to-pet-orange/10 p-4 md:p-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-        >
-            {/* Header Principal */}
-            <motion.header
-                className="bg-gradient-primary rounded-3xl p-8 mb-10 text-white shadow-xl"
-                initial={{ y: -50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-            >
-                <h1 className="text-3xl font-bold">🐾 Mi Facturación</h1>
-                <p className="text-white/80 mt-1">Gestiona tus pagos y facturas de forma sencilla.</p>
-            </motion.header>
-
-            <div className="space-y-12">
-                {/* Sección de Facturas Pendientes */}
-                <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-                    <h2 className="text-2xl font-bold text-pet-orange mb-4 flex items-center gap-2">
-                        <FileWarning className="w-6 h-6" /> Facturas Pendientes
-                    </h2>
-                    {pendingInvoices.length > 0 ? (
-                        <motion.div 
-                            className="space-y-4"
-                            variants={containerVariants}
-                            initial="hidden"
-                            animate="show"
-                        >
-                            {pendingInvoices.map((invoice) => (
-                                <motion.div key={invoice.id} variants={itemVariants}>
-                                    <InvoiceCard invoice={invoice} />
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    ) : (
-                        <div className="text-center py-10 px-6 bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border">
-                            <h3 className="text-lg font-semibold text-pet-green">¡Todo en orden!</h3>
-                            <p className="text-neutral-500 mt-1">No tienes ninguna factura pendiente de pago.</p>
-                        </div>
-                    )}
-                </motion.section>
-
-                {/* Sección de Métodos de Pago */}
-                <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-                    <h2 className="text-2xl font-bold text-neutral-800 mb-4 flex items-center gap-2">
-                        <CreditCard className="w-6 h-6 text-pet-blue" /> Métodos de Pago
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {paymentMethods.map(pm => <PaymentMethodCard key={pm.id} method={pm} />)}
-                        {/* Puedes añadir una tarjeta estática para agregar un nuevo método */}
-                    </div>
-                </motion.section>
-                
-                {/* Sección de Historial */}
-                <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}>
-                    <h2 className="text-2xl font-bold text-neutral-800 mb-4 flex items-center gap-2">
-                        <History className="w-6 h-6 text-neutral-500" /> Historial de Facturación
-                    </h2>
-                     {paidInvoices.length > 0 ? (
-                        <motion.div 
-                            className="space-y-4"
-                            variants={containerVariants}
-                            initial="hidden"
-                            animate="show"
-                        >
-                            {paidInvoices.map(invoice => (
-                                <motion.div key={invoice.id} variants={itemVariants} initial="hidden" animate="show">
-                                    <InvoiceCard invoice={invoice} />
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                     ) : (
-                         <div className="text-center py-10 px-6 bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border">
-                            <p className="text-neutral-500">Aún no tienes facturas pagadas.</p>
-                        </div>
-                     )}
-                </motion.section>
+        <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+            {/* Header */}
+            <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                    Mi Facturación
+                </h1>
+                <p className="text-gray-600">
+                    Gestiona tus métodos de pago y consulta tu historial de facturas
+                </p>
             </div>
-        </motion.div>
+
+            {/* Payment Methods Section */}
+            <section>
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        <CreditCard className="w-6 h-6 text-pet-teal" />
+                        <h2 className="text-2xl font-semibold text-gray-800">
+                            Métodos de Pago
+                        </h2>
+                    </div>
+                    <Button
+                        onClick={() => setShowPaymentForm(true)}
+                        className="bg-gradient-to-r from-pet-teal to-pet-blue text-white hover:from-pet-teal/90 hover:to-pet-blue/90"
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Agregar Método
+                    </Button>
+                </div>
+
+                {paymentMethods.length === 0 ? (
+                    <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                        <CreditCard className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600 mb-4">No tienes métodos de pago registrados</p>
+                        <Button
+                            onClick={() => setShowPaymentForm(true)}
+                            className="bg-gradient-to-r from-pet-teal to-pet-blue text-white"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Agregar tu primer método de pago
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {paymentMethods.map((method) => (
+                            <PaymentMethodCard
+                                key={method.id}
+                                method={method}
+                                onDelete={handleDeletePaymentMethod}
+                                onSetDefault={handleSetDefaultPaymentMethod}
+                                onEdit={handleEditPaymentMethod}
+                            />
+                        ))}
+                    </div>
+                )}
+            </section>
+
+            {/* Invoices Section */}
+            <section>
+                <div className="flex items-center gap-2 mb-6">
+                    <FileText className="w-6 h-6 text-pet-teal" />
+                    <h2 className="text-2xl font-semibold text-gray-800">
+                        Historial de Facturas
+                    </h2>
+                </div>
+
+                {invoices.length === 0 ? (
+                    <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                        <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600">No hay facturas disponibles</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {invoices.map((invoice) => (
+                            <InvoiceCard
+                                key={invoice.id}
+                                invoice={invoice}
+                                onView={handleViewInvoice}
+                                onDownload={handleDownloadInvoice}
+                                onPay={handlePayInvoice}
+                            />
+                        ))}
+                    </div>
+                )}
+            </section>
+
+            {/* Modals */}
+            <PaymentMethodForm
+                isOpen={showPaymentForm}
+                onClose={handleClosePaymentForm}
+                onSubmit={handleAddPaymentMethod}
+                mode={editingMethod ? 'edit' : 'add'}
+                initialData={editingMethod || undefined}
+            />
+
+            <InvoiceDetailModal
+                isOpen={showInvoiceModal}
+                onClose={handleCloseInvoiceModal}
+                invoice={selectedInvoice}
+                onDownload={handleDownloadInvoice}
+                onPay={handlePayInvoice}
+            />
+        </div>
     );
 };

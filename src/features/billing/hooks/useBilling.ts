@@ -1,85 +1,117 @@
+// features/billing/hooks/useBilling.ts
+
 import * as billingService from '@/services/billingService';
 
+import type { Invoice, PaymentMethod } from '@/types'; // Asegúrate de tener estos tipos
 import { useCallback, useEffect } from 'react';
 
-import { toast } from 'sonner'; // Usaremos sonner para notificaciones elegantes
+import { toast } from 'sonner';
 import { useAuthStore } from '@/store/AuthStore';
 import { useBillingStore } from '@/store/billingStore';
 
-/**
- * Hook para gestionar la lógica de negocio de la sección de facturación.
- * Se encarga de cargar datos iniciales y exponer acciones como pagar facturas.
- */
 export const useBilling = () => {
-    // 1. Obtiene el perfil del usuario para saber a quién pertenecen los datos
     const user = useAuthStore((state) => state.profile);
-
-    // 2. Obtiene las acciones del store de facturación de forma eficiente
     const { 
-        setData, 
-        setLoading, 
-        setError, 
+        setData, setLoading, setError, 
+        addPaymentMethod, removePaymentMethod, updatePaymentMethod,
         updateInvoice 
     } = useBillingStore.getState();
 
-    /**
-     * Carga todas las facturas y métodos de pago asociados a la cuenta del usuario.
-     * Utiliza Promise.all para realizar las peticiones en paralelo y mejorar el rendimiento.
-     */
     const loadBillingData = useCallback(async () => {
-        // Si no tenemos el ID de la cuenta, no podemos continuar.
         if (!user?.accountId) return;
-        
         setLoading(true);
         try {
-            // Peticiones simultáneas para facturas y métodos de pago
             const [invoices, paymentMethods] = await Promise.all([
                 billingService.getInvoicesByAccount(user.accountId),
                 billingService.getPaymentMethodsByAccount(user.accountId),
             ]);
-            
-            // Guarda los datos en el store si todo fue exitoso
             setData({ invoices, paymentMethods });
-            toast.success('Datos de facturación cargados correctamente.');
-
         } catch (err) {
             const message = 'Error al cargar los datos de facturación.';
             setError(message);
             toast.error(message);
         }
-    }, [user?.accountId, setData, setLoading, setError]); // Dependencias estables
+    }, [user?.accountId, setData, setLoading, setError]);
 
-    /**
-     * Maneja la acción de pagar una factura.
-     * Muestra notificaciones de carga, éxito o error durante el proceso.
-     */
-    const handlePayInvoice = useCallback(async (invoiceId: number) => {
-        // Creamos una promesa para que `toast.promise` la pueda seguir
-        const paymentPromise = async () => {
-            const updatedInvoice = await billingService.payInvoice(invoiceId);
-            // Actualizamos el estado local para que el cambio sea instantáneo en la UI
-            updateInvoice(updatedInvoice);
-            return updatedInvoice; // Retornamos la factura para el mensaje de éxito
-        };
-
-        // `toast.promise` gestiona automáticamente los estados de la UI
-        toast.promise(paymentPromise(), {
-            loading: 'Procesando pago, un momento por favor...',
-            success: (invoice) => `¡Factura #${invoice.id} pagada con éxito!`,
-            error: 'No se pudo procesar el pago. Inténtalo de nuevo.',
-        });
-    }, [updateInvoice]); // Dependencia estable
-
-    // 3. Efecto para cargar los datos cuando el componente se monta o el usuario cambia
     useEffect(() => {
         loadBillingData();
     }, [loadBillingData]);
 
-    // 4. Retornamos las acciones que los componentes de la UI necesitarán
+    const handlePayInvoice = useCallback(async (invoiceId: number) => {
+        toast.promise(billingService.payInvoice(invoiceId), {
+            loading: 'Procesando pago...',
+            success: (updatedInvoice) => {
+                updateInvoice(updatedInvoice);
+                return `¡Factura #${invoiceId} pagada con éxito!`;
+            },
+            error: 'No se pudo procesar el pago.',
+        });
+    }, [updateInvoice]);
+
+    const handleDeletePaymentMethod = useCallback(async (methodId: number) => {
+        // Optimistic update
+        const originalMethods = useBillingStore.getState().paymentMethods;
+        removePaymentMethod(methodId);
+
+        toast.promise(billingService.deletePaymentMethod(methodId), {
+            loading: 'Eliminando método de pago...',
+            success: () => 'Método de pago eliminado correctamente.',
+            error: () => {
+                // Revert
+                setData({ paymentMethods: originalMethods }); 
+                return 'Error al eliminar el método de pago.';
+            },
+        });
+    }, [removePaymentMethod, setData]);
+    
+    const handleAddPaymentMethod = useCallback(async (newMethodData: Omit<PaymentMethod, 'id'>) => {
+         if (!user?.accountId) return;
+         toast.promise(billingService.addPaymentMethod(user.accountId, newMethodData), {
+            loading: 'Agregando nuevo método de pago...',
+            success: (newMethod) => {
+                addPaymentMethod(newMethod);
+                return '¡Nuevo método de pago agregado!';
+            },
+            error: 'Error al agregar el método de pago.',
+        });
+    }, [addPaymentMethod, user?.accountId]);
+
+    const handleSetDefaultPaymentMethod = useCallback(async (methodId: number) => {
+        toast.promise(billingService.setDefaultPaymentMethod(methodId), {
+            loading: 'Actualizando método predeterminado...',
+            success: (updatedMethod) => {
+                updatePaymentMethod(updatedMethod);
+                // Lógica para desmarcar el anterior predeterminado si es necesario
+                loadBillingData(); // Recargar para asegurar consistencia
+                return 'Método de pago predeterminado actualizado.';
+            },
+            error: 'Error al actualizar.',
+        });
+    }, [updatePaymentMethod, loadBillingData]);
+
+    const handleDownloadInvoice = useCallback(async (invoiceId: number) => {
+        toast.promise(billingService.downloadInvoice(invoiceId), {
+            loading: 'Generando tu factura en PDF...',
+            success: (blob) => {
+                 const url = window.URL.createObjectURL(blob);
+                 const a = document.createElement('a');
+                 a.href = url;
+                 a.download = `factura-${invoiceId}.pdf`;
+                 document.body.appendChild(a);
+                 a.click();
+                 a.remove();
+                 window.URL.revokeObjectURL(url);
+                return '¡Descarga iniciada!';
+            },
+            error: 'No se pudo descargar la factura.',
+        });
+    }, []);
+
     return {
         handlePayInvoice,
-        // En el futuro, podrías añadir y retornar más acciones como:
-        // handleDeletePaymentMethod,
-        // handleAddPaymentMethod,
+        handleDeletePaymentMethod,
+        handleAddPaymentMethod,
+        handleSetDefaultPaymentMethod,
+        handleDownloadInvoice,
     };
 };

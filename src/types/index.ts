@@ -1,7 +1,9 @@
 // src/types/index.ts
 
+
 // Basado en el enum InvoiceStatus.java del backend
 export type InvoiceStatus = 'PENDING' | 'PAID' | 'CANCELLED';
+export type Role = 'CLIENT' | 'SITTER' | 'ADMIN';
 
 /**
  * Representa la información resumida de una factura.
