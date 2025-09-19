@@ -3,11 +3,11 @@
 import { Heart, Plus, RefreshCw } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
-import { useAuthStore } from '../../../store/AuthStore';
+import { useAuthStore } from '@/store/AuthStore';
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { usePetsActions } from '../hooks/usePetsActions';
-import { usePetsStore } from '../../../store/PetStore';
+import { useNavigate } from 'react-router';
+import { usePetsActions } from '@/features/pets/hooks/usePetsActions';
+import { usePetsStore } from '@/store/PetStore';
 
 export function PetsHeader() {
 

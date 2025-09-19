@@ -10,7 +10,7 @@ import {
 
 import type { ExtendedSitter } from '@/features/sitters/types';
 import { SittersProvider } from '@/features/sitters/context/SittersContext.tsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useSittersActions } from '@/features/sitters/hooks/useSittersActions';
 import { useSittersContext } from '@/features/sitters/hooks/useSittersContext';
 

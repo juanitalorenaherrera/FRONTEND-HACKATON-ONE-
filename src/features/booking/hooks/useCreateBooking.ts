@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 
-import { bookingSchema, type BookingFormData, type BookingCreationData } from '../types';
+import {
+	bookingSchema,
+	type BookingFormData,
+	type BookingCreationData,
+} from '@/features/booking/types';
 import { getActiveSitters } from '@/services/sitterService';
 import { getAllPets } from '@/services/petService';
 import { createBooking } from '@/services/bookingService';
