@@ -25,6 +25,7 @@ const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
       alt={alt} 
       className={className}
       onError={handleError}
+      crossOrigin="anonymous"
     />
   );
 };
