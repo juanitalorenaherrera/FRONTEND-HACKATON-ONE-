@@ -2,14 +2,13 @@
 
 import { CreditCard, FileText, Loader2, Plus } from 'lucide-react';
 import type { Invoice, PaymentMethod } from '@/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { InvoiceCard } from '@/features/billing/components/InvoiceCard';
 import { InvoiceDetailModal } from '@/features/billing/components/InvoideDetailModal';
 import { PaymentMethodCard } from '@/features/billing/components/PaymentMethodCard';
 import { PaymentMethodForm } from '@/features/billing/components/PaymentMethodForm';
-import { motion } from 'framer-motion';
 import { useBilling } from '@/features/billing/hooks/useBilling';
 import { useBillingStore } from '@/store/billingStore';
 
@@ -141,7 +140,7 @@ export const BillingView = () => {
                     </h2>
                 </div>
 
-                {invoices.length === 0 ? (
+                {!Array.isArray(invoices) || invoices.length === 0 ? (
                     <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
                         <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <p className="text-gray-600">No hay facturas disponibles</p>
