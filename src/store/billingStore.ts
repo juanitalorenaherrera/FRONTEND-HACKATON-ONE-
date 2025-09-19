@@ -38,7 +38,7 @@ const initialState = {
 
 export const useBillingStore = create<BillingState>()(
     devtools(
-        (set, get) => ({
+        (set) => ({
             ...initialState,
 
             setData: (data) => {
