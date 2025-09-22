@@ -1,4 +1,4 @@
-import axios from '../services/auth';
+import axios from '@/services/auth';
 
 interface PetData {
 	name: string;
