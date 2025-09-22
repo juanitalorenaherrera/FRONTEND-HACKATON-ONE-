@@ -7,7 +7,7 @@ import axios from './auth';
 const API_URL_INVOICES = '/api/invoices';
 const API_URL_PAYMENT_METHODS = '/api/payment-methods';
 // Mantenemos API_URL_ACCOUNTS por si se usa en otros endpoints que sí son correctos.
-const API_URL_ACCOUNTS = '/api/accounts';
+//const API_URL_ACCOUNTS = '/api/accounts';
 
 // Invoices
 export const getInvoicesByAccount = async (accountId: number): Promise<Invoice[]> => {
