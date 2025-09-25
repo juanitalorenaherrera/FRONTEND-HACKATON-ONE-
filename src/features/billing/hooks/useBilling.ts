@@ -1,13 +1,13 @@
 // features/billing/hooks/useBilling.ts
 
-import * as billingService from '@/services/billingService';
+import * as billingService from '@/features/billing/api/billing';
 
-import type { PaymentMethod } from '@/types'; // Asegúrate de tener estos tipos
 import { useCallback, useEffect } from 'react';
 
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/AuthStore';
-import { useBillingStore } from '@/store/billingStore';
+import { useBillingStore } from '@/features/billing/store/billingStore';
+import type { PaymentMethod } from '../types/invoices';
 
 export const useBilling = () => {
 	const user = useAuthStore((state) => state.profile);
