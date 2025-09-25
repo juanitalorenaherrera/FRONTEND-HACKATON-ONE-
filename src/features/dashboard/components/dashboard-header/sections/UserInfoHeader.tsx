@@ -1,9 +1,8 @@
-import { getRoleColor } from '../../../../../utils/dashboardHeader';
-import { useAuthStore } from '../../../../../store/AuthStore';
-import { Role } from '../../../../../types/authStore';
+import { getRoleColor } from '@/utils/dashboardHeader';
+import { useAuthStore } from '@/store/AuthStore';
+import { Role } from '@/features/auth/types/authStore';
 
 export default function UserInfoHeader() {
-
 	const user = useAuthStore((state) => state.profile);
 
 	return (

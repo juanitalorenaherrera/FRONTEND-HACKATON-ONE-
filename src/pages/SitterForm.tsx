@@ -1,10 +1,10 @@
 import { Link, useNavigate } from 'react-router';
-import { registerRequest } from '../services/authService';
+import { registerRequest } from '@/features/auth/api/auth';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { SitterRegisterRequest } from '../types/sitter';
 import { useAuthStore } from '../store/AuthStore';
-import { Role } from '../types/authStore';
+import { Role } from '@/features/auth/types/authStore';
 
 export default function RegisterPage() {
 	// --- Hooks ---

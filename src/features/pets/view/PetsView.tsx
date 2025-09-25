@@ -1,10 +1,10 @@
 // features/pets/pages/PetsView.tsx - VERSIÓN FINAL Y CORRECTA
 
 import { Outlet } from 'react-router';
-import { useAuthStore } from '../../../store/AuthStore';
+import { useAuthStore } from '@/store/AuthStore';
 import { useEffect } from 'react';
 import { usePetsActions } from '../hooks/usePetsActions';
-import { usePetsStore } from '../../../store/PetStore';
+import { usePetsStore } from '@/store/PetStore';
 
 function PetsViewContent() {
 	const isLoading = usePetsStore((state) => state.isLoading);

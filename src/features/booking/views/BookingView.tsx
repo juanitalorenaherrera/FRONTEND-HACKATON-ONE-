@@ -7,7 +7,7 @@ import { BookingsProvider } from '../context/BookingContext';
 //import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
 import { useBookingActions } from '../hooks/useBookingActions';
 import { useBookingContext } from '../hooks/useBookingContext';
-import { useAuthStore } from '../../../store/AuthStore';
+import { useAuthStore } from '@/store/AuthStore';
 
 function BookingsViewContent() {
     const { state: bookingsState } = useBookingContext();

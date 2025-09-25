@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useAuthStore } from '../store/AuthStore';
+import { useAuthStore } from '@/store/AuthStore';
 
 const baseURL = "http://44.207.65.254:8088";
 

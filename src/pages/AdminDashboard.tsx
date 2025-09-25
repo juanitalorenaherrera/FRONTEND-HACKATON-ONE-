@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useAuthStore } from '../store/AuthStore';
-import { Role } from '../types/authStore';
+import { useAuthStore } from '@/store/AuthStore';
+import { Role } from '@/features/auth/types/authStore';
 
 // Tipos para los datos del dashboard
 interface DashboardStats {
@@ -22,7 +22,7 @@ enum TypeActivity {
 enum Status {
 	PENDING = 'pending',
 	COMPLETED = 'completed',
-	WARNING = 'warning'
+	WARNING = 'warning',
 }
 
 interface RecentActivity {
@@ -206,8 +206,8 @@ export default function AdminDashboard() {
 					Panel de Administrador 👩‍💻
 				</h1>
 				<p className="text-gray-600">
-					Bienvenido, {user?.firstName || 'Admin'}. Gestiona tu plataforma
-					desde aquí.
+					Bienvenido, {user?.firstName || 'Admin'}. Gestiona tu
+					plataforma desde aquí.
 				</p>
 			</div>
 
