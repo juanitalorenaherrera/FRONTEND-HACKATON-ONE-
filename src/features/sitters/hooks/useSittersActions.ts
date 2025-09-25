@@ -46,7 +46,7 @@ export function useSittersActions() {
         fetchData(state.filters, abortControllerRef.current.signal);
         
         return () => abortControllerRef.current?.abort();
-    }, [stableFilters, fetchData]); // <-- El bucle se rompe aquí
+    }, [stableFilters, fetchData, state.filters]); // <-- El bucle se rompe aquí
 
     const refetch = useCallback(() => {
         dispatch({ type: 'CLEAR_FILTERS' });
