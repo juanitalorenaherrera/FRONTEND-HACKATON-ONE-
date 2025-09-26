@@ -2,8 +2,8 @@
 
 import { Calendar, Dog, User } from 'lucide-react';
 
-import { BOOKING_STATUS_CONFIG } from '@/features/booking/constants/config'; // Asumiendo que creas este archivo
-import type { BookingSummary } from '../types';
+import { BOOKING_STATUS_CONFIG } from '@/features/booking/constants/constants'; // Asumiendo que creas este archivo
+import type { BookingSummary } from '../types/bookingTypes';
 
 // import { formatBookingDateTime } from '../utils/bookingUtils'; // Asumiendo que creas este archivo
 

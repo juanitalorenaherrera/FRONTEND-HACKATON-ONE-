@@ -1,6 +1,6 @@
 import * as bookingService from '@/services/bookingService';
 
-import type { BookingFormData, BookingStatus } from '../types';
+import type { BookingFormData, BookingStatus } from '../types/bookingTypes';
 
 import type { Role } from '@/features/auth/types/authStore';
 import { toast } from 'sonner';

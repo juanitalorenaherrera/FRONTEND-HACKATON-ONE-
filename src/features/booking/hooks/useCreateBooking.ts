@@ -8,80 +8,81 @@ import {
 	bookingSchema,
 	type BookingFormData,
 	type BookingCreationData,
-} from '@/features/booking/types';
+} from '@/features/booking/types/bookingTypes';
 import { getActiveSitters } from '@/services/sitterService';
 import { getAllPets } from '@/services/petService';
 import { createBooking } from '@/services/bookingService';
 import { useAuthStore } from '@/store/AuthStore';
 
 export const useCreateBooking = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const preselectedSitterId = location.state?.sitterId;
-  const user = useAuthStore((state) => state.profile);
+	const navigate = useNavigate();
+	const location = useLocation();
+	const preselectedSitterId = location.state?.sitterId;
+	const user = useAuthStore((state) => state.profile);
 
-  const [loading, setLoading] = useState(true);
-  const [creationData, setCreationData] = useState<BookingCreationData | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+	const [loading, setLoading] = useState(true);
+	const [creationData, setCreationData] =
+		useState<BookingCreationData | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ✨ CORRECCIÓN: Usar el esquema importado y valores por defecto null
-  const form = useForm<BookingFormData>({
-    resolver: zodResolver(bookingSchema),
-    defaultValues: {
-      petId: null,
-      sitterId: preselectedSitterId ?? null,
-      serviceId: null,
-      startDate: null,
-      endDate: null,
-      additionalNotes: '',
-    },
-  });
+	// ✨ CORRECCIÓN: Usar el esquema importado y valores por defecto null
+	const form = useForm<BookingFormData>({
+		resolver: zodResolver(bookingSchema),
+		defaultValues: {
+			petId: null,
+			sitterId: preselectedSitterId ?? null,
+			serviceId: null,
+			startDate: null,
+			endDate: null,
+			additionalNotes: '',
+		},
+	});
 
-  useEffect(() => {
-    if (!user?.accountId) return;
+	useEffect(() => {
+		if (!user?.accountId) return;
 
-    const loadInitialData = async () => {
-      try {
-        setLoading(true);
-        const [sitters, pets] = await Promise.all([
-          getActiveSitters(),
-          getAllPets(),
-        ]);
-        
-        setCreationData({ sitters, pets, services: [] });
+		const loadInitialData = async () => {
+			try {
+				setLoading(true);
+				const [sitters, pets] = await Promise.all([
+					getActiveSitters(),
+					getAllPets(),
+				]);
 
-        if (preselectedSitterId) {
-          form.setValue('sitterId', preselectedSitterId);
-        }
-      } catch (error) {
-        toast.error("Error al cargar los datos iniciales.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadInitialData();
-  }, [preselectedSitterId, form, user?.accountId]);
+				setCreationData({ sitters, pets, services: [] });
 
-  const onSubmit: SubmitHandler<BookingFormData> = async (data) => {
-    setIsSubmitting(true);
-    try {
-      await createBooking(data);
-      toast.success("¡Reserva creada con éxito! 🐾");
-      navigate('/dashboard/bookings');
-    } catch (error) {
-      toast.error("Hubo un error al crear la reserva.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+				if (preselectedSitterId) {
+					form.setValue('sitterId', preselectedSitterId);
+				}
+			} catch (error) {
+				toast.error('Error al cargar los datos iniciales.');
+			} finally {
+				setLoading(false);
+			}
+		};
+		loadInitialData();
+	}, [preselectedSitterId, form, user?.accountId]);
 
-  return {
-    form,
-    loading,
-    creationData,
-    isSubmitting,
-    actions: {
-      onSubmit: form.handleSubmit(onSubmit),
-    },
-  };
+	const onSubmit: SubmitHandler<BookingFormData> = async (data) => {
+		setIsSubmitting(true);
+		try {
+			await createBooking(data);
+			toast.success('¡Reserva creada con éxito! 🐾');
+			navigate('/dashboard/bookings');
+		} catch (error) {
+			toast.error('Hubo un error al crear la reserva.');
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	return {
+		form,
+		loading,
+		creationData,
+		isSubmitting,
+		actions: {
+			onSubmit: form.handleSubmit(onSubmit),
+		},
+	};
 };

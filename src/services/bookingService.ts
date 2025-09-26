@@ -4,8 +4,8 @@ import type {
 	BookingStatus,
 	BookingSummary,
 	PageResponse,
-	UpdateBookingRequest
-} from '@/features/booking/types';
+	UpdateBookingRequest,
+} from '@/features/booking/types/bookingTypes';
 
 import type { Role } from '@/features/auth/types/authStore';
 import axios from './auth';
