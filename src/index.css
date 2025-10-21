@@ -39,6 +39,12 @@
 	--color-danger: #ef4444;
 	--radius-pet: 18px;
 	--shadow-shadow-brand: 0 10px 30px rgba(0, 0, 0, 0.35);
+  /* paleta de colores de PetPay */
+  --color-purple-petpay: #A26ACA
+  --color-blue-petpay: #75D3EA
+  --color-orange-petpay: #F15D22
+  --color-beige-petpay: #F2E6CA
+  --color-yellow-petpay: #FFD404
 }
 
 *,
